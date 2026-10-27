@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout infoCd="TRAILER" delimiter="|:" fieldCount="2">
-    <field name="recordType" type="String" index="0" desc="Record Type (Y, String, 1) - Luôn là T" values="T"/>
+    <field name="recordType" type="String" index="0" desc="Record Type (Y, String, 1) - Luôn là T"/>
     <field name="dataCount" type="Integer" index="1" desc="Data Count (Y, Number, 10) - Số dòng D; phải khớp thực tế (F004)"/>
 </layout>

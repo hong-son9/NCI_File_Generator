@@ -1,28 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout infoCd="LRPY" delimiter="|:" fieldCount="21">
-    <field name="recordType" type="String" index="0" desc="Record Type (Y, String, 1)" values="D"/>
-    <field name="evtCd" type="String" index="1" desc="Registration Event (Y, String, 1) - 등록구분. 1:신규등록, 3:변경, 7:삭제 (NCI Code Master C04 참조. 상환정보는 이력성 데이터로 해지 개념 없음)" errCode="E144" weights="1:90,3:8,7:2"/>
+    <field name="recordType" type="String" index="0" desc="Record Type (Y, String, 1)"/>
+    <field name="evtCd" type="String" index="1" desc="Registration Event (Y, String, 1) - 등록구분. 1:신규등록, 3:변경, 7:삭제 (NCI Code Master C04 참조. 상환정보는 이력성 데이터로 해지 개념 없음)"/>
     <field name="instCd" type="String" index="2" desc="Institution Code (Y, String, 7) - 회원기관 식별코드 (NICE 발급)"/>
     <field name="branchCd" type="String" index="3" desc="Branch Code (N, String, 20) - 대출을 취급한 지점코드"/>
     <field name="branchNm" type="String" index="4" desc="Branch Name (N, String, 200) - 대출을 취급한 지점명"/>
-    <field name="custCd" type="String" index="5" desc="Customer Code (Y, String, 30) - 차주 고객코드" errCodeMissing="E127" default="CUST{cust:06d}"/>
-    <field name="ctrtNo" type="String" index="6" desc="Contract Number (Y, String, 50) - 상환 대상 대출계약번호 (Loan Info 등록 시 사용한 계약번호와 동일해야 함)" errCode="E183" default="LN{seq:08d}"/>
-    <field name="baseDt" type="String" index="7" desc="Base Date (Y, String, 8) - 상환실적이 마감된 기준일 (yyyymmdd, 통상 전월 말일 기준)" notFuture="Y" errCode="E140" default="{monthend:-1}"/>
-    <field name="debtGrpCd" type="String" index="8" desc="Debt Group Code (Y, String, 1) - 기준일 시점의 채무 건전성 5단계 분류. 1~5 (NCI Code Master C12 참조)" errCode="E184" weights="1:88,2:6,3:3,4:2,5:1"/>
-    <field name="ctrtStatCd" type="String" index="9" desc="Contract Status Code (Y, String, 2) - 기준일 시점 계좌의 상태 (NCI Code Master C13 참조)" weights="11:88,13:7,17:3,12:2"/>
-    <field name="lstRepayDt" type="String" index="10" desc="Latest Repayment Date (N, String, 8) - 기준월 중 가장 최근에 상환이 이루어진 날짜 (yyyymmdd)" notFuture="Y" errCode="E312" default="{dateadd:baseDt:-27:0}"/>
-    <field name="principalRepayAmt" type="BigDecimal" index="11" desc="Principal Repayment Amount (Y, Number, 18) - 기준월 동안 실제 상환된 원금 (VND)" genRange="1000000-60000000"/>
-    <field name="interestRepayAmt" type="BigDecimal" index="12" desc="Interest Repayment Amount (Y, Number, 18) - 기준월 동안 실제 상환된 이자 (VND)" genRange="200000-25000000"/>
-    <field name="nextRepayDt" type="String" index="13" desc="Next Repayment Date (N, String, 8) - 다음 회차 상환 예정일 (yyyymmdd)" default="{dateadd:baseDt:1:31}"/>
-    <field name="nextPrincipalRepayAmt" type="BigDecimal" index="14" desc="Next Principal Repayment Amount (N, Number, 18) - 다음 회차에 상환해야 할 예정 원금 (VND)" genRange="1000000-60000000"/>
-    <field name="nextInterestRepayAmt" type="BigDecimal" index="15" desc="Next Interest Repayment Amount (N, Number, 18) - 다음 회차에 상환해야 할 예정 이자 (VND)" genRange="200000-25000000"/>
-    <field name="remPrincipalRepayCnt" type="BigDecimal" index="16" desc="Remaining Principal Repayment Count (N, Number, 3) - 원금 상환이 남은 잔여 회차 수" genRange="1-110"/>
-    <field name="remInterestRepayCnt" type="BigDecimal" index="17" desc="Remaining Interest Repayment Count (N, Number, 3) - 이자 상환이 남은 잔여 회차 수" genRange="1-110"/>
-    <field name="bal" type="BigDecimal" index="18" desc="Balance (Y, Number, 18) - 일반(할부·거치식) 대출의 기준월 말 잔액 (VND)" genRange="10000000-2500000000"/>
-    <field name="overdraftAvgBal" type="BigDecimal" index="19" desc="Overdraft Average Balance (N, Number, 18) - 한도대출(마이너스통장 등)의 기준월 평균 사용잔액 (VND)" genRange="5000000-300000000" fillRate="0.1"/>
-    <field name="consentFg" type="String" index="20" desc="Consent Flag (Y, String, 1) - 정보수집동의여부. 1:동의, 0:미동의" errCode="E191" weights="1:97,0:3"/>
-
-    <rule type="dateOrder" a="lstRepayDt" b="baseDt" gap="0-27" adjust="a" level="warn" desc="Ngày trả gần nhất không sau ngày cơ sở"/>
-    <rule type="dateOrder" a="baseDt" b="nextRepayDt" strict="Y" gap="1-31" level="warn" desc="Ngày trả kỳ tới phải sau ngày cơ sở"/>
-    <rule type="lte" small="principalRepayAmt" big="bal" level="warn"/>
+    <field name="custCd" type="String" index="5" desc="Customer Code (Y, String, 30) - 차주 고객코드"/>
+    <field name="ctrtNo" type="String" index="6" desc="Contract Number (Y, String, 50) - 상환 대상 대출계약번호 (Loan Info 등록 시 사용한 계약번호와 동일해야 함)"/>
+    <field name="baseDt" type="String" index="7" desc="Base Date (Y, String, 8) - 상환실적이 마감된 기준일 (yyyymmdd, 통상 전월 말일 기준)"/>
+    <field name="debtGrpCd" type="String" index="8" desc="Debt Group Code (Y, String, 1) - 기준일 시점의 채무 건전성 5단계 분류. 1~5 (NCI Code Master C12 참조)"/>
+    <field name="ctrtStatCd" type="String" index="9" desc="Contract Status Code (Y, String, 2) - 기준일 시점 계좌의 상태 (NCI Code Master C13 참조)"/>
+    <field name="lstRepayDt" type="String" index="10" desc="Latest Repayment Date (N, String, 8) - 기준월 중 가장 최근에 상환이 이루어진 날짜 (yyyymmdd)"/>
+    <field name="principalRepayAmt" type="BigDecimal" index="11" desc="Principal Repayment Amount (Y, Number, 18) - 기준월 동안 실제 상환된 원금 (VND)"/>
+    <field name="interestRepayAmt" type="BigDecimal" index="12" desc="Interest Repayment Amount (Y, Number, 18) - 기준월 동안 실제 상환된 이자 (VND)"/>
+    <field name="nextRepayDt" type="String" index="13" desc="Next Repayment Date (N, String, 8) - 다음 회차 상환 예정일 (yyyymmdd)"/>
+    <field name="nextPrincipalRepayAmt" type="BigDecimal" index="14" desc="Next Principal Repayment Amount (N, Number, 18) - 다음 회차에 상환해야 할 예정 원금 (VND)"/>
+    <field name="nextInterestRepayAmt" type="BigDecimal" index="15" desc="Next Interest Repayment Amount (N, Number, 18) - 다음 회차에 상환해야 할 예정 이자 (VND)"/>
+    <field name="remPrincipalRepayCnt" type="BigDecimal" index="16" desc="Remaining Principal Repayment Count (N, Number, 3) - 원금 상환이 남은 잔여 회차 수"/>
+    <field name="remInterestRepayCnt" type="BigDecimal" index="17" desc="Remaining Interest Repayment Count (N, Number, 3) - 이자 상환이 남은 잔여 회차 수"/>
+    <field name="bal" type="BigDecimal" index="18" desc="Balance (Y, Number, 18) - 일반(할부·거치식) 대출의 기준월 말 잔액 (VND)"/>
+    <field name="overdraftAvgBal" type="BigDecimal" index="19" desc="Overdraft Average Balance (N, Number, 18) - 한도대출(마이너스통장 등)의 기준월 평균 사용잔액 (VND)"/>
+    <field name="consentFg" type="String" index="20" desc="Consent Flag (Y, String, 1) - 정보수집동의여부. 1:동의, 0:미동의"/>
 </layout>

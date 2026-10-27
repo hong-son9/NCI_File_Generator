@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rules infoCd="DELQ">
+    <field name="recordType" required="Y" maxLen="1" values="D"/>
+    <field name="evtCd" required="Y" maxLen="1" codeRef="C04" errCode="E143" weights="1:65,3:20,2:13,7:2"/>
+    <field name="instCd" required="Y" maxLen="7"/>
+    <field name="branchCd" required="N" maxLen="20"/>
+    <field name="branchNm" required="N" maxLen="200"/>
+    <field name="custCd" required="Y" maxLen="30" errCodeMissing="E127" default="CUST{cust:06d}"/>
+    <field name="ctrtNo" required="Y" maxLen="50" errCode="E183" default="LN{seq:08d}"/>
+    <field name="debtGrpCd" required="Y" maxLen="1" codeRef="C12" errCode="E184" weights="2:45,3:25,4:15,5:15"/>
+    <field name="loanTypeCd" required="Y" maxLen="3" codeRef="C17" errCode="E132" errCodeMissing="E131" weights="140:30,180:20,110:15,160:10,210:15,220:10"/>
+    <field name="loanAmt" required="Y" maxLen="18" genRange="20000000-2000000000"/>
+    <field name="bal" required="Y" maxLen="18" genRange="10000000-1500000000"/>
+    <field name="occrDt" required="Y" maxLen="8" format="yyyymmdd" notFuture="Y" errCode="E128"/>
+    <field name="dlqAmt" required="Y" maxLen="18" genRange="1000000-200000000"/>
+    <field name="dlqTypeCd" required="Y" maxLen="2" codeRef="C26" errCode="E185"/>
+    <field name="chgClsDt" required="M" maxLen="8" format="yyyymmdd" notFuture="Y" errCode="E321"/>
+    <field name="eventReasonCode" required="Y" maxLen="2" codeRef="C38" errCode="E130"/>
+    <field name="consentFg" required="Y" maxLen="1" values="1,0" errCode="E191" weights="1:97,0:3"/>
+
+    <rule type="lte" small="bal" big="loanAmt" ratio="0.3-0.95" level="warn" desc="Dư nợ ≤ số tiền vay ban đầu"/>
+    <rule type="lte" small="dlqAmt" big="bal" ratio="0.02-0.3" level="warn" desc="Số tiền quá hạn ≤ dư nợ"/>
+    <rule type="valueMap" field="dlqTypeCd" when="loanTypeCd" map="210,220,230,240:16,17;*:11,12,14,15" level="warn" desc="Loại quá hạn phù hợp sản phẩm (thẻ 16/17, khoản vay 11-15)"/>
+    <rule type="requiredWhen" field="chgClsDt" when="evtCd" in="2,3" errCode="E321"/>
+    <rule type="dateOrder" a="occrDt" b="chgClsDt" gap="10-700" errCode="E134"/>
+    <rule type="valueMap" field="eventReasonCode" when="evtCd" map="1:11;3:12-14;2:21-33,99" level="warn" desc="Lý do sự kiện phù hợp evtCd (11=mới, 12-14=thay đổi, 21-33=chấm dứt)"/>
+</rules>

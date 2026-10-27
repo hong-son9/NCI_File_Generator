@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rules infoCd="CRPY">
+    <field name="recordType" required="Y" maxLen="1" values="D"/>
+    <field name="evtCd" required="Y" maxLen="1" codeRef="C04" values="1,3,7" errCode="E144" weights="1:90,3:8,7:2"/>
+    <field name="instCd" required="Y" maxLen="7"/>
+    <field name="branchCd" required="N" maxLen="20"/>
+    <field name="branchNm" required="N" maxLen="200"/>
+    <field name="custCd" required="Y" maxLen="30" errCodeMissing="E127" default="CUST{cust:06d}"/>
+    <field name="ctrtNo" required="Y" maxLen="50" errCode="E183" default="CD{seq:08d}"/>
+    <field name="baseDt" required="Y" maxLen="8" format="yyyymmdd" notFuture="Y" errCode="E140" default="{monthend:-1}"/>
+    <field name="debtGrpCd" required="Y" maxLen="1" codeRef="C12" errCode="E184" weights="1:88,2:6,3:3,4:2,5:1"/>
+    <field name="ctrtStatCd" required="Y" maxLen="2" codeRef="C13" weights="11:88,13:7,17:3,12:2"/>
+    <field name="lmtAmt" required="Y" maxLen="18" genRange="10000000-500000000"/>
+    <field name="cadvLmtAmt" required="Y" maxLen="18" genRange="5000000-100000000"/>
+    <field name="payReqAmt" required="Y" maxLen="18" genRange="500000-60000000"/>
+    <field name="payAmt" required="Y" maxLen="18" genRange="500000-60000000"/>
+    <field name="revolBal" required="N" maxLen="18" genRange="0-30000000" fillRate="0.3"/>
+    <field name="useAmt" required="Y" maxLen="18" genRange="1000000-80000000"/>
+    <field name="lsUseAmt" required="N" maxLen="18" genRange="500000-50000000"/>
+    <field name="instlUseAmt" required="N" maxLen="18" genRange="0-20000000"/>
+    <field name="cadvUseAmt" required="N" maxLen="18" genRange="0-10000000"/>
+    <field name="debitUseAmt" required="N" maxLen="18" genRange="0-10000000" fillRate="0.2"/>
+    <field name="ovseUseAmt" required="N" maxLen="18" genRange="0-20000000" fillRate="0.3"/>
+    <field name="ovseCadvUseAmt" required="N" maxLen="18" genRange="0-5000000" fillRate="0.1"/>
+    <field name="payDueDt" required="N" maxLen="8" format="yyyymmdd" notFuture="Y" errCode="E311" default="{dateadd:baseDt:-20:-5}"/>
+    <field name="nextPayDueDt" required="N" maxLen="8" format="yyyymmdd" errCode="E313" default="{dateadd:payDueDt:28:31}"/>
+    <field name="nextMinPayAmt" required="N" maxLen="18" genRange="200000-5000000"/>
+    <field name="consentFg" required="Y" maxLen="1" values="1,0" errCode="E191" weights="1:97,0:3"/>
+
+    <rule type="lte" small="cadvLmtAmt" big="lmtAmt" ratio="0.2-0.5" level="warn"/>
+    <rule type="lte" small="payReqAmt" big="lmtAmt" level="warn" desc="Số tiền sao kê không vượt hạn mức"/>
+    <rule type="lte" small="payAmt" big="payReqAmt" ratio="0.3-1.0" level="warn" desc="Số tiền thanh toán ≤ số tiền sao kê"/>
+    <rule type="lte" small="useAmt" big="lmtAmt" level="warn" desc="Tổng chi tiêu không vượt hạn mức"/>
+    <rule type="lte" small="lsUseAmt+instlUseAmt+cadvUseAmt+debitUseAmt" big="useAmt" level="warn" desc="Tổng các loại chi tiêu ≤ tổng sử dụng"/>
+    <rule type="lte" small="cadvUseAmt" big="cadvLmtAmt" level="warn"/>
+    <rule type="lte" small="ovseUseAmt" big="useAmt" level="warn"/>
+    <rule type="lte" small="ovseCadvUseAmt" big="cadvUseAmt" level="warn"/>
+    <rule type="lte" small="nextMinPayAmt" big="lmtAmt" level="warn"/>
+    <rule type="dateOrder" a="payDueDt" b="baseDt" gap="5-20" adjust="a" level="warn" desc="Ngày đến hạn thanh toán nằm trong kỳ, trước ngày cơ sở"/>
+    <rule type="dateOrder" a="payDueDt" b="nextPayDueDt" strict="Y" gap="28-31" level="warn"/>
+</rules>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rules infoCd="LOAN">
+    <field name="recordType" required="Y" maxLen="1" values="D"/>
+    <field name="evtCd" required="Y" maxLen="1" codeRef="C04" errCode="E143" weights="1:75,3:15,2:8,7:2"/>
+    <field name="instCd" required="Y" maxLen="7"/>
+    <field name="branchCd" required="N" maxLen="20"/>
+    <field name="branchNm" required="N" maxLen="200"/>
+    <field name="custCd" required="Y" maxLen="30" errCodeMissing="E127" default="CUST{cust:06d}"/>
+    <field name="ctrtNo" required="Y" maxLen="50" errCode="E183" default="LN{seq:08d}"/>
+    <field name="debtGrpCd" required="Y" maxLen="1" codeRef="C12" errCode="E184" weights="1:86,2:7,3:3,4:2,5:2"/>
+    <field name="loanAmt" required="Y" maxLen="18" genRange="20000000-3000000000"/>
+    <field name="occrDt" required="Y" maxLen="8" format="yyyymmdd" notFuture="Y" errCode="E129"/>
+    <field name="matuDt" required="Y" maxLen="8" format="yyyymmdd" errCode="E133"/>
+    <field name="chgClsDt" required="M" maxLen="8" format="yyyymmdd" notFuture="Y" errCode="E307"/>
+    <field name="eventReasonCode" required="Y" maxLen="2" codeRef="C37" errCode="E130"/>
+    <field name="interestRate" required="N" maxLen="5" genRange="600-1800"/>
+    <field name="loanPurposeCd" required="N" maxLen="2" codeRef="C16" errCode="E186"/>
+    <field name="loanTypeCd" required="Y" maxLen="3" codeRef="C17" values="110,120,130,140,150,160,170,180,190,195,320,330,340,350,410-418" errCode="E132" errCodeMissing="E131" weights="140:28,110:14,160:14,180:14,130:8,170:6,320:5,120:4,411:4,412:3"/>
+    <field name="repayTypeCd" required="N" maxLen="2" codeRef="C18" errCode="E193"/>
+    <field name="principalRepayCnt" required="N" maxLen="3" genRange="6-120"/>
+    <field name="interestRepayCnt" required="N" maxLen="3" genRange="6-120"/>
+    <field name="principalRepayCycle" required="N" maxLen="2" codeRef="C19" errCode="E195"/>
+    <field name="interestRepayCycle" required="N" maxLen="2" codeRef="C19" errCode="E194"/>
+    <field name="graceStrtDt" required="N" maxLen="8" format="yyyymmdd" errCode="E308" fillRate="0.2"/>
+    <field name="gracePeriod" required="M" maxLen="3" genRange="3-24"/>
+    <field name="guarStatFg" required="N" maxLen="1" values="0,1" errCode="E189" weights="0:80,1:20"/>
+    <field name="collStatFg" required="N" maxLen="1" values="0,1" errCode="E190" weights="0:60,1:40"/>
+    <field name="leaseCollPropertyAmt" required="M" maxLen="18" genRange="200000000-3000000000"/>
+    <field name="leaseCollStatCd" required="M" maxLen="2" codeRef="C22" errCode="E303" weights="11:75,12:25"/>
+    <field name="leaseCollbrand" required="M" maxLen="100" gen="brand"/>
+    <field name="leaseCollRegNo" required="M" maxLen="20" gen="plate"/>
+    <field name="leaseCollManuDt" required="M" maxLen="8" format="yyyymmdd" notFuture="Y" errCode="E317"/>
+    <field name="consentFg" required="Y" maxLen="1" values="1,0" errCode="E191" weights="1:97,0:3"/>
+
+    <rule type="dateOrder" a="occrDt" b="matuDt" strict="Y" gap="180-3650" errCode="E306"/>
+    <rule type="requiredWhen" field="chgClsDt" when="evtCd" in="2,3" errCode="E146"/>
+    <rule type="dateOrder" a="occrDt" b="chgClsDt" gap="30-1500" errCode="E135"/>
+    <rule type="dateOrder" a="occrDt" b="graceStrtDt" gap="0-60" errCode="E308"/>
+    <rule type="requiredWhen" field="gracePeriod" when="graceStrtDt" notEmpty="Y" level="warn"/>
+    <rule type="valueMap" field="eventReasonCode" when="evtCd" map="1:11;3:12-14;2:21-33,99" level="warn" desc="Lý do sự kiện phù hợp evtCd (11=mới, 12-14=thay đổi, 21-33=chấm dứt)"/>
+    <rule type="valueMap" field="repayTypeCd" when="loanTypeCd" map="110:13;120:14;130:11;140,320,330,340,350,410-418:12;*:11,12,13" level="warn" desc="Phương thức trả nợ phù hợp loại khoản vay"/>
+    <rule type="valueMap" field="principalRepayCycle" when="repayTypeCd" map="13:21;14:22;*:14,16" level="warn"/>
+    <rule type="valueMap" field="interestRepayCycle" when="repayTypeCd" map="13:14,16,21;*:14" level="warn"/>
+    <rule type="repayCount" field="principalRepayCnt" cycle="principalRepayCycle" a="occrDt" b="matuDt" level="warn"/>
+    <rule type="repayCount" field="interestRepayCnt" cycle="interestRepayCycle" a="occrDt" b="matuDt" level="warn"/>
+    <rule type="valueMap" field="loanPurposeCd" when="loanTypeCd" map="150,160:17;320,330,411:16;412:15;414:27;415:17;170:19,20,28;120:28,19;*:11,13,14,21,22,34" level="warn" desc="Mục đích vay phù hợp loại khoản vay"/>
+    <rule type="valueMap" field="collStatFg" when="loanTypeCd" map="150,160,320,330,410-417:1" level="warn" desc="Vay mua nhà/xe, thuê tài chính phải có tài sản bảo đảm"/>
+    <rule type="requiredWhen" field="leaseCollPropertyAmt" when="loanTypeCd" in="410-417" level="warn"/>
+    <rule type="requiredWhen" field="leaseCollStatCd" when="loanTypeCd" in="410-417" level="warn"/>
+    <rule type="requiredWhen" field="leaseCollbrand" when="loanTypeCd" in="410-417" level="warn"/>
+    <rule type="requiredWhen" field="leaseCollRegNo" when="loanTypeCd" in="410-417" level="warn"/>
+    <rule type="requiredWhen" field="leaseCollManuDt" when="loanTypeCd" in="410-417" level="warn"/>
+    <rule type="dateOrder" a="leaseCollManuDt" b="occrDt" gap="0-1800" adjust="a" level="warn" desc="Tài sản phải sản xuất trước ngày thuê"/>
+    <rule type="lte" small="loanAmt" big="leaseCollPropertyAmt" ratio="0.5-0.9" level="warn" desc="Số tiền thuê không vượt giá trị tài sản"/>
+</rules>

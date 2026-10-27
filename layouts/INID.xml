@@ -1,51 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout infoCd="INID" delimiter="|:" fieldCount="38">
-    <field name="recordType" type="String" index="0" desc="Record Type (Y, String, 1)" values="D"/>
-    <field name="evtCd" type="String" index="1" desc="Registration Event (Y, String, 1) - 등록구분. 1:신규등록, 2:해지, 3:변경, 7:삭제 (NCI Code Master C04 참조)" errCode="E143" weights="1:80,3:15,2:3,7:2"/>
+    <field name="recordType" type="String" index="0" desc="Record Type (Y, String, 1)"/>
+    <field name="evtCd" type="String" index="1" desc="Registration Event (Y, String, 1) - 등록구분. 1:신규등록, 2:해지, 3:변경, 7:삭제 (NCI Code Master C04 참조)"/>
     <field name="instCd" type="String" index="2" desc="Institution Code (Y, String, 7) - 회원기관 식별코드 (NICE 발급)"/>
     <field name="branchCd" type="String" index="3" desc="Branch Code (N, String, 20) - 정보를 등록한 지점코드 (회원기관 자체관리)"/>
     <field name="branchNm" type="String" index="4" desc="Branch Name (N, String, 200) - 정보를 등록한 지점명"/>
-    <field name="custCd" type="String" index="5" desc="Customer Code (Y, String, 30) - 회원기관이 부여한 고객 식별코드 (다른 정보성 시트와 연결되는 핵심 키)" errCodeMissing="E127" default="CUST{cust:06d}"/>
-    <field name="subjectType" type="String" index="6" desc="Subject Type (Y, String, 1) - 조회·등록 대상 구분. 본 API에서는 1(개인) 고정 (NCI Code Master C01 참조)" values="1" errCode="E101"/>
-    <field name="cccdNo" type="String" index="7" desc="CCCD Number (M1, String, 12) - 베트남 신분증(CCCD, 12자리) 번호" pattern="^\d{12}$" errCode="E175"/>
-    <field name="cmndNo" type="String" index="8" desc="CMND Number (M1, String, 12) - 구(舊) 신분증(CMND, 9자리) 번호. CCCD 전환 이전 발급된 신분증 체계" length="9" pattern="^\d{9}$" errCode="E102"/>
-    <field name="idCardType" type="String" index="9" desc="ID Card Type (M1, String, 1) - 위 두 항목 외 신분 확인 서류 종류. 예: 3:운전면허증, 4:여권, 8:외국인등록증 등 (NCI Code Master C03 참조)" values="3-8" errCode="E102"/>
-    <field name="idNumber" type="String" index="10" desc="ID Number (M1, String, 20) - idCardType에 따른 신분증 서류의 실제 번호" gen="idNumber" errCode="E102"/>
-    <field name="idIssueDt" type="String" index="11" desc="ID Issue Date (N, String, 8) - 신분증 발급일자 (yyyymmdd)" notFuture="Y" errCode="E319"/>
-    <field name="taxCode" type="String" index="12" desc="Tax Code (N, String, 15) - 개인 납세자 번호" gen="taxPerson" pattern="^\d{10}(-\d{3})?$" fillRate="0.6"/>
-    <field name="membNm" type="String" index="13" desc="Member Name (Y, String, 250) - 개인의 성명" gen="personName" errCode="E176" errCodeMissing="E177"/>
-    <field name="custLstUpdtDt" type="String" index="14" desc="Customer Last Update Date (Y, String, 8) - 회원기관이 해당 고객정보를 마지막으로 갱신한 날짜 (yyyymmdd)" notFuture="Y" errCode="E315"/>
-    <field name="birthDt" type="String" index="15" desc="Birth Date (N, String, 8) - 생년월일 (yyyymmdd)" notFuture="Y" errCode="E320"/>
-    <field name="gender" type="String" index="16" desc="Gender (N, String, 1) - 성별코드. M:Male, F:Female (NCI Code Master C02 참조)" errCode="E178"/>
-    <field name="nationalityCd" type="String" index="17" desc="Nationality Code (N, String, 3) - 국적 코드 (NCI Code Master C36 참조)" errCode="E179" weights="VNM:95,KOR:2,CHN:1,JPN:1,USA:1"/>
-    <field name="mobileNo" type="String" index="18" desc="Mobile Number (N, String, 15) - 휴대전화번호 (국가번호 없이 첫자리 0 포함하여 입력)" pattern="^0\d{9}$"/>
-    <field name="email" type="String" index="19" desc="Email (N, String, 100) - 이메일 주소 ('@' 포함 전체 주소)" pattern="^[^@\s]+@[^@\s]+\.[^@\s]+$" errCode="E180"/>
-    <field name="homeTelNo" type="String" index="20" desc="Home Telephone Number (N, String, 15) - 자택 유선전화번호" pattern="^0\d{9,10}$" fillRate="0.4"/>
-    <field name="homeAdr" type="String" index="21" desc="Home Address (M2, String, 500) - 자택 주소" fillRate="0.95"/>
-    <field name="homeZipCd" type="String" index="22" desc="Home Zip Code (N, String, 5) - 자택 우편번호" pattern="^\d{5}$"/>
-    <field name="officeTaxCode" type="String" index="23" desc="Office Tax Code (N, String, 15) - 재직 중인 직장 또는 운영 중인 개인사업자의 사업자등록번호(세금코드)" gen="taxCorp" pattern="^\d{10}(-\d{3})?$"/>
-    <field name="officeNm" type="String" index="24" desc="Office Name (N, String, 250) - 위 사업체의 상호명" gen="companyName"/>
-    <field name="officeTypeCd" type="String" index="25" desc="Office Type Code (N, String, 2) - 위 사업체의 법인·기업 형태 코드 (NCI Code Master C07 참조)" gen="corpType" errCode="E302"/>
-    <field name="officeBusinessLineCd" type="String" index="26" desc="Office Business Line Code (N, String, 3) - 위 사업체의 업종 코드 (NCI Code Master C08 참조)" errCode="E301"/>
-    <field name="departmentNm" type="String" index="27" desc="Department Name (N, String, 200) - 재직 중인 직장 내 소속 부서명" errCode="E181"/>
+    <field name="custCd" type="String" index="5" desc="Customer Code (Y, String, 30) - 회원기관이 부여한 고객 식별코드 (다른 정보성 시트와 연결되는 핵심 키)"/>
+    <field name="subjectType" type="String" index="6" desc="Subject Type (Y, String, 1) - 조회·등록 대상 구분. 본 API에서는 1(개인) 고정 (NCI Code Master C01 참조)"/>
+    <field name="cccdNo" type="String" index="7" desc="CCCD Number (M1, String, 12) - 베트남 신분증(CCCD, 12자리) 번호"/>
+    <field name="cmndNo" type="String" index="8" desc="CMND Number (M1, String, 12) - 구(舊) 신분증(CMND, 9자리) 번호. CCCD 전환 이전 발급된 신분증 체계"/>
+    <field name="idCardType" type="String" index="9" desc="ID Card Type (M1, String, 1) - 위 두 항목 외 신분 확인 서류 종류. 예: 3:운전면허증, 4:여권, 8:외국인등록증 등 (NCI Code Master C03 참조)"/>
+    <field name="idNumber" type="String" index="10" desc="ID Number (M1, String, 20) - idCardType에 따른 신분증 서류의 실제 번호"/>
+    <field name="idIssueDt" type="String" index="11" desc="ID Issue Date (N, String, 8) - 신분증 발급일자 (yyyymmdd)"/>
+    <field name="taxCode" type="String" index="12" desc="Tax Code (N, String, 15) - 개인 납세자 번호"/>
+    <field name="membNm" type="String" index="13" desc="Member Name (Y, String, 250) - 개인의 성명"/>
+    <field name="custLstUpdtDt" type="String" index="14" desc="Customer Last Update Date (Y, String, 8) - 회원기관이 해당 고객정보를 마지막으로 갱신한 날짜 (yyyymmdd)"/>
+    <field name="birthDt" type="String" index="15" desc="Birth Date (N, String, 8) - 생년월일 (yyyymmdd)"/>
+    <field name="gender" type="String" index="16" desc="Gender (N, String, 1) - 성별코드. M:Male, F:Female (NCI Code Master C02 참조)"/>
+    <field name="nationalityCd" type="String" index="17" desc="Nationality Code (N, String, 3) - 국적 코드 (NCI Code Master C36 참조)"/>
+    <field name="mobileNo" type="String" index="18" desc="Mobile Number (N, String, 15) - 휴대전화번호 (국가번호 없이 첫자리 0 포함하여 입력)"/>
+    <field name="email" type="String" index="19" desc="Email (N, String, 100) - 이메일 주소 ('@' 포함 전체 주소)"/>
+    <field name="homeTelNo" type="String" index="20" desc="Home Telephone Number (N, String, 15) - 자택 유선전화번호"/>
+    <field name="homeAdr" type="String" index="21" desc="Home Address (M2, String, 500) - 자택 주소"/>
+    <field name="homeZipCd" type="String" index="22" desc="Home Zip Code (N, String, 5) - 자택 우편번호"/>
+    <field name="officeTaxCode" type="String" index="23" desc="Office Tax Code (N, String, 15) - 재직 중인 직장 또는 운영 중인 개인사업자의 사업자등록번호(세금코드)"/>
+    <field name="officeNm" type="String" index="24" desc="Office Name (N, String, 250) - 위 사업체의 상호명"/>
+    <field name="officeTypeCd" type="String" index="25" desc="Office Type Code (N, String, 2) - 위 사업체의 법인·기업 형태 코드 (NCI Code Master C07 참조)"/>
+    <field name="officeBusinessLineCd" type="String" index="26" desc="Office Business Line Code (N, String, 3) - 위 사업체의 업종 코드 (NCI Code Master C08 참조)"/>
+    <field name="departmentNm" type="String" index="27" desc="Department Name (N, String, 200) - 재직 중인 직장 내 소속 부서명"/>
     <field name="positionNm" type="String" index="28" desc="Position Name (N, String, 200) - 재직 중인 직장 내 직위·직급"/>
-    <field name="employmentDt" type="String" index="29" desc="Employment Date (N, String, 8) - 현 직장 입사일 (yyyymmdd)" notFuture="Y" errCode="E316"/>
-    <field name="officeTelNo" type="String" index="30" desc="Office Telephone Number (N, String, 15) - 직장 유선전화번호" pattern="^0\d{9,10}$"/>
-    <field name="officeAdr" type="String" index="31" desc="Office Address (M2, String, 500) - 직장 주소" fillRate="0.7"/>
-    <field name="officeZipCd" type="String" index="32" desc="Office Zip Code (N, String, 5) - 직장 우편번호" pattern="^\d{5}$"/>
-    <field name="annualIncome" type="BigDecimal" index="33" desc="Annual Income (N, Number, 18) - 연간 소득 (근로소득 등, 단위: 백만 VND)" genRange="60-1500"/>
-    <field name="taxAmt" type="BigDecimal" index="34" desc="Tax Amount (N, Number, 18) - 연간 납부 세액 (단위: 백만 VND)" genRange="1-100"/>
-    <field name="vehicleTypeCd" type="String" index="35" desc="Vehicle Type Code (N, String, 2) - 보유 차량의 유형 코드 (오토바이/승용차/전기차 등) (NCI Code Master C10 참조)" errCode="E304" weights="11:70,12:20,15:8,13:2" fillRate="0.7"/>
-    <field name="engineDisplacementCd" type="String" index="36" desc="Engine Displacement Code (N, String, 2) - 보유 차량의 배기량 구간 코드 (NCI Code Master C11 참조)" required="M" errCode="E300"/>
-    <field name="consentFg" type="String" index="37" desc="Consent Flag (Y, String, 1) - 정보 수집·조회에 대한 정보주체 동의 여부. 1:동의, 0:미동의" errCode="E191" weights="1:97,0:3"/>
-
-    <rule type="atLeastOne" fields="cccdNo,cmndNo,idNumber" weights="88,8,4" errCode="E102" desc="Phải có CCCD, CMND hoặc giấy tờ khác"/>
-    <rule type="requiredWhen" field="idCardType" when="idNumber" notEmpty="Y" errCode="E102"/>
-    <rule type="requiredWhen" field="idNumber" when="idCardType" notEmpty="Y" errCode="E102"/>
-    <rule type="atLeastOne" fields="homeAdr,officeAdr" errCode="E138" desc="Phải có địa chỉ nhà hoặc địa chỉ nơi làm việc"/>
-    <rule type="dateOrder" a="birthDt" b="idIssueDt" strict="Y" gap="5840-16000" level="warn" desc="Ngày cấp giấy tờ phải sau ngày sinh (≥16 tuổi)"/>
-    <rule type="dateOrder" a="birthDt" b="employmentDt" strict="Y" gap="6570-12000" level="warn" desc="Ngày vào làm phải sau ngày sinh (≥18 tuổi)"/>
-    <rule type="lte" small="taxAmt" big="annualIncome" ratio="0.01-0.12" level="warn"/>
-    <rule type="requiredWhen" field="engineDisplacementCd" when="vehicleTypeCd" notEmpty="Y" level="warn"/>
-    <rule type="valueMap" field="engineDisplacementCd" when="vehicleTypeCd" map="11:11-13;12:14-19;13,14:17,18;15:20;*:11-20" level="warn" desc="Dung tích xi lanh phù hợp loại xe"/>
+    <field name="employmentDt" type="String" index="29" desc="Employment Date (N, String, 8) - 현 직장 입사일 (yyyymmdd)"/>
+    <field name="officeTelNo" type="String" index="30" desc="Office Telephone Number (N, String, 15) - 직장 유선전화번호"/>
+    <field name="officeAdr" type="String" index="31" desc="Office Address (M2, String, 500) - 직장 주소"/>
+    <field name="officeZipCd" type="String" index="32" desc="Office Zip Code (N, String, 5) - 직장 우편번호"/>
+    <field name="annualIncome" type="BigDecimal" index="33" desc="Annual Income (N, Number, 18) - 연간 소득 (근로소득 등, 단위: 백만 VND)"/>
+    <field name="taxAmt" type="BigDecimal" index="34" desc="Tax Amount (N, Number, 18) - 연간 납부 세액 (단위: 백만 VND)"/>
+    <field name="vehicleTypeCd" type="String" index="35" desc="Vehicle Type Code (N, String, 2) - 보유 차량의 유형 코드 (오토바이/승용차/전기차 등) (NCI Code Master C10 참조)"/>
+    <field name="engineDisplacementCd" type="String" index="36" desc="Engine Displacement Code (N, String, 2) - 보유 차량의 배기량 구간 코드 (NCI Code Master C11 참조)"/>
+    <field name="consentFg" type="String" index="37" desc="Consent Flag (Y, String, 1) - 정보 수집·조회에 대한 정보주체 동의 여부. 1:동의, 0:미동의"/>
 </layout>

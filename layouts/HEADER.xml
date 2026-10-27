@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout infoCd="HEADER" delimiter="|:" fieldCount="11">
-    <field name="recordType" type="String" index="0" desc="Record Type (Y, String, 1) - Luôn là H" values="H"/>
+    <field name="recordType" type="String" index="0" desc="Record Type (Y, String, 1) - Luôn là H"/>
     <field name="institutionCode" type="String" index="1" desc="Institution Code (Y, String, 7) - Mã tổ chức thành viên do NICE cấp; phải khớp tên file (F022)"/>
     <field name="institutionName" type="String" index="2" desc="Institution Name (N, String, 200) - Tên tổ chức"/>
     <field name="baseDateFrom" type="String" index="3" desc="Base Date From (Y, String, 8) - Ngày dữ liệu từ (yyyymmdd)"/>
@@ -11,5 +11,4 @@
     <field name="registrationType" type="String" index="8" desc="Registration Type (Y, String, 3) - MST: toàn bộ dữ liệu, chỉ được evtCd=1 (F009); INF: dữ liệu thay đổi (NCI Code Master C05 참조)"/>
     <field name="userId" type="String" index="9" desc="User ID (Y, String, 20) - Tài khoản gửi file (F024)"/>
     <field name="responseCode" type="String" index="10" desc="Response Code (N, String, 4) - Để trống khi gửi; NICE trả về (NCI Code Master C34 참조)"/>
-    <rule type="dateOrder" a="baseDateFrom" b="baseDateTo" level="warn"/>
 </layout>

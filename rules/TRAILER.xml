@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rules infoCd="TRAILER">
+    <field name="recordType" required="Y" maxLen="1" values="T"/>
+    <field name="dataCount" required="Y" maxLen="10"/>
+</rules>

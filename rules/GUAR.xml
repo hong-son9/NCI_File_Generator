@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rules infoCd="GUAR">
+    <field name="recordType" required="Y" maxLen="1" values="D"/>
+    <field name="evtCd" required="Y" maxLen="1" codeRef="C04" errCode="E143" weights="1:75,3:15,2:8,7:2"/>
+    <field name="instCd" required="Y" maxLen="7"/>
+    <field name="branchCd" required="N" maxLen="20"/>
+    <field name="branchNm" required="N" maxLen="200"/>
+    <field name="custCd" required="Y" maxLen="30" errCodeMissing="E127" default="CUST{cust+500000:06d}"/>
+    <field name="ctrtNo" required="Y" maxLen="50" errCode="E183" default="GR{seq:08d}"/>
+    <field name="debtorCustCd" required="Y" maxLen="20" default="CUST{cust:06d}"/>
+    <field name="debtorCtrtNo" required="Y" maxLen="50" errCode="E182" default="LN{seq:08d}"/>
+    <field name="occrDt" required="Y" maxLen="8" format="yyyymmdd" notFuture="Y" errCode="E129"/>
+    <field name="guarTypeCd" required="Y" maxLen="2" codeRef="C23" errCode="E196" weights="12:55,11:25,15:10,14:5,13:3,16:2"/>
+    <field name="matuDt" required="Y" maxLen="8" format="yyyymmdd" errCode="E133"/>
+    <field name="lmtAmt" required="Y" maxLen="18" genRange="50000000-3000000000"/>
+    <field name="bal" required="Y" maxLen="18" genRange="10000000-2000000000"/>
+    <field name="chgClsDt" required="M" maxLen="8" format="yyyymmdd" notFuture="Y" errCode="E307"/>
+    <field name="consentFg" required="Y" maxLen="1" values="1,0" errCode="E191" weights="1:97,0:3"/>
+
+    <rule type="dateOrder" a="occrDt" b="matuDt" strict="Y" gap="180-3650" errCode="E136"/>
+    <rule type="lte" small="bal" big="lmtAmt" ratio="0.1-1.0" level="warn" desc="Dư nợ bảo lãnh ≤ hạn mức bảo lãnh"/>
+    <rule type="requiredWhen" field="chgClsDt" when="evtCd" in="2,3" errCode="E146"/>
+    <rule type="dateOrder" a="occrDt" b="chgClsDt" gap="30-1500" errCode="E135"/>
+</rules>

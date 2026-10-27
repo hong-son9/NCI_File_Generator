@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rules infoCd="HEADER">
+    <field name="recordType" required="Y" maxLen="1" values="H"/>
+    <field name="institutionCode" required="Y" maxLen="7"/>
+    <field name="institutionName" required="N" maxLen="200"/>
+    <field name="baseDateFrom" required="Y" maxLen="8" format="yyyymmdd"/>
+    <field name="baseDateTo" required="Y" maxLen="8" format="yyyymmdd"/>
+    <field name="reportingDate" required="Y" maxLen="8" format="yyyymmdd"/>
+    <field name="fileType" required="Y" maxLen="3"/>
+    <field name="informationType" required="Y" maxLen="4" codeRef="C06"/>
+    <field name="registrationType" required="Y" maxLen="3" codeRef="C05"/>
+    <field name="userId" required="Y" maxLen="20"/>
+    <field name="responseCode" required="N" maxLen="4" codeRef="C34"/>
+
+    <rule type="dateOrder" a="baseDateFrom" b="baseDateTo" level="warn"/>
+</rules>

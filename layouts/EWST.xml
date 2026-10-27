@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout infoCd="EWST" delimiter="|:" fieldCount="7">
-    <field name="recordType" type="String" index="0" desc="Record Type (Y, String, 1) - D=Data" values="D"/>
-    <field name="registrationEvent" type="String" index="1" desc="Registration Event (Y, String, 1) - Sự kiện đăng ký. 1:New, 2:Closing, 3:Change, 7:Delete (NCI Code Master C04 참조)" values="1,2,3,7" errCode="E110" weights="1:80,3:10,2:8,7:2"/>
+    <field name="recordType" type="String" index="0" desc="Record Type (Y, String, 1) - D=Data"/>
+    <field name="registrationEvent" type="String" index="1" desc="Registration Event (Y, String, 1) - Sự kiện đăng ký. 1:New, 2:Closing, 3:Change, 7:Delete (NCI Code Master C04 참조)"/>
     <field name="institutionCode" type="String" index="2" desc="Institution Code (Y, String, 7) - Mã tổ chức thành viên (NICE cấp)"/>
     <field name="branchCode" type="String" index="3" desc="Branch Code (N, String, 20) - Mã chi nhánh"/>
     <field name="branchName" type="String" index="4" desc="Branch Name (N, String, 200) - Tên chi nhánh"/>
-    <field name="customerCode" type="String" index="5" desc="Customer Code (Y, String, 30) - Mã khách hàng cần theo dõi cảnh báo sớm (EWS)" errCodeMissing="E127" default="CUST{cust:06d}"/>
-    <field name="consentOfInformationCollection" type="String" index="6" desc="Consent of Information Collection (Y, String, 1) - 1:Consent, 0:Dissent" values="0,1" errCode="E191" weights="1:97,0:3"/>
+    <field name="customerCode" type="String" index="5" desc="Customer Code (Y, String, 30) - Mã khách hàng cần theo dõi cảnh báo sớm (EWS)"/>
+    <field name="consentOfInformationCollection" type="String" index="6" desc="Consent of Information Collection (Y, String, 1) - 1:Consent, 0:Dissent"/>
 </layout>

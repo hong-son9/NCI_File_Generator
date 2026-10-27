@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rules infoCd="COID">
+    <field name="recordType" required="Y" maxLen="1" values="D"/>
+    <field name="evtCd" required="Y" maxLen="1" codeRef="C04" errCode="E143" weights="1:80,3:15,2:3,7:2"/>
+    <field name="instCd" required="Y" maxLen="7"/>
+    <field name="branchCd" required="N" maxLen="20"/>
+    <field name="branchNm" required="N" maxLen="200"/>
+    <field name="custCd" required="Y" maxLen="30" errCodeMissing="E127" default="CORP{cust:06d}"/>
+    <field name="subjectType" required="Y" maxLen="1" codeRef="C01" values="3" errCode="E101"/>
+    <field name="taxCode" required="Y" maxLen="15" errCode="E145" gen="taxCorp" pattern="^\d{10}(-\d{3})?$"/>
+    <field name="bizRegDt" required="N" maxLen="8" format="yyyymmdd" notFuture="Y" errCode="E318"/>
+    <field name="membNm" required="Y" maxLen="200" errCode="E176" errCodeMissing="E177" gen="companyName"/>
+    <field name="custLstUpdtDt" required="Y" maxLen="8" format="yyyymmdd" notFuture="Y" errCode="E315"/>
+    <field name="corpTypeCd" required="N" maxLen="2" codeRef="C07" errCode="E302" gen="corpType"/>
+    <field name="corpBusinessLineCd" required="N" maxLen="3" codeRef="C08" errCode="E301"/>
+    <field name="corpAdr" required="Y" maxLen="500"/>
+    <field name="corpZipCd" required="Y" maxLen="5" pattern="^\d{5}$"/>
+    <field name="provincialCd" required="N" maxLen="2" codeRef="C32" errCode="E188"/>
+    <field name="corpTelNo" required="N" maxLen="15" pattern="^0\d{9,10}$"/>
+    <field name="corpFaxNo" required="N" maxLen="15" fillRate="0.5" pattern="^0\d{9,10}$"/>
+    <field name="corpWebAdr" required="N" maxLen="100" fillRate="0.6"/>
+
+    <rule type="dateOrder" a="bizRegDt" b="custLstUpdtDt" gap="30-3000" level="warn" desc="Ngày cập nhật KH không trước ngày cấp ĐKKD"/>
+</rules>

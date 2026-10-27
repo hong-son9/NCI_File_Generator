@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rules infoCd="CARD">
+    <field name="recordType" required="Y" maxLen="1" values="D"/>
+    <field name="evtCd" required="Y" maxLen="1" codeRef="C04" errCode="E143" weights="1:75,3:15,2:8,7:2"/>
+    <field name="instCd" required="Y" maxLen="7"/>
+    <field name="branchCd" required="N" maxLen="20"/>
+    <field name="branchNm" required="N" maxLen="200"/>
+    <field name="custCd" required="Y" maxLen="30" errCodeMissing="E127" default="CUST{cust:06d}"/>
+    <field name="ctrtNo" required="Y" maxLen="50" errCode="E183" default="CD{seq:08d}"/>
+    <field name="debtGrpCd" required="Y" maxLen="1" codeRef="C12" errCode="E184" weights="1:88,2:6,3:3,4:2,5:1"/>
+    <field name="loanTypeCd" required="Y" maxLen="3" codeRef="C17" values="210,220,230,240" errCode="E132" errCodeMissing="E131" weights="210:55,220:30,230:10,240:5"/>
+    <field name="lmtAmt" required="Y" maxLen="18" genRange="10000000-500000000"/>
+    <field name="cadvLmtAmt" required="Y" maxLen="18" genRange="5000000-100000000"/>
+    <field name="occrDt" required="Y" maxLen="8" format="yyyymmdd" notFuture="Y" errCode="E129"/>
+    <field name="expirationMonth" required="Y" maxLen="6" format="yyyymm"/>
+    <field name="minPayRate" required="M" maxLen="5" genRange="300-2000"/>
+    <field name="minPayAmt" required="M" maxLen="18" genRange="200000-5000000"/>
+    <field name="chgClsDt" required="M" maxLen="8" format="yyyymmdd" notFuture="Y" errCode="E307"/>
+    <field name="eventReasonCode" required="Y" maxLen="2" codeRef="C37" errCode="E130"/>
+    <field name="consentFg" required="Y" maxLen="1" values="1,0" errCode="E191" weights="1:97,0:3"/>
+
+    <rule type="dateOrder" a="occrDt" b="expirationMonth" strict="Y" gap="1095-1825" level="warn" desc="Tháng hết hạn phải sau ngày phát hành"/>
+    <rule type="requiredWhen" field="chgClsDt" when="evtCd" in="2,3" errCode="E146"/>
+    <rule type="dateOrder" a="occrDt" b="chgClsDt" gap="30-1500" errCode="E135"/>
+    <rule type="lte" small="cadvLmtAmt" big="lmtAmt" ratio="0.2-0.5" level="warn"/>
+    <rule type="requiredWhen" field="minPayRate" when="loanTypeCd" in="220" level="warn" desc="Thẻ revolving (220) phải có tỷ lệ thanh toán tối thiểu"/>
+    <rule type="requiredWhen" field="minPayAmt" when="loanTypeCd" in="220" level="warn"/>
+    <rule type="valueMap" field="eventReasonCode" when="evtCd" map="1:11;3:12-14;2:21-33,99" level="warn" desc="Lý do sự kiện phù hợp evtCd (11=mới, 12-14=thay đổi, 21-33=chấm dứt)"/>
+</rules>

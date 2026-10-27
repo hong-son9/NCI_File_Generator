@@ -65,69 +65,6 @@ def find_code_file(layout_dir) -> Path | None:
     return None
 
 
-def _xlsx_sheets(path):
-    """Đọc .xlsx chỉ bằng thư viện chuẩn (không cần openpyxl). Trả về [(tên sheet, [[ô,...],...])]."""
-    import zipfile
-    m_ns = "http://schemas.openxmlformats.org/spreadsheetml/2006/main"
-    r_ns = "http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-    q = lambda tag: f"{{{m_ns}}}{tag}"
-
-    def col_idx(ref: str) -> int:
-        n = 0
-        for ch in re.match(r"[A-Z]+", ref).group(0):
-            n = n * 26 + ord(ch) - 64
-        return n - 1
-
-    out = []
-    with zipfile.ZipFile(path) as z:
-        shared = []
-        if "xl/sharedStrings.xml" in z.namelist():
-            for si in ET.fromstring(z.read("xl/sharedStrings.xml")).findall(q("si")):
-                shared.append("".join(t.text or "" for t in si.iter(q("t"))))
-        rels = {r.get("Id"): r.get("Target") for r in ET.fromstring(z.read("xl/_rels/workbook.xml.rels"))}
-        for sh in ET.fromstring(z.read("xl/workbook.xml")).find(q("sheets")):
-            target = rels[sh.get(f"{{{r_ns}}}id")]
-            target = target.lstrip("/") if target.startswith("/") else "xl/" + target
-            rows = []
-            for row in ET.fromstring(z.read(target)).iter(q("row")):
-                cells = {}
-                for c in row.findall(q("c")):
-                    t, v = c.get("t"), c.find(q("v"))
-                    if t == "s" and v is not None:
-                        val = shared[int(v.text)]
-                    elif t == "inlineStr":
-                        val = "".join(x.text or "" for x in c.iter(q("t")))
-                    else:
-                        val = v.text if v is not None else None
-                        if val and re.fullmatch(r"-?\d+\.0+", val):
-                            val = val.split(".")[0]
-                    cells[col_idx(c.get("r"))] = val
-                rows.append([cells.get(i) for i in range(max(cells) + 1)] if cells else [])
-            out.append((sh.get("name"), rows))
-    return out
-
-
-def import_code_master_xlsx(xlsx_path, out_csv) -> int:
-    """Chuyển file NCICODE_Master_*.xlsx thành codes/nci_codes.csv (group,code,desc_vi,desc_en)."""
-    rows = []
-    for _name, sheet in _xlsx_sheets(xlsx_path):
-        title = str((sheet[0][0] if sheet and sheet[0] else "") or "")
-        m = re.match(r"\[(C\d+)\]", title)
-        if not m:
-            continue
-        for r in sheet[2:]:
-            if not r or r[0] is None or str(r[0]).strip() == "":
-                continue
-            r = list(r) + [None] * 3
-            rows.append([m.group(1), str(r[0]).strip(), r[1] or "", r[2] or ""])
-    Path(out_csv).parent.mkdir(parents=True, exist_ok=True)
-    with open(out_csv, "w", encoding="utf-8-sig", newline="") as fh:
-        w = csv.writer(fh)
-        w.writerow(["group", "code", "desc_vi", "desc_en"])
-        w.writerows(rows)
-    return len(rows)
-
-
 # =========================================================================== layout
 
 @dataclass
@@ -175,10 +112,9 @@ class Field:
             parts.append("bắt buộc")
         elif self.is_cond:
             parts.append("bắt buộc có điều kiện")
-        if self.allowed:
-            src = f"mã {self.code_ref}" if self.code_ref else "chỉ nhận"
+        if self.allowed and not self.code_ref:
             vals = ",".join(self.allowed)
-            parts.append(f"{src}: {vals if len(vals) <= 40 else vals[:40] + f'… ({len(self.allowed)} mã)'}")
+            parts.append(f"chỉ nhận: {vals if len(vals) <= 40 else vals[:40] + '…'}")
         if self.fmt:
             parts.append(self.fmt + (" ≤ hôm nay" if self.not_future else ""))
         elif self.fixed_len:
@@ -189,8 +125,6 @@ class Field:
             parts.append(f"định dạng {self.pattern}")
         if self.is_numeric:
             parts.append("số")
-        if self.err_code:
-            parts.append(f"[{self.err_code}]")
         return "; ".join(parts)
 
 
@@ -224,7 +158,7 @@ class Rule:
         return t
 
     def full_label(self) -> str:
-        tag = f"[{self.err_code}]" if self.err_code else "[cảnh báo]" if self.level == "warn" else ""
+        tag = "[cảnh báo]" if self.level == "warn" else ""
         return f"{self.label()} {tag}".strip()
 
 
@@ -273,8 +207,8 @@ def _parse_weights(spec: str) -> dict:
     return w
 
 
-def _apply_rules(f: Field, el: ET.Element, codes: dict) -> None:
-    desc = f.desc or ""
+def _apply_rules(f: Field, el: ET.Element, codes: dict, parse_desc: bool = True) -> None:
+    desc = f.desc if parse_desc else ""
     m = _SPEC_RE.search(desc)
     if m:
         flag = m.group(1)
@@ -341,14 +275,27 @@ def _apply_rules(f: Field, el: ET.Element, codes: dict) -> None:
         f.fill_rate = float(a["fillRate"])
 
 
+def rules_path(layout_path) -> Path:
+    """layouts/LOAN.xml -> rules/LOAN.xml (quy tắc sinh/kiểm tra, tách khỏi layout chuẩn)."""
+    p = Path(layout_path)
+    return p.parent.parent / "rules" / p.name
+
+
 def load_layout(path, codes: dict | None = None) -> Layout:
+    """Layout chỉ có <field name type index desc>. Quy tắc từng cột (thuộc tính) và <rule> liên cột
+    đọc từ rules/<tên>.xml; cột có trong file quy tắc thì không suy quy tắc từ desc nữa."""
     path = Path(path)
     codes = codes or {}
     root = ET.parse(path).getroot()
+    rp = rules_path(path)
+    rroot = ET.parse(rp).getroot() if rp.exists() else ET.Element("rules")
+    extra = {el.get("name"): el for el in rroot.findall("field")}
     fields = []
     for el in root.findall("field"):
         f = Field(el.get("name"), el.get("type", "String"), int(el.get("index")), el.get("desc", ""))
-        _apply_rules(f, el, codes)
+        r = extra.get(f.name)
+        _apply_rules(f, ET.Element("field", {**el.attrib, **r.attrib}) if r is not None else el, codes,
+                     parse_desc=r is None)
         fields.append(f)
     fields.sort(key=lambda f: f.index)
     expected = int(root.get("fieldCount", len(fields)))
@@ -359,7 +306,10 @@ def load_layout(path, codes: dict | None = None) -> Layout:
             raise LayoutError(f"index bị thiếu/trùng tại vị trí {i} (field {f.name})")
     names = {f.name for f in fields}
     rules = []
-    for el in root.findall("rule"):
+    unknown = [n for n in extra if n not in names]
+    if unknown:
+        raise LayoutError(f"{rp.name} trong rules/ có cột không có trong layout: {', '.join(unknown)}")
+    for el in root.findall("rule") + rroot.findall("rule"):
         r = Rule(el.get("type", ""), dict(el.attrib), el.get("errCode", ""), el.get("level", "error"))
         refs = [r.g(k) for k in ("a", "b", "field", "when", "big", "cycle") if r.g(k)]
         refs += [x for k in ("fields", "small") for x in re.split(r"[,+]", r.g(k)) if x]
@@ -394,6 +344,13 @@ CITIES = [
     ("40", "Nghệ An", "43", "0238", "37"), ("56", "Khánh Hòa", "57", "0258", "79"),
 ]
 CITY_WEIGHTS = [34, 30, 8, 7, 6, 5, 5, 5]
+# Mã tỉnh -> tên chi nhánh 01, 02, 03 (branchCd = CN + mã tỉnh + số thứ tự chi nhánh)
+BRANCHES = {
+    "01": ["Hoàn Kiếm", "Ba Đình", "Cầu Giấy"], "79": ["Sài Gòn", "Bến Thành", "Tân Bình"],
+    "48": ["Hải Châu", "Sơn Trà", "Thanh Khê"], "31": ["Hồng Bàng", "Ngô Quyền", "Lê Chân"],
+    "92": ["Ninh Kiều", "Cái Răng", "Bình Thủy"], "22": ["Hạ Long", "Cẩm Phả", "Uông Bí"],
+    "40": ["Vinh", "Cửa Lò", "Hoàng Mai"], "56": ["Nha Trang", "Cam Ranh", "Ninh Hòa"],
+}
 WARDS = ["Phường 1", "Phường Bến Thành", "Phường Hoàn Kiếm", "Phường Cầu Giấy", "Phường Hải Châu",
          "Phường Ninh Kiều", "Phường Ngô Quyền", "Phường Hồng Gai", "Phường Vinh", "Phường Nha Trang"]
 STREETS = ["Láng Hạ", "Trần Hưng Đạo", "Nguyễn Trãi", "Lê Lợi", "Hai Bà Trưng", "Lý Thường Kiệt",
@@ -493,10 +450,15 @@ def _gen_by_keyword(kw: str, f: Field, ctx: _Ctx) -> str | None:
         return p.company
     if kw == "corpType":
         return p.corp_type
-    if kw == "branchName":
+    if kw == "branchName":            # tên đi theo branchCd đã sinh ở cột trước
+        code = ctx.row.get("branchCd") or ctx.row.get("branchCode") or ""
+        names = BRANCHES.get(city[0], [])
+        no = code[4:] if code.startswith(f"CN{city[0]}") else ""
+        if no.isdigit() and 1 <= int(no) <= len(names):
+            return f"Chi nhánh {names[int(no) - 1]} - {city[1]}"
         return f"Chi nhánh {city[1]}"
     if kw == "branchCode":
-        return f"CN{city[0]}{rnd.randint(1, 3):02d}"
+        return f"CN{city[0]}{rnd.randint(1, len(BRANCHES.get(city[0], [])) or 3):02d}"
     if kw == "address":
         if "office" in f.name.lower():          # nơi làm việc: khác địa chỉ nhà, cùng tỉnh
             return f"Số {rnd.randint(1, 500)} {rnd.choice(STREETS)}, {rnd.choice(WARDS)}, {city[1]}"
@@ -727,6 +689,7 @@ def _map_lookup(rule: Rule, key: str) -> list[str] | None:
 # Chu kỳ trả nợ C19 -> số ngày mỗi kỳ (21 = trả 1 lần cuối kỳ; 22/99 = không tính)
 CYCLE_DAYS = {"11": 1, "12": 7, "13": 14, "14": 30.4, "15": 60.9, "16": 91.3, "17": 121.7, "18": 152.2,
               "19": 182.6, "20": 365.25}
+IRREGULAR_CYCLES = ("22", "99")
 
 
 def _expected_count(rule: Rule, row: dict, layout: Layout) -> int | None:
@@ -789,6 +752,9 @@ def repair_rule(rule: Rule, ctx: _Ctx, layout: Layout) -> None:
     rnd, row, t = ctx.rnd, ctx.row, rule.type
     today = date.today()
     if t == "repayCount":
+        if row.get(rule.g("cycle"), "") in IRREGULAR_CYCLES:     # trả không đều -> không có số kỳ cố định
+            _set(ctx, rule.g("field"), "")
+            return
         exp = _expected_count(rule, row, layout)
         if exp is not None and row.get(rule.g("field"), "") != "":
             _set(ctx, rule.g("field"), str(exp))
@@ -1134,19 +1100,164 @@ def _plan_rows(n: int, lc: Lifecycle, customers: int, lifecycle: bool, mst: bool
     return plan[:n]
 
 
-def _event_dates(layout: Layout, lc: Lifecycle, base: dict, rnd, count: int) -> list[str]:
-    """Ngày thay đổi tăng dần (sau ngày mở / ngày cập nhật ban đầu, không quá hôm nay)."""
+MATURITY_FIELDS = ("matuDt", "expirationMonth")
+AMOUNT_CHANGE_FIELDS = ("loanAmt", "lmtAmt")      # số tiền vay / hạn mức: đổi -> lý do 12
+INFO_CHANGE_FIELDS = ("mobileNo", "email", "homeAdr", "officeAdr", "officeNm", "positionNm", "annualIncome",
+                      "corpAdr", "corpTelNo", "corpWebAdr")   # INID/COID: cập nhật thông tin khách hàng
+GOOD_CLOSE = {"21": 88, "29": 4, "30": 4, "31": 4}  # tất toán bình thường (C37)
+BAD_CLOSE = ("23", "24", "26", "32")                 # xóa nợ, bán nợ, ghi nhận tổn thất, phá sản
+
+
+@dataclass
+class _Step:
+    """1 sự kiện sau đăng ký mới: lý do (C37), việc thay đổi (amount/rate/grade/info) và cột bị đổi."""
+    reason: str = ""
+    action: str = ""
+    field: str = ""
+    grade: str = ""
+
+
+def _reason_field(layout: Layout) -> str | None:
+    return next((f.name for f in layout.fields if "reasoncode" in f.name.lower()), None)
+
+
+def _maturity_field(layout: Layout) -> Field | None:
+    return next((layout.get(n) for n in MATURITY_FIELDS if layout.get(n)), None)
+
+
+def _rule_gap(layout: Layout, a: str, b: str | None, default=(1, 1500)) -> tuple[int, int]:
+    for r in layout.rules:
+        if r.type == "dateOrder" and r.g("a") == a and r.g("b") == b:
+            return _gap(r, default)
+    return default
+
+
+def _lte_smalls(layout: Layout, big: str) -> set[str]:
+    """Các cột phải ≤ cột big (quy tắc lte) -> chỉnh lại khi big thay đổi."""
+    return {s for r in layout.rules if r.type == "lte" and r.g("big") == big for s in r.g("small").split("+")}
+
+
+def _can_increase(layout: Layout, name: str, row: dict) -> bool:
+    return not any(r.type == "lte" and name in r.g("small").split("+") and row.get(r.g("big"), "")
+                   for r in layout.rules)
+
+
+def _months(a: date, b: date) -> int:
+    return (b.year - a.year) * 12 + b.month - a.month
+
+
+def _fit_contract(layout: Layout, lc: Lifecycle, ctx: _Ctx, evts: list[str]) -> None:
+    """Dòng đăng ký mới: nhóm nợ ban đầu, ngày mở đủ sớm cho các sự kiện sau, hợp đồng chưa tất toán thì
+    chưa đến hạn, ân hạn nằm trong thời hạn vay."""
+    rnd, row, today = ctx.rnd, ctx.row, date.today()
+    grp = layout.get("debtGrpCd")
+    if grp and grp.allowed and grp.weights:             # mới đăng ký -> nhóm nợ phổ biến nhất (LOAN 1, DELQ 2)
+        _set(ctx, grp.name, max((k for k in grp.weights if k in grp.allowed), key=grp.weights.get))
+    occ, mat = layout.get("occrDt"), _maturity_field(layout)
+    if occ and row.get(occ.name) and occ.name not in ctx.locked:
+        n = len(evts) - 1
+        need = (_rule_gap(layout, occ.name, lc.change_date)[0] + 20 * n) if n else 0
+        mat_hi = _rule_gap(layout, occ.name, mat.name, (180, 3650))[1] if mat else 0
+        open_end = evts[-1] != "2"
+        for _ in range(30):
+            d_occ = _parse_date(row.get(occ.name, ""), occ.fmt)
+            d_mat = _parse_date(row.get(mat.name, ""), mat.fmt) if mat else None
+            if d_occ and (today - d_occ).days >= need and (not mat or not open_end or (d_mat and d_mat > today)):
+                break
+            back_hi = mat_hi - 60 if mat and open_end and mat_hi - 60 > need else need + 1500
+            _set(ctx, occ.name, _fmt_date(today - timedelta(days=rnd.randint(need, back_hi)), occ.fmt))
+            _repair(layout, ctx)
+    elif lc.change_date and len(evts) > 1 and row.get(lc.change_date) and lc.change_date not in ctx.locked:
+        cd, need = layout.get(lc.change_date), 20 * (len(evts) - 1)    # INID/COID: chừa chỗ cho các lần cập nhật
+        d = _parse_date(row[lc.change_date], cd.fmt)
+        if not d or (today - d).days < need:
+            _set(ctx, cd.name, _fmt_date(today - timedelta(days=rnd.randint(need, need + 720)), cd.fmt))
+            ctx.locked.add(cd.name)
+            _repair(layout, ctx)
+    gs, gp, mt = layout.get("graceStrtDt"), layout.get("gracePeriod"), layout.get("matuDt")
+    if gs and gp and mt and occ and row.get(gs.name):
+        d_gs, d_mt = _parse_date(row[gs.name], gs.fmt), _parse_date(row.get(mt.name, ""), mt.fmt)
+        d_oc = _parse_date(row.get(occ.name, ""), occ.fmt)
+        cap = min(_months(d_gs, d_mt) - 1, _months(d_oc, d_mt) // 3) if d_gs and d_mt and d_oc else 0
+        if cap < 1:                                     # kỳ hạn quá ngắn -> không có ân hạn
+            _set(ctx, gs.name, "")
+            _set(ctx, gp.name, "")
+        elif not row.get(gp.name, "").isdigit() or not 1 <= int(row[gp.name]) <= cap:
+            _set(ctx, gp.name, str(rnd.randint(1, cap)))
+
+
+def _plan_story(layout: Layout, lc: Lifecycle, row: dict, evts: list[str], rnd) -> list[_Step]:
+    """Kịch bản các sự kiện sau đăng ký mới. Thay đổi: đổi số tiền (12), lãi suất / nhóm nợ / thông tin (13).
+    Tất toán: bình thường (21...), hoặc nợ xấu dần lên nhóm 4-5 rồi xóa nợ / bán nợ / xử lý tài sản (23-28)."""
+    reason, grp = _reason_field(layout), layout.get("debtGrpCd")
+    amounts = [f.name for f in layout.fields if f.is_numeric and f.gen_range and f.gen_range[1] > 1000
+               and "rate" not in f.name.lower() and row.get(f.name)
+               and (f.name in AMOUNT_CHANGE_FIELDS or any(f.name in r.g("small").split("+")
+                                                          for r in layout.rules if r.type == "lte"))]
+    if layout.get("bal"):                               # DELQ/GUAR: dư nợ, số tiền quá hạn biến động
+        amounts = [n for n in amounts if n not in AMOUNT_CHANGE_FIELDS]
+    else:                                               # LOAN/CARD: số tiền vay / hạn mức
+        amounts = [n for n in amounts if n in AMOUNT_CHANGE_FIELDS] or amounts
+    rate = next((f.name for f in layout.fields if f.name.lower() == "interestrate" and row.get(f.name)), None)
+    info = [n for n in INFO_CHANGE_FIELDS if layout.get(n)]
+    n_chg = evts.count("3")
+    grade = int(row["debtGrpCd"]) if grp and row.get("debtGrpCd", "").isdigit() else 0
+    bad = bool(grade) and evts[-1] == "2" and n_chg >= 1 and rnd.random() < 0.25
+    target = rnd.choice([4, 5]) if bad else grade
+    steps = []
+    for i, e in enumerate(evts[1:]):
+        if e == "2":
+            if not reason:
+                steps.append(_Step())
+            elif bad:
+                pool = list(BAD_CLOSE) + (["25", "28"] if row.get("collStatFg") == "1" else []) \
+                    + (["27"] if row.get("guarStatFg") == "1" else [])
+                steps.append(_Step(rnd.choice(pool)))
+            else:
+                steps.append(_Step(rnd.choices(list(GOOD_CLOSE), list(GOOD_CLOSE.values()))[0]))
+            continue
+        if bad:                                         # nợ xấu dần: nhóm nợ tăng tới 4-5 trước khi xử lý
+            grade = min(5, grade + -(-(target - grade) // (n_chg - i)))
+            steps.append(_Step("13", "grade", "debtGrpCd", str(grade)))
+            continue
+        opts = ([("amount", 45)] if amounts else []) + ([("rate", 30)] if rate else []) \
+            + ([("grade", 15)] if grade else []) + ([("info", 40)] if info and not reason else [])
+        act = rnd.choices([a for a, _ in opts], [w for _, w in opts])[0] if opts else ""
+        if act == "amount":
+            steps.append(_Step("12", act, rnd.choice(amounts)))
+        elif act == "rate":
+            steps.append(_Step("13", act, rate))
+        elif act == "grade":
+            grade = grade + 1 if grade == 1 else grade - 1
+            steps.append(_Step("13", act, "debtGrpCd", str(grade)))
+        else:
+            steps.append(_Step("13" if reason else "", act, rnd.choice(info) if act == "info" else ""))
+    return steps
+
+
+def _event_dates(layout: Layout, lc: Lifecycle, base: dict, rnd, evts: list[str], story: list[_Step]) -> list[str]:
+    """Ngày các sự kiện sau đăng ký mới: tăng dần, cách ngày mở ≥ gap của quy tắc, không quá hôm nay.
+    Thay đổi xảy ra trước ngày đáo hạn; tất toán bình thường của hợp đồng đã đến hạn rơi vào ngày đáo hạn."""
+    count = len(evts) - 1
     if not lc.change_date or count <= 0:
         return []
-    f = layout.get(lc.change_date)
-    start = _parse_date(base.get(lc.change_date, ""), f.fmt) or _parse_date(base.get("occrDt", ""), "yyyymmdd") \
-        or date.today() - timedelta(days=365)
-    room = (date.today() - start).days
-    if room >= count:
-        offs = sorted(rnd.sample(range(1, room + 1), count))
-    else:
-        offs = [min(i + 1, max(room, 0)) for i in range(count)]
-    return [_fmt_date(start + timedelta(days=o), f.fmt) for o in offs]
+    f, today = layout.get(lc.change_date), date.today()
+    occ = _parse_date(base.get("occrDt", ""), "yyyymmdd")
+    start = occ or _parse_date(base.get(lc.change_date, ""), f.fmt) or today - timedelta(days=365)
+    lo = start + timedelta(days=_rule_gap(layout, "occrDt", lc.change_date)[0] if occ else 1)
+    mat_f = _maturity_field(layout)
+    mat = _parse_date(base.get(mat_f.name, ""), mat_f.fmt) if mat_f else None
+    close = None
+    if evts[-1] == "2" and story and story[-1].reason in ("", "21") and mat and mat <= today:
+        close = max(mat - timedelta(days=rnd.randint(0, 10)), lo + timedelta(days=count - 1))
+    m = count - (1 if close else 0)
+    hi = close - timedelta(days=1) if close else today
+    room = (hi - lo).days + 1
+    offs = sorted(rnd.sample(range(room), m)) if room >= m else list(range(m))
+    days = [lo + timedelta(days=o) for o in offs]
+    if close:
+        days.append(min(today, max(close, (days[-1] if days else lo) + timedelta(days=1))))
+    return [_fmt_date(d, f.fmt) for d in days]
 
 
 def _repair(layout: Layout, ctx: _Ctx) -> None:
@@ -1175,23 +1286,60 @@ def _build_row(layout: Layout, ctx: _Ctx, src: dict | None, fixed: dict, mst: bo
     return [ctx.row[f.name] for f in layout.fields]
 
 
+HISTORY_CARRY = ("branchCd", "branchNm", "debtGrpCd", "ctrtStatCd", "lmtAmt", "cadvLmtAmt",
+                 "principalRepayAmt", "nextPrincipalRepayAmt", "interestRepayAmt", "nextInterestRepayAmt")
+
+
+def _fit_history(layout: Layout, ctx: _Ctx, months: int) -> None:
+    """Tháng đầu LRPY: dư nợ đủ lớn để trả gốc hết các tháng sau mà vẫn ≥ số gốc mỗi kỳ."""
+    bal, paid = _num(ctx.row.get("bal", "")), _num(ctx.row.get("principalRepayAmt", ""))
+    if bal is not None and paid is not None and bal < paid * (months + 1):
+        _set(ctx, "bal", _num_str(_round_amount(paid * (months + 1) * Decimal(ctx.rnd.uniform(1.5, 20)))))
+
+
+def _next_month(layout: Layout, lc: Lifecycle, prev: dict, fixed: dict) -> dict:
+    """LRPY/CRPY tháng sau của cùng hợp đồng: giữ nhóm nợ, trạng thái, hạn mức, số tiền trả mỗi kỳ;
+    dư nợ giảm đúng số gốc đã trả, số kỳ còn lại giảm 1. Ngày và chi tiêu trong tháng sinh mới."""
+    src = {n: prev[n] for n in (lc.key, lc.cust) + HISTORY_CARRY if n and prev.get(n, "") != "" and n not in fixed}
+    bal, paid = _num(prev.get("bal", "")), _num(prev.get("principalRepayAmt", ""))
+    if bal is not None and paid is not None and "bal" not in fixed:
+        paid = min(paid, bal)                           # kỳ cuối: trả nốt phần còn lại
+        src["principalRepayAmt"], src["bal"] = _num_str(paid), _num_str(bal - paid)
+    for n in ("remPrincipalRepayCnt", "remInterestRepayCnt"):
+        if prev.get(n, "").isdigit() and n not in fixed:
+            src[n] = str(max(int(prev[n]) - 1, 0))
+    return src
+
+
 def _change_event(layout: Layout, lc: Lifecycle, ctx: _Ctx, prev: dict, evt: str, chg_date: str | None,
-                  fixed: dict) -> list[str]:
-    """Dòng thay đổi/tất toán: giữ nguyên thông tin hợp đồng, đổi sự kiện, ngày thay đổi và 1 số tiền."""
-    rnd = ctx.rnd
-    ctx.row = dict(prev)
-    ctx.locked = {f.name for f in layout.fields if not f.is_numeric or f.is_date} | set(fixed)
-    ctx.locked -= {f.name for f in layout.fields if "reasoncode" in f.name.lower()}
-    ctx.row[lc.evt] = evt
+                  step: _Step, fixed: dict) -> list[str]:
+    """Dòng thay đổi/tất toán: giữ nguyên thông tin hợp đồng, chỉ đổi sự kiện, ngày, lý do và đúng 1 thứ
+    theo kịch bản (số tiền / lãi suất / nhóm nợ / thông tin KH). Tất toán không đổi giá trị nào."""
+    rnd, row = ctx.rnd, dict(prev)
+    ctx.row = row
+    ctx.locked = {f.name for f in layout.fields}
+    row[lc.evt] = evt
     if lc.change_date and chg_date:
-        ctx.row[lc.change_date] = chg_date
-    amounts = [f for f in layout.fields if f.is_numeric and f.gen_range and ctx.row.get(f.name)
-               and f.gen_range[1] > 1000 and f.name not in fixed]
-    if amounts:
-        f = rnd.choice(amounts)
-        ctx.row[f.name] = _num_str(_round_amount(Decimal(ctx.row[f.name]) * Decimal(rnd.uniform(0.85, 0.98))))
+        row[lc.change_date] = chg_date
+    reason = _reason_field(layout)
+    if reason and step.reason:
+        row[reason] = step.reason
+    f = layout.get(step.field) if step.field and step.field not in fixed else None
+    if f and step.action == "amount":
+        lo, hi = (0.8, 0.95) if not _can_increase(layout, f.name, row) or rnd.random() < 0.5 else (1.1, 1.3)
+        row[f.name] = _num_str(_round_amount(Decimal(row[f.name]) * Decimal(rnd.uniform(lo, hi))))
+    elif f and step.action == "rate":
+        lo, hi = f.gen_range or (Decimal(0), Decimal(10 ** 5))
+        new = Decimal(row[f.name]) + rnd.choice([-1, 1]) * 25 * rnd.randint(1, 8)
+        row[f.name] = _num_str(min(max(new, lo), hi))
+    elif f and step.action == "grade":
+        row[f.name] = step.grade
+    elif f and step.action == "info":
+        row[f.name] = default_value(f, ctx, force=True)
+    if f:                                               # cột phụ thuộc (≤ cột vừa đổi) được chỉnh theo
+        ctx.locked -= _lte_smalls(layout, f.name) - set(fixed)
     _repair(layout, ctx)
-    return [ctx.row[f.name] for f in layout.fields]
+    return [row[f.name] for f in layout.fields]
 
 
 def generate(layout: Layout, header_layout: Layout, trailer_layout: Layout,
@@ -1222,12 +1370,14 @@ def generate(layout: Layout, header_layout: Layout, trailer_layout: Layout,
             rows.append(_build_row(layout, ctx, src, fixed, mst))
             ctxs.append(ctx)
     else:
-        personas, prev, dates = {}, {}, []
-        for i, (g, cust, j, k, evt) in enumerate(_plan_rows(n_rows, lc, customers, lifecycle, mst, rnd), 1):
+        personas, prev, dates, story = {}, {}, [], []
+        plan = _plan_rows(n_rows, lc, customers, lifecycle, mst, rnd)
+        for i, (g, cust, j, k, evt) in enumerate(plan, 1):
             persona = personas.setdefault(cust, _make_persona(rnd))
             ctx = _Ctx(rnd, g, header, persona, cust=cust, row_no=i)
             if j > 0 and not lc.history:
-                vals = _change_event(layout, lc, ctx, prev, evt, dates[j - 1] if j - 1 < len(dates) else None, fixed)
+                vals = _change_event(layout, lc, ctx, prev, evt, dates[j - 1] if j - 1 < len(dates) else None,
+                                     story[j - 1], fixed)
             else:
                 src = {}
                 if lc.evt and (lifecycle or i == 1) and lc.evt not in fixed:
@@ -1235,10 +1385,18 @@ def generate(layout: Layout, header_layout: Layout, trailer_layout: Layout,
                 if lc.history and "baseDt" not in fixed:     # LRPY/CRPY: mỗi dòng 1 tháng, tăng dần
                     src["baseDt"] = _month_end(-(k - j)).strftime("%Y%m%d")
                 if j > 0 and lc.history:                    # tháng tiếp theo của cùng hợp đồng
-                    src.update({n: prev[n] for n in (lc.key, lc.cust, "branchCd", "branchNm") if n and n in prev})
+                    src.update(_next_month(layout, lc, prev, fixed))
                 vals = _build_row(layout, ctx, src or None, fixed, mst)
-                if j == 0:
-                    dates = _event_dates(layout, lc, ctx.row, rnd, k - 1)
+                if j == 0 and lc.history and lifecycle:
+                    _fit_history(layout, ctx, k)
+                    vals = [ctx.row[f.name] for f in layout.fields]
+                if j == 0 and not lc.history:
+                    evts = [p[4] for p in plan[i - 1:i - 1 + k]]
+                    if lifecycle:
+                        _fit_contract(layout, lc, ctx, evts)
+                        vals = [ctx.row[f.name] for f in layout.fields]
+                    story = _plan_story(layout, lc, ctx.row, evts, rnd)
+                    dates = _event_dates(layout, lc, ctx.row, rnd, evts, story)
             prev = dict(ctx.row)
             rows.append(vals)
             ctxs.append(ctx)

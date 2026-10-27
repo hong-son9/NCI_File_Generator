@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rules infoCd="EWST">
+    <field name="recordType" required="Y" maxLen="1" values="D"/>
+    <field name="registrationEvent" required="Y" maxLen="1" codeRef="C04" errCode="E110" weights="1:80,3:10,2:8,7:2"/>
+    <field name="institutionCode" required="Y" maxLen="7"/>
+    <field name="branchCode" required="N" maxLen="20"/>
+    <field name="branchName" required="N" maxLen="200"/>
+    <field name="customerCode" required="Y" maxLen="30" errCodeMissing="E127" default="CUST{cust:06d}"/>
+    <field name="consentOfInformationCollection" required="Y" maxLen="1" values="0,1" errCode="E191" weights="1:97,0:3"/>
+</rules>

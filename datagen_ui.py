@@ -18,6 +18,7 @@ from tkinter import ttk, filedialog, messagebox
 import datagen_core as core
 
 APP_DIR = Path(__file__).resolve().parent
+LAYOUT_DIR = APP_DIR / "layouts"
 CONFIG_DIR = APP_DIR / "configs"
 GLOBAL_CFG = CONFIG_DIR / "_app.json"
 ROW_LEVEL_LABEL = "(Cả dòng)"
@@ -25,13 +26,6 @@ MODES = [("random", "Ngẫu nhiên N dòng"), ("rows", "Dòng chỉ định")]
 ALL_ERROR_LABELS = {**core.ERROR_LABELS, **core.ROW_ERROR_LABELS, **core.RULE_ERROR_LABELS}
 RULE_LABEL_PREFIX = "(Quy tắc "
 PREVIEW_LIMIT = 1000
-TEMPLATE_HELP = (
-    "Để trống = tự sinh theo quy tắc.   Mẫu dùng được:  {seq} số thứ tự hợp đồng · {cust} số thứ tự khách hàng · "
-    "{row} số thứ tự dòng · {seq:4} → 0001 · "
-    "{seq+40:4} → 0041 · {rand:6} 6 chữ số ngẫu nhiên · {today} · {date:20250101-20261231} · "
-    "{1|2|3} chọn ngẫu nhiên · {H.institutionCode} lấy từ header · {ctrtNo} lấy cột đứng trước · "
-    "{empty} để trống.  Ví dụ: loanacct{seq+40:4}"
-)
 
 
 def _read_json(path: Path) -> dict:
@@ -67,7 +61,6 @@ class App(tk.Tk):
         self.header_vars: dict[str, tk.StringVar] = {}
         self._err_type_codes: list[str] = []
 
-        self.layout_dir = tk.StringVar(value=g.get("layout_dir", str(APP_DIR / "layouts")))
         self.out_dir = tk.StringVar(value=g.get("out_dir", str(APP_DIR / "output")))
         self.info_var = tk.StringVar()
         self.rows_var = tk.StringVar(value="10")
@@ -96,38 +89,27 @@ class App(tk.Tk):
         top.pack(fill="x")
         r1 = ttk.Frame(top)
         r1.pack(fill="x")
-        ttk.Label(r1, text="Thư mục layout:").pack(side="left")
-        ttk.Entry(r1, textvariable=self.layout_dir).pack(side="left", fill="x", expand=True, padx=6)
-        ttk.Button(r1, text="Chọn...", command=self.choose_layout_dir).pack(side="left")
-        ttk.Button(r1, text="Tải lại", command=self.reload_layouts).pack(side="left", padx=(4, 0))
-        ttk.Button(r1, text="Nạp Code Master (.xlsx)...", command=self.import_codes).pack(side="left", padx=(12, 0))
+        ttk.Label(r1, text="Loại dữ liệu:").pack(side="left")
+        self.info_cb = ttk.Combobox(r1, textvariable=self.info_var, state="readonly", width=12)
+        self.info_cb.pack(side="left", padx=(6, 4))
+        self.info_cb.bind("<<ComboboxSelected>>", lambda e: self.select_layout(self.info_var.get()))
+        ttk.Button(r1, text="Tải lại layout", command=self.reload_layouts).pack(side="left", padx=(0, 16))
+        ttk.Label(r1, text="Số dòng:").pack(side="left")
+        self.rows_spin = ttk.Spinbox(r1, from_=1, to=1_000_000, textvariable=self.rows_var, width=8)
+        self.rows_spin.pack(side="left", padx=(6, 16))
+        ttk.Label(r1, text="Số khách hàng:").pack(side="left")
+        self.cust_spin = ttk.Spinbox(r1, from_=0, to=1_000_000, textvariable=self.cust_var, width=6)
+        self.cust_spin.pack(side="left", padx=(6, 16))
+        ttk.Label(r1, text="Seed:").pack(side="left")
+        ttk.Entry(r1, textvariable=self.seed_var, width=8).pack(side="left", padx=(6, 16))
+        self.lifecycle_cb = ttk.Checkbutton(r1, text="Vòng đời hợp đồng", variable=self.lifecycle_var)
+        self.lifecycle_cb.pack(side="left")
 
         r2 = ttk.Frame(top)
-        r2.pack(fill="x", pady=(8, 0))
-        ttk.Label(r2, text="Loại dữ liệu:").pack(side="left")
-        self.info_cb = ttk.Combobox(r2, textvariable=self.info_var, state="readonly", width=14)
-        self.info_cb.pack(side="left", padx=(6, 16))
-        self.info_cb.bind("<<ComboboxSelected>>", lambda e: self.select_layout(self.info_var.get()))
-        ttk.Label(r2, text="Số dòng:").pack(side="left")
-        self.rows_spin = ttk.Spinbox(r2, from_=1, to=1_000_000, textvariable=self.rows_var, width=9)
-        self.rows_spin.pack(side="left", padx=(6, 16))
-        ttk.Label(r2, text="Seed:").pack(side="left")
-        ttk.Entry(r2, textvariable=self.seed_var, width=8).pack(side="left", padx=(6, 2))
-        ttk.Label(r2, text="(trống = mỗi lần khác)", foreground="#777").pack(side="left", padx=(0, 16))
+        r2.pack(fill="x", pady=(6, 0))
         ttk.Button(r2, text="Dùng file CSV...", command=self.load_csv).pack(side="left")
         ttk.Button(r2, text="Bỏ CSV", command=self.clear_csv).pack(side="left", padx=4)
         ttk.Label(r2, textvariable=self.csv_label, foreground="#555").pack(side="left", padx=6)
-
-        r3 = ttk.Frame(top)
-        r3.pack(fill="x", pady=(6, 0))
-        ttk.Label(r3, text="Số khách hàng:").pack(side="left")
-        self.cust_spin = ttk.Spinbox(r3, from_=0, to=1_000_000, textvariable=self.cust_var, width=7)
-        self.cust_spin.pack(side="left", padx=(6, 4))
-        ttk.Label(r3, text="(custCd dùng chung trong file; 0 = mỗi hợp đồng 1 khách hàng)",
-                  foreground="#777").pack(side="left", padx=(0, 16))
-        self.lifecycle_cb = ttk.Checkbutton(r3, text="Vòng đời hợp đồng: 1 (mới) → 3 (thay đổi) → 2 (tất toán), "
-                                                     "dòng đầu luôn evtCd=1", variable=self.lifecycle_var)
-        self.lifecycle_cb.pack(side="left")
 
         self.nb = ttk.Notebook(self)
         self.nb.pack(fill="both", expand=True, padx=10, pady=4)
@@ -165,7 +147,7 @@ class App(tk.Tk):
         defaults = core.header_defaults()
         self.header_vars = {}
         if not H:
-            ttk.Label(box, text="⚠ Không tìm thấy HEADER.xml trong thư mục layout", foreground="#b00").pack()
+            ttk.Label(box, text="⚠ Không có layouts/HEADER.xml", foreground="#b00").pack()
         else:
             for i, f in enumerate(H.fields):
                 var = tk.StringVar(value=old.get(f.name, saved.get(f.name, defaults.get(f.name, ""))))
@@ -178,22 +160,18 @@ class App(tk.Tk):
                     state = "disabled"
                 ttk.Label(box, text=f.name).grid(row=i, column=0, sticky="w", pady=2)
                 ttk.Entry(box, textvariable=var, width=32, state=state).grid(row=i, column=1, sticky="w", padx=8)
-                note = f.desc + ("  (tự lấy theo loại dữ liệu)" if f.name == "informationType" else "")
-                ttk.Label(box, text=note, foreground="#777").grid(row=i, column=2, sticky="w")
                 self.header_vars[f.name] = var
 
-        fbox = ttk.LabelFrame(self.header_tab, text="Tên file & định dạng", padding=10)
+        fbox = ttk.LabelFrame(self.header_tab, text="File xuất", padding=10)
         fbox.pack(fill="x", pady=(12, 0))
         ttk.Label(fbox, text="Đuôi tên file (yymmdd)").grid(row=0, column=0, sticky="w", pady=2)
         ttk.Entry(fbox, textvariable=self.suffix_var, width=12).grid(row=0, column=1, sticky="w", padx=8)
         ttk.Label(fbox, text="Tên file (trống = tự đặt)").grid(row=1, column=0, sticky="w", pady=2)
         ttk.Entry(fbox, textvariable=self.filename_var, width=40).grid(row=1, column=1, sticky="w", padx=8)
-        ttk.Label(fbox, text="Mặc định: <institutionCode>_<LOẠI>INF_NICE.<yymmdd>", foreground="#777").grid(
-            row=1, column=2, sticky="w")
-        ttk.Checkbutton(fbox, text="Xuống dòng kiểu Windows (CRLF)", variable=self.crlf_var).grid(
+        ttk.Checkbutton(fbox, text="Xuống dòng CRLF", variable=self.crlf_var).grid(
             row=2, column=0, columnspan=2, sticky="w", pady=(6, 0))
-        ttk.Checkbutton(fbox, text="Xuất kèm báo cáo lỗi (.errors.csv) khi có chèn lỗi",
-                        variable=self.report_var).grid(row=3, column=0, columnspan=3, sticky="w")
+        ttk.Checkbutton(fbox, text="Xuất kèm .errors.csv", variable=self.report_var).grid(
+            row=3, column=0, columnspan=2, sticky="w")
 
     def _build_cols_tab(self):
         cols = ("idx", "name", "type", "rule", "value")
@@ -201,8 +179,8 @@ class App(tk.Tk):
         frame.pack(fill="both", expand=True)
         self.col_tree = ttk.Treeview(frame, columns=cols, show="headings", selectmode="browse")
         for c, text, w, st in [("idx", "#", 40, False), ("name", "Cột", 170, False), ("type", "Kiểu", 90, False),
-                               ("rule", "Quy tắc (đọc từ layout)", 300, True),
-                               ("value", "Giá trị / mẫu  — double-click để sửa", 380, True)]:
+                               ("rule", "Quy tắc", 300, True),
+                               ("value", "Giá trị (double-click để sửa)", 380, True)]:
             self.col_tree.heading(c, text=text, anchor="w")
             self.col_tree.column(c, width=w, stretch=st, anchor="w")
         self.col_tree.tag_configure("set", background="#e3f4e1")
@@ -215,23 +193,10 @@ class App(tk.Tk):
 
         ttk.Label(self.cols_tab, textvariable=self.desc_var, foreground="#335", wraplength=1150,
                   justify="left").pack(fill="x", pady=(6, 0))
-        ttk.Label(self.cols_tab, text=TEMPLATE_HELP, foreground="#666", wraplength=1100,
-                  justify="left").pack(fill="x", pady=(4, 0))
         btns = ttk.Frame(self.cols_tab)
         btns.pack(fill="x", pady=(6, 0))
-        ttk.Button(btns, text="Sửa giá trị cột đang chọn", command=lambda: self._edit_value(None)).pack(side="left")
-        ttk.Button(btns, text="Xóa giá trị cột đang chọn", command=self._clear_value).pack(side="left", padx=4)
-        ttk.Button(btns, text="Xóa tất cả giá trị", command=self._clear_all_values).pack(side="left")
-
-        rbox = ttk.LabelFrame(self.cols_tab, text="Quy tắc liên cột (đọc từ thẻ <rule> trong layout) — dữ liệu sinh ra luôn thỏa các quy tắc này",
-                              padding=6)
-        rbox.pack(fill="x", pady=(8, 0))
-        self.rules_text = tk.Text(rbox, height=6, wrap="word", font="TkDefaultFont", relief="flat",
-                                  background=self.cget("background"))
-        rsb = ttk.Scrollbar(rbox, orient="vertical", command=self.rules_text.yview)
-        self.rules_text.configure(yscrollcommand=rsb.set)
-        self.rules_text.pack(side="left", fill="x", expand=True)
-        rsb.pack(side="left", fill="y")
+        ttk.Button(btns, text="Xóa giá trị", command=self._clear_value).pack(side="left")
+        ttk.Button(btns, text="Xóa tất cả", command=self._clear_all_values).pack(side="left", padx=4)
 
     def _build_err_tab(self):
         form = ttk.LabelFrame(self.err_tab, text="Thêm lỗi cho dòng detail", padding=10)
@@ -256,9 +221,6 @@ class App(tk.Tk):
         ttk.Button(r3, text="+ Thêm lỗi", command=self.add_error).pack(side="left")
         ttk.Label(form, textvariable=self.err_hint, foreground="#335").grid(
             row=4, column=0, columnspan=4, sticky="w", pady=(6, 0))
-        ttk.Label(form, text="Chọn dòng: Ngẫu nhiên → 3  |  Dòng chỉ định → 1,4,7-9.  Ngẫu nhiên ưu tiên dòng chưa có lỗi "
-                             "(mỗi dòng 1 lỗi).  Mã trong [ ] là mã lỗi NICE mong đợi (Code Master C34/C35).",
-                  foreground="#777").grid(row=5, column=0, columnspan=4, sticky="w")
 
         lst = ttk.LabelFrame(self.err_tab, text="Danh sách lỗi sẽ chèn", padding=10)
         lst.pack(fill="both", expand=True, pady=(10, 0))
@@ -299,7 +261,7 @@ class App(tk.Tk):
         self.preview_text.tag_configure("ln", foreground="#999")
         pw.add(tf, weight=3)
 
-        rf = ttk.LabelFrame(pw, text="Lỗi đã chèn (dòng tô đỏ ở trên)", padding=6)
+        rf = ttk.LabelFrame(pw, text="Lỗi đã chèn", padding=6)
         cols = ("line", "field", "code", "label", "old", "new", "note")
         self.rep_tree = ttk.Treeview(rf, columns=cols, show="headings", height=6)
         for c, t, w in [("line", "Dòng", 50), ("field", "Cột", 150), ("code", "Mã NICE", 70), ("label", "Lỗi", 260),
@@ -314,30 +276,10 @@ class App(tk.Tk):
         pw.add(rf, weight=1)
 
     # ------------------------------------------------------------------ layouts
-    def choose_layout_dir(self):
-        d = filedialog.askdirectory(initialdir=self.layout_dir.get(), title="Chọn thư mục chứa layout XML")
-        if d:
-            self.layout_dir.set(d)
-            self.reload_layouts()
-
-    def import_codes(self):
-        path = filedialog.askopenfilename(title="Chọn file NCI Code Master (.xlsx)",
-                                          filetypes=[("Excel", "*.xlsx"), ("Tất cả", "*.*")])
-        if not path:
-            return
-        out = Path(self.layout_dir.get()).parent / "codes" / "nci_codes.csv"
-        try:
-            n = core.import_code_master_xlsx(path, out)
-        except Exception as e:
-            messagebox.showerror("Không nạp được Code Master", str(e))
-            return
-        messagebox.showinfo("Đã nạp Code Master", f"{n} mã → {out}")
-        self.reload_layouts()
-
     def reload_layouts(self):
         if self.layout:
             self._save_config()
-        repo, problems = core.load_layouts(self.layout_dir.get())
+        repo, problems = core.load_layouts(LAYOUT_DIR)
         self.repo = repo
         if problems:
             messagebox.showwarning("Layout lỗi", "Không đọc được:\n\n" + "\n".join(problems))
@@ -353,9 +295,9 @@ class App(tk.Tk):
             self.info_var.set("")
             self._refresh_columns()
             self._refresh_err_fields()
-        cf = core.find_code_file(self.layout_dir.get())
-        msg = f"Đã nạp {len(types)} loại dữ liệu: {', '.join(types)}"
-        msg += f"   |   Code Master: {cf.name if cf else '⚠ chưa có (bấm Nạp Code Master)'}"
+        msg = f"Đã nạp {len(types)} loại dữ liệu"
+        if not core.find_code_file(LAYOUT_DIR):
+            msg += "   ⚠ Thiếu codes/nci_codes.csv"
         if missing:
             msg += f"   ⚠ Thiếu layout: {', '.join(missing)}"
         self.status.set(msg)
@@ -372,7 +314,7 @@ class App(tk.Tk):
         self._refresh_columns()
         self._refresh_err_fields()
         self._refresh_errors()
-        self.status.set(f"{info}: {len(self.layout.fields)} cột — {self.layout.path}")
+        self.status.set(f"{info}: {len(self.layout.fields)} cột")
 
     # ------------------------------------------------------------------ cột
     def _refresh_columns(self):
@@ -383,24 +325,12 @@ class App(tk.Tk):
             val = "D (cố định)" if f.name == "recordType" else self.fixed.get(f.name, "")
             self.col_tree.insert("", "end", iid=f.name, values=(f.index, f.name, f.type, f.rule_text(), val),
                                  tags=("set",) if self.fixed.get(f.name) else ())
-        self.rules_text.configure(state="normal")
-        self.rules_text.delete("1.0", "end")
-        lines = [f"{i + 1}. {r.full_label()}" for i, r in enumerate(self.layout.rules)]
-        self.rules_text.insert("end", "\n".join(lines) if lines else "(layout này không có quy tắc liên cột)")
-        self.rules_text.configure(state="disabled", height=min(max(len(lines), 1), 7))
 
     def _on_col_select(self, _=None):
         sel = self.col_tree.selection()
         if sel and self.layout:
             f = self.layout.get(sel[0])
-            txt = f"{f.name}: {f.desc}" if f.desc else f.name
-            if f.default:
-                txt += f"\nMặc định khi sinh: {f.default}"
-            if f.allowed and f.code_desc:
-                items = [f"{c}={f.code_desc.get(c, '')}" for c in f.allowed[:14]]
-                more = f"  … (+{len(f.allowed) - 14} mã)" if len(f.allowed) > 14 else ""
-                txt += f"\nMã {f.code_ref}: " + " · ".join(items) + more
-            self.desc_var.set(txt)
+            self.desc_var.set(f"{f.name}: {f.desc}" if f.desc else f.name)
 
     def _edit_value(self, event):
         tree = self.col_tree
@@ -458,7 +388,7 @@ class App(tk.Tk):
         self.err_field_cb.set("")
         self.err_type_cb.set("")
         self.err_type_cb["values"] = []
-        self.err_hint.set("Chọn cột để xem các loại lỗi phù hợp")
+        self.err_hint.set("")
 
     def _rule_label(self, i: int) -> str:
         return f"{RULE_LABEL_PREFIX}{i + 1}) {self.layout.rules[i].full_label()}"
@@ -476,7 +406,7 @@ class App(tk.Tk):
             self.err_type_cb["values"] = [ALL_ERROR_LABELS["RULE"]]
             self.err_type_cb.current(0)
             r = self.layout.rules[ri]
-            self.err_hint.set(f"Làm sai quy tắc: {r.label()}  →  mã NICE mong đợi: {r.err_code or '(cảnh báo, không có mã riêng)'}")
+            self.err_hint.set(f"Làm sai quy tắc: {r.label()}")
             return
         f = None if name == ROW_LEVEL_LABEL else self.layout.get(name)
         self._err_type_codes = core.applicable_errors(f)
@@ -486,7 +416,7 @@ class App(tk.Tk):
         if f is None:
             self.err_hint.set("Lỗi cấu trúc dòng: thiếu/thừa cột, sai recordType")
         else:
-            self.err_hint.set(f"Quy tắc {f.name}: {f.rule_text() or '(không có quy tắc — chỉ nên dùng Giá trị tự nhập)'}")
+            self.err_hint.set(f"{f.name}: {f.rule_text() or 'không có quy tắc, nên dùng Giá trị tự nhập'}")
 
     def add_error(self):
         if not self.layout:
@@ -569,7 +499,7 @@ class App(tk.Tk):
         if unknown:
             msg.append("Cột không có trong layout (bỏ qua): " + ", ".join(unknown))
         if missing:
-            msg.append("Cột thiếu trong CSV (sẽ tự sinh / lấy giá trị tab 2): " + ", ".join(missing))
+            msg.append("Cột thiếu trong CSV (sẽ tự sinh): " + ", ".join(missing))
         if msg:
             messagebox.showinfo("Lưu ý CSV", "\n\n".join(msg))
 
@@ -773,7 +703,7 @@ class App(tk.Tk):
                     "file_errors": [k for k, v in self.file_err_vars.items() if v.get()],
                 })
             _write_json(GLOBAL_CFG, {
-                "layout_dir": self.layout_dir.get(), "out_dir": self.out_dir.get(),
+                "out_dir": self.out_dir.get(),
                 "crlf": self.crlf_var.get(), "report": self.report_var.get(),
                 "header": {k: v.get() for k, v in self.header_vars.items()
                            if k not in ("recordType", "informationType")},

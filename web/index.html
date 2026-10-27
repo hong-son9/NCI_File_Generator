@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NICE Test Data Generator</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+</head>
+<body>
+  <div id="loading" class="loading">
+    <div class="spinner"></div>
+    <div id="loading-text">Đang tải Python (Pyodide)...</div>
+  </div>
+
+  <header class="topbar">
+    <h1>NICE Test Data Generator</h1>
+  </header>
+
+  <section class="toolbar">
+    <div class="row">
+      <label>Loại dữ liệu <select id="info"></select></label>
+      <label>Số dòng <input id="rows" type="number" min="1" value="10"></label>
+      <label>Số khách hàng <input id="customers" type="number" min="0" value="1"></label>
+      <label>Seed <input id="seed" type="text" inputmode="numeric" size="8"></label>
+      <label class="check"><input id="lifecycle" type="checkbox" checked> Vòng đời hợp đồng</label>
+    </div>
+    <div class="row">
+      <label class="btn">Dùng file CSV...<input id="csv-file" type="file" accept=".csv,text/csv" hidden></label>
+      <button id="csv-clear" type="button">Bỏ CSV</button>
+      <span id="csv-label" class="muted">(tự sinh dữ liệu)</span>
+    </div>
+  </section>
+
+  <nav class="tabs" role="tablist">
+    <button role="tab" data-tab="header">1. Header &amp; file</button>
+    <button role="tab" data-tab="cols" class="active">2. Giá trị cột</button>
+    <button role="tab" data-tab="errors">3. Lỗi dữ liệu</button>
+    <button role="tab" data-tab="preview">4. Xem trước</button>
+  </nav>
+
+  <main>
+    <section id="tab-header" class="tab">
+      <fieldset>
+        <legend>Dòng Header (H)</legend>
+        <div id="header-fields" class="grid2"></div>
+      </fieldset>
+      <fieldset>
+        <legend>File xuất</legend>
+        <div class="grid2">
+          <label for="suffix">Đuôi tên file (yymmdd)</label><input id="suffix" size="12">
+          <label for="filename">Tên file (trống = tự đặt)</label><input id="filename" size="40">
+        </div>
+        <label class="check"><input id="crlf" type="checkbox"> Xuống dòng CRLF</label>
+        <label class="check"><input id="report" type="checkbox" checked> Xuất kèm .errors.csv</label>
+      </fieldset>
+    </section>
+
+    <section id="tab-cols" class="tab active">
+      <div class="table-wrap">
+        <table id="cols-table">
+          <thead><tr><th>#</th><th>Cột</th><th>Kiểu</th><th>Quy tắc</th><th>Giá trị</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <p id="col-desc" class="desc"></p>
+      <button id="clear-values" type="button">Xóa tất cả</button>
+    </section>
+
+    <section id="tab-errors" class="tab">
+      <fieldset>
+        <legend>Thêm lỗi cho dòng detail</legend>
+        <div class="row">
+          <label>Cột / quy tắc <select id="err-field"></select></label>
+          <label>Loại lỗi <select id="err-type"></select></label>
+        </div>
+        <div class="row">
+          <label>Chọn dòng
+            <select id="err-mode">
+              <option value="random">Ngẫu nhiên N dòng</option>
+              <option value="rows">Dòng chỉ định</option>
+            </select>
+          </label>
+          <label>Số dòng / danh sách <input id="err-rows" value="1" size="12"></label>
+          <label>Giá trị tự nhập <input id="err-custom" size="18"></label>
+          <button id="err-add" type="button">+ Thêm lỗi</button>
+        </div>
+        <p id="err-hint" class="desc"></p>
+      </fieldset>
+      <fieldset>
+        <legend>Danh sách lỗi sẽ chèn</legend>
+        <div class="table-wrap short">
+          <table id="err-table">
+            <thead><tr><th>Cột / quy tắc</th><th>Loại lỗi</th><th>Chọn dòng</th><th>Dòng</th><th>Giá trị tự nhập</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <button id="err-clear" type="button">Xóa hết</button>
+      </fieldset>
+      <fieldset>
+        <legend>Lỗi cấp file</legend>
+        <div id="file-errors" class="row"></div>
+      </fieldset>
+    </section>
+
+    <section id="tab-preview" class="tab">
+      <pre id="preview-text" class="preview"></pre>
+      <fieldset>
+        <legend>Lỗi đã chèn</legend>
+        <div class="table-wrap short">
+          <table id="report-table">
+            <thead><tr><th>Dòng</th><th>Cột</th><th>Mã NICE</th><th>Lỗi</th><th>Giá trị gốc</th><th>Giá trị lỗi</th><th>Ghi chú</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </fieldset>
+    </section>
+  </main>
+
+  <footer class="actions">
+    <label class="btn">Kiểm tra file...<input id="check-file" type="file" hidden></label>
+    <span class="spacer"></span>
+    <button id="btn-preview" type="button">Xem trước</button>
+    <button id="btn-generate" type="button" class="primary">★ Tạo file</button>
+  </footer>
+  <div id="status" class="status">Sẵn sàng</div>
+
+  <dialog id="check-dialog">
+    <div class="dialog-head">
+      <strong id="check-title"></strong>
+      <button type="button" id="check-close" aria-label="Đóng">✕</button>
+    </div>
+    <p id="check-summary"></p>
+    <div class="table-wrap">
+      <table id="check-table">
+        <thead><tr><th>Dòng</th><th>Mã NICE</th><th>Mức</th><th>Cột</th><th>Lỗi</th><th>Giá trị</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>

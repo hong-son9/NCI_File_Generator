@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rules infoCd="LRPY">
+    <field name="recordType" required="Y" maxLen="1" values="D"/>
+    <field name="evtCd" required="Y" maxLen="1" codeRef="C04" values="1,3,7" errCode="E144" weights="1:90,3:8,7:2"/>
+    <field name="instCd" required="Y" maxLen="7"/>
+    <field name="branchCd" required="N" maxLen="20"/>
+    <field name="branchNm" required="N" maxLen="200"/>
+    <field name="custCd" required="Y" maxLen="30" errCodeMissing="E127" default="CUST{cust:06d}"/>
+    <field name="ctrtNo" required="Y" maxLen="50" errCode="E183" default="LN{seq:08d}"/>
+    <field name="baseDt" required="Y" maxLen="8" format="yyyymmdd" notFuture="Y" errCode="E140" default="{monthend:-1}"/>
+    <field name="debtGrpCd" required="Y" maxLen="1" codeRef="C12" errCode="E184" weights="1:88,2:6,3:3,4:2,5:1"/>
+    <field name="ctrtStatCd" required="Y" maxLen="2" codeRef="C13" weights="11:88,13:7,17:3,12:2"/>
+    <field name="lstRepayDt" required="N" maxLen="8" format="yyyymmdd" notFuture="Y" errCode="E312" default="{dateadd:baseDt:-27:0}"/>
+    <field name="principalRepayAmt" required="Y" maxLen="18" genRange="1000000-60000000"/>
+    <field name="interestRepayAmt" required="Y" maxLen="18" genRange="200000-25000000"/>
+    <field name="nextRepayDt" required="N" maxLen="8" format="yyyymmdd" default="{dateadd:baseDt:1:31}"/>
+    <field name="nextPrincipalRepayAmt" required="N" maxLen="18" genRange="1000000-60000000"/>
+    <field name="nextInterestRepayAmt" required="N" maxLen="18" genRange="200000-25000000"/>
+    <field name="remPrincipalRepayCnt" required="N" maxLen="3" genRange="1-110"/>
+    <field name="remInterestRepayCnt" required="N" maxLen="3" genRange="1-110"/>
+    <field name="bal" required="Y" maxLen="18" genRange="10000000-2500000000"/>
+    <field name="overdraftAvgBal" required="N" maxLen="18" genRange="5000000-300000000" fillRate="0.1"/>
+    <field name="consentFg" required="Y" maxLen="1" values="1,0" errCode="E191" weights="1:97,0:3"/>
+
+    <rule type="dateOrder" a="lstRepayDt" b="baseDt" gap="0-27" adjust="a" level="warn" desc="Ngày trả gần nhất không sau ngày cơ sở"/>
+    <rule type="dateOrder" a="baseDt" b="nextRepayDt" strict="Y" gap="1-31" level="warn" desc="Ngày trả kỳ tới phải sau ngày cơ sở"/>
+    <rule type="lte" small="principalRepayAmt" big="bal" level="warn"/>
+</rules>

@@ -1,29 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout infoCd="CARD" delimiter="|:" fieldCount="18">
-    <field name="recordType" type="String" index="0" desc="Record Type (Y, String, 1)" values="D"/>
-    <field name="evtCd" type="String" index="1" desc="Registration Event (Y, String, 1) - 등록구분. 1:신규등록, 2:해지, 3:변경, 7:삭제 (NCI Code Master C04 참조)" errCode="E143" weights="1:75,3:15,2:8,7:2"/>
+    <field name="recordType" type="String" index="0" desc="Record Type (Y, String, 1)"/>
+    <field name="evtCd" type="String" index="1" desc="Registration Event (Y, String, 1) - 등록구분. 1:신규등록, 2:해지, 3:변경, 7:삭제 (NCI Code Master C04 참조)"/>
     <field name="instCd" type="String" index="2" desc="Institution Code (Y, String, 7) - 회원기관 식별코드 (NICE 발급)"/>
     <field name="branchCd" type="String" index="3" desc="Branch Code (N, String, 20) - 카드 발급 지점코드"/>
     <field name="branchNm" type="String" index="4" desc="Branch Name (N, String, 200) - 카드 발급 지점명"/>
-    <field name="custCd" type="String" index="5" desc="Customer Code (Y, String, 30) - 카드 소지자(회원) 고객코드" errCodeMissing="E127" default="CUST{cust:06d}"/>
-    <field name="ctrtNo" type="String" index="6" desc="Contract Number (Y, String, 50) - 카드 계약(카드번호 대응) 고유번호" errCode="E183" default="CD{seq:08d}"/>
-    <field name="debtGrpCd" type="String" index="7" desc="Debt Group Code (Y, String, 1) - 카드 채무의 건전성 5단계 분류. 1~5 (NCI Code Master C12 참조)" errCode="E184" weights="1:88,2:6,3:3,4:2,5:1"/>
-    <field name="loanTypeCd" type="String" index="8" desc="Loan Type Code (Y, String, 3) - 카드 상품 유형 코드. 예: 210:일반 신용카드, 220:리볼빙 신용카드, 230:카드론 등 (NCI Code Master C17 참조)" values="210,220,230,240" errCode="E132" errCodeMissing="E131" weights="210:55,220:30,230:10,240:5"/>
-    <field name="lmtAmt" type="BigDecimal" index="9" desc="Limit Amount (Y, Number, 18) - 카드 이용(구매) 한도 (VND)" genRange="10000000-500000000"/>
-    <field name="cadvLmtAmt" type="BigDecimal" index="10" desc="Cash Advance Limit Amount (Y, Number, 18) - 카드 현금서비스(인출) 한도 (VND)" genRange="5000000-100000000"/>
-    <field name="occrDt" type="String" index="11" desc="Occurrence Date (Y, String, 8) - 카드 최초 발급일 (yyyymmdd)" notFuture="Y" errCode="E129"/>
+    <field name="custCd" type="String" index="5" desc="Customer Code (Y, String, 30) - 카드 소지자(회원) 고객코드"/>
+    <field name="ctrtNo" type="String" index="6" desc="Contract Number (Y, String, 50) - 카드 계약(카드번호 대응) 고유번호"/>
+    <field name="debtGrpCd" type="String" index="7" desc="Debt Group Code (Y, String, 1) - 카드 채무의 건전성 5단계 분류. 1~5 (NCI Code Master C12 참조)"/>
+    <field name="loanTypeCd" type="String" index="8" desc="Loan Type Code (Y, String, 3) - 카드 상품 유형 코드. 예: 210:일반 신용카드, 220:리볼빙 신용카드, 230:카드론 등 (NCI Code Master C17 참조)"/>
+    <field name="lmtAmt" type="BigDecimal" index="9" desc="Limit Amount (Y, Number, 18) - 카드 이용(구매) 한도 (VND)"/>
+    <field name="cadvLmtAmt" type="BigDecimal" index="10" desc="Cash Advance Limit Amount (Y, Number, 18) - 카드 현금서비스(인출) 한도 (VND)"/>
+    <field name="occrDt" type="String" index="11" desc="Occurrence Date (Y, String, 8) - 카드 최초 발급일 (yyyymmdd)"/>
     <field name="expirationMonth" type="String" index="12" desc="Expiration Month (Y, String, 6) - 카드 유효기간(만료 연월) (yyyymm)"/>
-    <field name="minPayRate" type="BigDecimal" index="13" desc="Minimum Payment Rate (N, Number, 5) - 리볼빙 결제 시 최소 납부해야 하는 비율(소수 2째자리까지 표기하되 소수점은 제외하고 100배 정수로 표기, 예: 10.00%는 1000)" required="M" genRange="300-2000"/>
-    <field name="minPayAmt" type="BigDecimal" index="14" desc="Minimum Payment Amount (N, Number, 18) - 리볼빙 결제 시 최소 납부금액 (VND)" required="M" genRange="200000-5000000"/>
-    <field name="chgClsDt" type="String" index="15" desc="Change/Close Date (M, String, 8) - 카드가 변동/해지된 날짜 (yyyymmdd). evtCd가 2(해지) 3(변동)인 경우 필수" notFuture="Y" errCode="E307"/>
-    <field name="eventReasonCode" type="String" index="16" desc="Event Reason Code (Y, String, 2) - 카드 이벤트 발생 사유. 예: 01:신규발급, 11:전액상환 해지, 13:대손상각 등 (NCI Code Master C37 참조)" errCode="E130"/>
-    <field name="consentFg" type="String" index="17" desc="Consent Flag (Y, String, 1) - 정보수집동의여부. 1:동의, 0:미동의" errCode="E191" weights="1:97,0:3"/>
-
-    <rule type="dateOrder" a="occrDt" b="expirationMonth" strict="Y" gap="1095-1825" level="warn" desc="Tháng hết hạn phải sau ngày phát hành"/>
-    <rule type="requiredWhen" field="chgClsDt" when="evtCd" in="2,3" errCode="E146"/>
-    <rule type="dateOrder" a="occrDt" b="chgClsDt" gap="30-1500" errCode="E135"/>
-    <rule type="lte" small="cadvLmtAmt" big="lmtAmt" ratio="0.2-0.5" level="warn"/>
-    <rule type="requiredWhen" field="minPayRate" when="loanTypeCd" in="220" level="warn" desc="Thẻ revolving (220) phải có tỷ lệ thanh toán tối thiểu"/>
-    <rule type="requiredWhen" field="minPayAmt" when="loanTypeCd" in="220" level="warn"/>
-    <rule type="valueMap" field="eventReasonCode" when="evtCd" map="1:11;3:12-14;2:21-33,99" level="warn" desc="Lý do sự kiện phù hợp evtCd (11=mới, 12-14=thay đổi, 21-33=chấm dứt)"/>
+    <field name="minPayRate" type="BigDecimal" index="13" desc="Minimum Payment Rate (N, Number, 5) - 리볼빙 결제 시 최소 납부해야 하는 비율(소수 2째자리까지 표기하되 소수점은 제외하고 100배 정수로 표기, 예: 10.00%는 1000)"/>
+    <field name="minPayAmt" type="BigDecimal" index="14" desc="Minimum Payment Amount (N, Number, 18) - 리볼빙 결제 시 최소 납부금액 (VND)"/>
+    <field name="chgClsDt" type="String" index="15" desc="Change/Close Date (M, String, 8) - 카드가 변동/해지된 날짜 (yyyymmdd). evtCd가 2(해지) 3(변동)인 경우 필수"/>
+    <field name="eventReasonCode" type="String" index="16" desc="Event Reason Code (Y, String, 2) - 카드 이벤트 발생 사유. 예: 01:신규발급, 11:전액상환 해지, 13:대손상각 등 (NCI Code Master C37 참조)"/>
+    <field name="consentFg" type="String" index="17" desc="Consent Flag (Y, String, 1) - 정보수집동의여부. 1:동의, 0:미동의"/>
 </layout>

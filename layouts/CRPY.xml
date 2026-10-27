@@ -1,41 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout infoCd="CRPY" delimiter="|:" fieldCount="26">
-    <field name="recordType" type="String" index="0" desc="Record Type (Y, String, 1)" values="D"/>
-    <field name="evtCd" type="String" index="1" desc="Registration Event (Y, String, 1) - 등록구분. 1:신규등록, 3:변경, 7:삭제 (NCI Code Master C04 참조. 상환정보는 이력성 데이터로 해지 개념 없음)" errCode="E144" weights="1:90,3:8,7:2"/>
+    <field name="recordType" type="String" index="0" desc="Record Type (Y, String, 1)"/>
+    <field name="evtCd" type="String" index="1" desc="Registration Event (Y, String, 1) - 등록구분. 1:신규등록, 3:변경, 7:삭제 (NCI Code Master C04 참조. 상환정보는 이력성 데이터로 해지 개념 없음)"/>
     <field name="instCd" type="String" index="2" desc="Institution Code (Y, String, 7) - 회원기관 식별코드 (NICE 발급)"/>
     <field name="branchCd" type="String" index="3" desc="Branch Code (N, String, 20) - 카드 발급 지점코드"/>
     <field name="branchNm" type="String" index="4" desc="Branch Name (N, String, 200) - 카드 발급 지점명"/>
-    <field name="custCd" type="String" index="5" desc="Customer Code (Y, String, 30) - 카드 소지자 고객코드" errCodeMissing="E127" default="CUST{cust:06d}"/>
-    <field name="ctrtNo" type="String" index="6" desc="Contract Number (Y, String, 50) - 상환실적 대상 카드계약번호 (Credit Card Info 등록 시 사용한 계약번호와 동일해야 함)" errCode="E183" default="CD{seq:08d}"/>
-    <field name="baseDt" type="String" index="7" desc="Base Date (Y, String, 8) - 정보의 신규·변경·삭제 기준일 (yyyymmdd, 통상 전월 말일 기준으로 집계)" notFuture="Y" errCode="E140" default="{monthend:-1}"/>
-    <field name="debtGrpCd" type="String" index="8" desc="Debt Group Code (Y, String, 1) - 기준일 시점의 채무 건전성 5단계 분류 (NCI Code Master C12 참조)" errCode="E184" weights="1:88,2:6,3:3,4:2,5:1"/>
-    <field name="ctrtStatCd" type="String" index="9" desc="Contract Status Code (Y, String, 2) - 기준일 시점 카드계좌 상태 (NCI Code Master C13 참조)" weights="11:88,13:7,17:3,12:2"/>
-    <field name="lmtAmt" type="BigDecimal" index="10" desc="Limit Amount (Y, Number, 18) - 기준일 시점의 카드 이용한도 (VND)" genRange="10000000-500000000"/>
-    <field name="cadvLmtAmt" type="BigDecimal" index="11" desc="Cash Advance Limit Amount (Y, Number, 18) - 기준일 시점의 현금서비스 한도 (VND)" genRange="5000000-100000000"/>
-    <field name="payReqAmt" type="BigDecimal" index="12" desc="Payment Request Amount (Y, Number, 18) - 기준월(통상 전월)에 청구된 모든 청구금액의 합계 (VND)" genRange="500000-60000000"/>
-    <field name="payAmt" type="BigDecimal" index="13" desc="Payment Amount (Y, Number, 18) - 기준월(통상 전월)에 결제한 금액의 합계 (VND)" genRange="500000-60000000"/>
-    <field name="revolBal" type="BigDecimal" index="14" desc="Revolving Balance (N, Number, 18) - 리볼빙 결제로 이월된 잔액 (VND)" genRange="0-30000000" fillRate="0.3"/>
-    <field name="useAmt" type="BigDecimal" index="15" desc="Usage Amount (Y, Number, 18) - 전월 1일부터 말일까지의 총 사용금액 (VND)" genRange="1000000-80000000"/>
-    <field name="lsUseAmt" type="BigDecimal" index="16" desc="Lump Sum Usage Amount (N, Number, 18) - 총 이용금액 중 일시불 이용분 (VND)" genRange="500000-50000000"/>
-    <field name="instlUseAmt" type="BigDecimal" index="17" desc="Installment Usage Amount (N, Number, 18) - 총 이용금액 중 할부 이용분 (VND)" genRange="0-20000000"/>
-    <field name="cadvUseAmt" type="BigDecimal" index="18" desc="Cash Advance Usage Amount (N, Number, 18) - 총 이용금액 중 현금서비스 이용분 (VND)" genRange="0-10000000"/>
-    <field name="debitUseAmt" type="BigDecimal" index="19" desc="Debit Usage Amount (N, Number, 18) - 총 이용금액 중 체크(직불)카드 이용분 (VND)" genRange="0-10000000" fillRate="0.2"/>
-    <field name="ovseUseAmt" type="BigDecimal" index="20" desc="Overseas Usage Amount (N, Number, 18) - 해외에서 신용카드로 이용한 금액 (VND)" genRange="0-20000000" fillRate="0.3"/>
-    <field name="ovseCadvUseAmt" type="BigDecimal" index="21" desc="Overseas Cash Advance Usage Amount (N, Number, 18) - 해외에서 현금서비스로 이용한 금액 (VND)" genRange="0-5000000" fillRate="0.1"/>
-    <field name="payDueDt" type="String" index="22" desc="Payment Due Date (N, String, 8) - 기준월에 청구된 결제 일자 (yyyymmdd)" notFuture="Y" errCode="E311" default="{dateadd:baseDt:-20:-5}"/>
-    <field name="nextPayDueDt" type="String" index="23" desc="Next Payment Due Date (N, String, 8) - 다음 청구기간의 결제 마감 예정일 (yyyymmdd)" errCode="E313" default="{dateadd:payDueDt:28:31}"/>
-    <field name="nextMinPayAmt" type="BigDecimal" index="24" desc="Next Minimum Payment Amount (N, Number, 18) - 다음 결제일까지 납부해야 하는 최소 결제금액(리볼빙 등) (VND)" genRange="200000-5000000"/>
-    <field name="consentFg" type="String" index="25" desc="Consent Flag (Y, String, 1) - 정보수집동의여부. 1:동의, 0:미동의" errCode="E191" weights="1:97,0:3"/>
-
-    <rule type="lte" small="cadvLmtAmt" big="lmtAmt" ratio="0.2-0.5" level="warn"/>
-    <rule type="lte" small="payReqAmt" big="lmtAmt" level="warn" desc="Số tiền sao kê không vượt hạn mức"/>
-    <rule type="lte" small="payAmt" big="payReqAmt" ratio="0.3-1.0" level="warn" desc="Số tiền thanh toán ≤ số tiền sao kê"/>
-    <rule type="lte" small="useAmt" big="lmtAmt" level="warn" desc="Tổng chi tiêu không vượt hạn mức"/>
-    <rule type="lte" small="lsUseAmt+instlUseAmt+cadvUseAmt+debitUseAmt" big="useAmt" level="warn" desc="Tổng các loại chi tiêu ≤ tổng sử dụng"/>
-    <rule type="lte" small="cadvUseAmt" big="cadvLmtAmt" level="warn"/>
-    <rule type="lte" small="ovseUseAmt" big="useAmt" level="warn"/>
-    <rule type="lte" small="ovseCadvUseAmt" big="cadvUseAmt" level="warn"/>
-    <rule type="lte" small="nextMinPayAmt" big="lmtAmt" level="warn"/>
-    <rule type="dateOrder" a="payDueDt" b="baseDt" gap="5-20" adjust="a" level="warn" desc="Ngày đến hạn thanh toán nằm trong kỳ, trước ngày cơ sở"/>
-    <rule type="dateOrder" a="payDueDt" b="nextPayDueDt" strict="Y" gap="28-31" level="warn"/>
+    <field name="custCd" type="String" index="5" desc="Customer Code (Y, String, 30) - 카드 소지자 고객코드"/>
+    <field name="ctrtNo" type="String" index="6" desc="Contract Number (Y, String, 50) - 상환실적 대상 카드계약번호 (Credit Card Info 등록 시 사용한 계약번호와 동일해야 함)"/>
+    <field name="baseDt" type="String" index="7" desc="Base Date (Y, String, 8) - 정보의 신규·변경·삭제 기준일 (yyyymmdd, 통상 전월 말일 기준으로 집계)"/>
+    <field name="debtGrpCd" type="String" index="8" desc="Debt Group Code (Y, String, 1) - 기준일 시점의 채무 건전성 5단계 분류 (NCI Code Master C12 참조)"/>
+    <field name="ctrtStatCd" type="String" index="9" desc="Contract Status Code (Y, String, 2) - 기준일 시점 카드계좌 상태 (NCI Code Master C13 참조)"/>
+    <field name="lmtAmt" type="BigDecimal" index="10" desc="Limit Amount (Y, Number, 18) - 기준일 시점의 카드 이용한도 (VND)"/>
+    <field name="cadvLmtAmt" type="BigDecimal" index="11" desc="Cash Advance Limit Amount (Y, Number, 18) - 기준일 시점의 현금서비스 한도 (VND)"/>
+    <field name="payReqAmt" type="BigDecimal" index="12" desc="Payment Request Amount (Y, Number, 18) - 기준월(통상 전월)에 청구된 모든 청구금액의 합계 (VND)"/>
+    <field name="payAmt" type="BigDecimal" index="13" desc="Payment Amount (Y, Number, 18) - 기준월(통상 전월)에 결제한 금액의 합계 (VND)"/>
+    <field name="revolBal" type="BigDecimal" index="14" desc="Revolving Balance (N, Number, 18) - 리볼빙 결제로 이월된 잔액 (VND)"/>
+    <field name="useAmt" type="BigDecimal" index="15" desc="Usage Amount (Y, Number, 18) - 전월 1일부터 말일까지의 총 사용금액 (VND)"/>
+    <field name="lsUseAmt" type="BigDecimal" index="16" desc="Lump Sum Usage Amount (N, Number, 18) - 총 이용금액 중 일시불 이용분 (VND)"/>
+    <field name="instlUseAmt" type="BigDecimal" index="17" desc="Installment Usage Amount (N, Number, 18) - 총 이용금액 중 할부 이용분 (VND)"/>
+    <field name="cadvUseAmt" type="BigDecimal" index="18" desc="Cash Advance Usage Amount (N, Number, 18) - 총 이용금액 중 현금서비스 이용분 (VND)"/>
+    <field name="debitUseAmt" type="BigDecimal" index="19" desc="Debit Usage Amount (N, Number, 18) - 총 이용금액 중 체크(직불)카드 이용분 (VND)"/>
+    <field name="ovseUseAmt" type="BigDecimal" index="20" desc="Overseas Usage Amount (N, Number, 18) - 해외에서 신용카드로 이용한 금액 (VND)"/>
+    <field name="ovseCadvUseAmt" type="BigDecimal" index="21" desc="Overseas Cash Advance Usage Amount (N, Number, 18) - 해외에서 현금서비스로 이용한 금액 (VND)"/>
+    <field name="payDueDt" type="String" index="22" desc="Payment Due Date (N, String, 8) - 기준월에 청구된 결제 일자 (yyyymmdd)"/>
+    <field name="nextPayDueDt" type="String" index="23" desc="Next Payment Due Date (N, String, 8) - 다음 청구기간의 결제 마감 예정일 (yyyymmdd)"/>
+    <field name="nextMinPayAmt" type="BigDecimal" index="24" desc="Next Minimum Payment Amount (N, Number, 18) - 다음 결제일까지 납부해야 하는 최소 결제금액(리볼빙 등) (VND)"/>
+    <field name="consentFg" type="String" index="25" desc="Consent Flag (Y, String, 1) - 정보수집동의여부. 1:동의, 0:미동의"/>
 </layout>

@@ -1,59 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  LOAN - Thông tin khoản vay. Layout gốc không có desc chi tiết; bổ sung theo NCI Code Master 20261008
-  và theo các layout cùng họ (CARD, DELQ). Chỗ ghi [suy ra] = độ dài/đơn vị suy ra, cần NICE xác nhận.
--->
 <layout infoCd="LOAN" delimiter="|:" fieldCount="31">
-    <field name="recordType" type="String" index="0" desc="Record Type (Y, String, 1)" values="D"/>
-    <field name="evtCd" type="String" index="1" desc="Registration Event (Y, String, 1) - Sự kiện đăng ký. 1:Đăng ký mới, 2:Tất toán/Chấm dứt, 3:Thay đổi, 7:Xóa (NCI Code Master C04 참조)" errCode="E143" weights="1:75,3:15,2:8,7:2"/>
-    <field name="instCd" type="String" index="2" desc="Institution Code (Y, String, 7) - Mã tổ chức thành viên (NICE cấp)"/>
-    <field name="branchCd" type="String" index="3" desc="Branch Code (N, String, 20) - Mã chi nhánh giải ngân"/>
-    <field name="branchNm" type="String" index="4" desc="Branch Name (N, String, 200) - Tên chi nhánh"/>
-    <field name="custCd" type="String" index="5" desc="Customer Code (Y, String, 30) - Mã khách hàng vay (liên kết INID/COID)" errCodeMissing="E127" default="CUST{cust:06d}"/>
-    <field name="ctrtNo" type="String" index="6" desc="Contract Number (Y, String, 50) - Số hợp đồng vay; LRPY/DELQ/GUAR/COLL dùng lại số này" errCode="E183" default="LN{seq:08d}"/>
-    <field name="debtGrpCd" type="String" index="7" desc="Debt Group Code (Y, String, 1) - Nhóm nợ 1~5 (NCI Code Master C12 참조)" errCode="E184" weights="1:86,2:7,3:3,4:2,5:2"/>
-    <field name="loanAmt" type="BigDecimal" index="8" desc="Loan Amount (Y, Number, 18) - Số tiền vay / hạn mức (VND)" genRange="20000000-3000000000"/>
-    <field name="occrDt" type="String" index="9" desc="Occurrence Date (Y, String, 8) - Ngày mở khoản vay (yyyymmdd), không sau hôm nay" notFuture="Y" errCode="E129"/>
-    <field name="matuDt" type="String" index="10" desc="Maturity Date (Y, String, 8) - Ngày đáo hạn (yyyymmdd), phải sau ngày mở" errCode="E133"/>
-    <field name="chgClsDt" type="String" index="11" desc="Change/Close Date (M, String, 8) - Ngày thay đổi/tất toán (yyyymmdd). Bắt buộc khi evtCd = 2 hoặc 3" notFuture="Y" errCode="E307"/>
-    <field name="eventReasonCode" type="String" index="12" desc="Event Reason Code (Y, String, 2) - Lý do sự kiện (NCI Code Master C37 참조)" errCode="E130"/>
-    <field name="interestRate" type="BigDecimal" index="13" desc="Interest Rate (N, Number, 5) - Lãi suất năm x100, bỏ dấu thập phân, vd 10.50% = 1050 [suy ra theo CARD.minPayRate]" genRange="600-1800"/>
-    <field name="loanPurposeCd" type="String" index="14" desc="Loan Purpose Code (N, String, 2) - Mục đích vay (NCI Code Master C16 참조)" errCode="E186"/>
-    <field name="loanTypeCd" type="String" index="15" desc="Loan Type Code (Y, String, 3) - Loại khoản vay, không gồm mã thẻ 210~240 (NCI Code Master C17 참조)" values="110,120,130,140,150,160,170,180,190,195,320,330,340,350,410-418" errCode="E132" errCodeMissing="E131" weights="140:28,110:14,160:14,180:14,130:8,170:6,320:5,120:4,411:4,412:3"/>
-    <field name="repayTypeCd" type="String" index="16" desc="Repayment Type Code (N, String, 2) - Phương thức trả nợ (NCI Code Master C18 참조)" errCode="E193"/>
-    <field name="principalRepayCnt" type="Integer" index="17" desc="Principal Repayment Count (N, Number, 3) - Số kỳ trả gốc" genRange="6-120"/>
-    <field name="interestRepayCnt" type="Integer" index="18" desc="Interest Repayment Count (N, Number, 3) - Số kỳ trả lãi" genRange="6-120"/>
-    <field name="principalRepayCycle" type="String" index="19" desc="Principal Repayment Cycle (N, String, 2) - Chu kỳ trả gốc (NCI Code Master C19 참조)" errCode="E195"/>
-    <field name="interestRepayCycle" type="String" index="20" desc="Interest Repayment Cycle (N, String, 2) - Chu kỳ trả lãi (NCI Code Master C19 참조)" errCode="E194"/>
-    <field name="graceStrtDt" type="String" index="21" desc="Grace Start Date (N, String, 8) - Ngày bắt đầu ân hạn (yyyymmdd), không trước ngày mở" errCode="E308" fillRate="0.2"/>
-    <field name="gracePeriod" type="Integer" index="22" desc="Grace Period (M, Number, 3) - Số tháng ân hạn; có khi có graceStrtDt [suy ra đơn vị tháng]" genRange="3-24"/>
-    <field name="guarStatFg" type="String" index="23" desc="Guarantee Status Flag (N, String, 1) - Có bảo lãnh: 0:Không, 1:Có [mã chưa có trong Code Master, E189]" values="0,1" errCode="E189" weights="0:80,1:20"/>
-    <field name="collStatFg" type="String" index="24" desc="Collateral Status Flag (N, String, 1) - Có tài sản bảo đảm: 0:Không, 1:Có [mã chưa có trong Code Master, E190]" values="0,1" errCode="E190" weights="0:60,1:40"/>
-    <field name="leaseCollPropertyAmt" type="BigDecimal" index="25" desc="Lease Collateral Property Amount (M, Number, 18) - Giá trị tài sản cho thuê tài chính (VND). Chỉ khi loanTypeCd 410~417" genRange="200000000-3000000000"/>
-    <field name="leaseCollStatCd" type="String" index="26" desc="Lease Collateral Status Code (M, String, 2) - Tình trạng tài sản thuê: 11:Mới, 12:Đã qua sử dụng (NCI Code Master C22 참조)" errCode="E303" weights="11:75,12:25"/>
-    <field name="leaseCollbrand" type="String" index="27" desc="Lease Collateral Brand (M, String, 100) - Nhãn hiệu tài sản thuê [suy ra độ dài]" gen="brand"/>
-    <field name="leaseCollRegNo" type="String" index="28" desc="Lease Collateral Registration Number (M, String, 20) - Biển số / số đăng ký tài sản [suy ra độ dài]" gen="plate"/>
-    <field name="leaseCollManuDt" type="String" index="29" desc="Lease Collateral Manufacture Date (M, String, 8) - Ngày sản xuất tài sản (yyyymmdd), không sau hôm nay" notFuture="Y" errCode="E317"/>
-    <field name="consentFg" type="String" index="30" desc="Consent Flag (Y, String, 1) - Đồng ý thu thập thông tin. 1:Đồng ý, 0:Không đồng ý" errCode="E191" weights="1:97,0:3"/>
-
-    <rule type="dateOrder" a="occrDt" b="matuDt" strict="Y" gap="180-3650" errCode="E306"/>
-    <rule type="requiredWhen" field="chgClsDt" when="evtCd" in="2,3" errCode="E146"/>
-    <rule type="dateOrder" a="occrDt" b="chgClsDt" gap="30-1500" errCode="E135"/>
-    <rule type="dateOrder" a="occrDt" b="graceStrtDt" gap="0-60" errCode="E308"/>
-    <rule type="requiredWhen" field="gracePeriod" when="graceStrtDt" notEmpty="Y" level="warn"/>
-    <rule type="valueMap" field="eventReasonCode" when="evtCd" map="1:11;3:12-14;2:21-33,99" level="warn" desc="Lý do sự kiện phù hợp evtCd (11=mới, 12-14=thay đổi, 21-33=chấm dứt)"/>
-    <rule type="valueMap" field="repayTypeCd" when="loanTypeCd" map="110:13;120:14;130:11;140,320,330,340,350,410-418:12;*:11,12,13" level="warn" desc="Phương thức trả nợ phù hợp loại khoản vay"/>
-    <rule type="valueMap" field="principalRepayCycle" when="repayTypeCd" map="13:21;14:22;*:14,16" level="warn"/>
-    <rule type="valueMap" field="interestRepayCycle" when="repayTypeCd" map="13:14,16,21;*:14" level="warn"/>
-    <rule type="repayCount" field="principalRepayCnt" cycle="principalRepayCycle" a="occrDt" b="matuDt" level="warn"/>
-    <rule type="repayCount" field="interestRepayCnt" cycle="interestRepayCycle" a="occrDt" b="matuDt" level="warn"/>
-    <rule type="valueMap" field="loanPurposeCd" when="loanTypeCd" map="150,160:17;320,330,411:16;412:15;414:27;415:17;170:19,20,28;120:28,19;*:11,13,14,21,22,34" level="warn" desc="Mục đích vay phù hợp loại khoản vay"/>
-    <rule type="valueMap" field="collStatFg" when="loanTypeCd" map="150,160,320,330,410-417:1" level="warn" desc="Vay mua nhà/xe, thuê tài chính phải có tài sản bảo đảm"/>
-    <rule type="requiredWhen" field="leaseCollPropertyAmt" when="loanTypeCd" in="410-417" level="warn"/>
-    <rule type="requiredWhen" field="leaseCollStatCd" when="loanTypeCd" in="410-417" level="warn"/>
-    <rule type="requiredWhen" field="leaseCollbrand" when="loanTypeCd" in="410-417" level="warn"/>
-    <rule type="requiredWhen" field="leaseCollRegNo" when="loanTypeCd" in="410-417" level="warn"/>
-    <rule type="requiredWhen" field="leaseCollManuDt" when="loanTypeCd" in="410-417" level="warn"/>
-    <rule type="dateOrder" a="leaseCollManuDt" b="occrDt" gap="0-1800" adjust="a" level="warn" desc="Tài sản phải sản xuất trước ngày thuê"/>
-    <rule type="lte" small="loanAmt" big="leaseCollPropertyAmt" ratio="0.5-0.9" level="warn" desc="Số tiền thuê không vượt giá trị tài sản"/>
+    <field name="recordType" type="String" index="0" desc="Record Type"/>
+    <field name="evtCd" type="String" index="1" desc="Event Code"/>
+    <field name="instCd" type="String" index="2" desc="Institution Code"/>
+    <field name="branchCd" type="String" index="3" desc="Branch Code"/>
+    <field name="branchNm" type="String" index="4" desc="Branch Name"/>
+    <field name="custCd" type="String" index="5" desc="Customer Code"/>
+    <field name="ctrtNo" type="String" index="6" desc="Contract Number"/>
+    <field name="debtGrpCd" type="String" index="7" desc="Debt Group"/>
+    <field name="loanAmt" type="BigDecimal" index="8" desc="Loan Amount"/>
+    <field name="occrDt" type="String" index="9" desc="Occurrence Date"/>
+    <field name="matuDt" type="String" index="10" desc="Maturity Date"/>
+    <field name="chgClsDt" type="String" index="11" desc="Change/Close Date"/>
+    <field name="eventReasonCode" type="String" index="12" desc="Event Reason Code"/>
+    <field name="interestRate" type="BigDecimal" index="13" desc="Interest Rate"/>
+    <field name="loanPurposeCd" type="String" index="14" desc="Loan Purpose Code"/>
+    <field name="loanTypeCd" type="String" index="15" desc="Loan Type Code"/>
+    <field name="repayTypeCd" type="String" index="16" desc="Repayment Type Code"/>
+    <field name="principalRepayCnt" type="Integer" index="17" desc="Principal Repayment Count"/>
+    <field name="interestRepayCnt" type="Integer" index="18" desc="Interest Repayment Count"/>
+    <field name="principalRepayCycle" type="String" index="19" desc="Principal Repayment Cycle"/>
+    <field name="interestRepayCycle" type="String" index="20" desc="Interest Repayment Cycle"/>
+    <field name="graceStrtDt" type="String" index="21" desc="Grace Start Date"/>
+    <field name="gracePeriod" type="Integer" index="22" desc="Grace Period"/>
+    <field name="guarStatFg" type="String" index="23" desc="Guarantee Status Flag"/>
+    <field name="collStatFg" type="String" index="24" desc="Collateral Status Flag"/>
+    <field name="leaseCollPropertyAmt" type="BigDecimal" index="25" desc="Lease Collateral Property Amount"/>
+    <field name="leaseCollStatCd" type="String" index="26" desc="Lease Collateral Status Code"/>
+    <field name="leaseCollbrand" type="String" index="27" desc="Lease Collateral Brand"/>
+    <field name="leaseCollRegNo" type="String" index="28" desc="Lease Collateral Registration Number"/>
+    <field name="leaseCollManuDt" type="String" index="29" desc="Lease Collateral Manufacture Date"/>
+    <field name="consentFg" type="String" index="30" desc="Consent Flag"/>
 </layout>
