@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout infoCd="COLL" delimiter="|:" fieldCount="17">
+    <field name="recordType" type="String" index="0" desc="Record Type (Y, String, 1)" values="D"/>
+    <field name="evtCd" type="String" index="1" desc="Registration Event (Y, String, 1) - 등록구분. 1:신규등록, 2:해지, 3:변경, 7:삭제 (NCI Code Master C04 참조)" errCode="E143" weights="1:75,3:15,2:8,7:2"/>
+    <field name="instCd" type="String" index="2" desc="Institution Code (Y, String, 7) - 회원기관 식별코드 (NICE 발급)"/>
+    <field name="branchCd" type="String" index="3" desc="Branch Code (N, String, 20) - 담보를 취급한 지점코드"/>
+    <field name="branchNm" type="String" index="4" desc="Branch Name (N, String, 200) - 담보 취급 지점명"/>
+    <field name="custCd" type="String" index="5" desc="Customer Code (Y, String, 30) - 담보제공자(담보물의 소유자)의 고객코드" errCodeMissing="E127" default="CUST{cust:06d}"/>
+    <field name="ctrtNo" type="String" index="6" desc="Contract Number (Y, String, 50) - 담보 건을 식별하는 고유번호(담보번호)" errCode="E183" default="CL{seq:08d}"/>
+    <field name="debtorCustCd" type="String" index="7" desc="Debtor Customer Code (Y, String, 20) - 담보가 제공된 대상인 주채무자의 고객코드" default="CUST{cust:06d}"/>
+    <field name="debtorCtrtNo" type="String" index="8" desc="Debtor Contract Number (Y, String, 50) - 담보가 제공된 대출 계약번호 (Loan Info와 연결)" errCode="E182" default="LN{seq:08d}"/>
+    <field name="collRightTypeCd" type="String" index="9" desc="Collateral Right Type Code (Y, String, 2) - 담보권의 법적 성격 구분. 예: 11:질권(동산·점유이전), 12:저당권(부동산 등 점유유지), 13:보증(인적담보) 등 (NCI Code Master C25 참조)" errCode="E197"/>
+    <field name="collTypeCd" type="String" index="10" desc="Collateral Type Code (Y, String, 2) - 담보물의 종류 코드. 예: 11:토지이용권, 12:운송수단(차량), 18:예금증서 등 (NCI Code Master C24 참조)" errCode="E198" weights="11:45,12:25,18:15,22:5,15:4,38:3,21:3"/>
+    <field name="occrDt" type="String" index="11" desc="Occurrence Date (Y, String, 8) - 담보 설정계약의 효력 발생일 (yyyymmdd)" notFuture="Y" errCode="E129"/>
+    <field name="collAmt" type="BigDecimal" index="12" desc="Collateral Amount (Y, Number, 18) - 해당 담보로 담보되는(설정된) 채권금액 (VND)" genRange="50000000-3000000000"/>
+    <field name="evalDt" type="String" index="13" desc="Evaluation Date (N, String, 8) - 담보물에 대한 감정평가(가치평가)가 실시된 날짜 (yyyymmdd)" notFuture="Y" errCode="E310"/>
+    <field name="evalAmt" type="BigDecimal" index="14" desc="Evaluation Amount (N, Number, 18) - 감정평가를 통해 산정된 담보물의 평가가치 (VND)" genRange="80000000-5000000000"/>
+    <field name="chgClsDt" type="String" index="15" desc="Change/Close Date (Y, String, 8) - 담보 내용이 변경되거나 담보가 해지된 날짜 (yyyymmdd)" notFuture="Y" errCode="E309"/>
+    <field name="consentFg" type="String" index="16" desc="Consent Flag (Y, String, 1) - 정보수집동의여부. 1:동의, 0:미동의" errCode="E191" weights="1:97,0:3"/>
+
+    <rule type="valueMap" field="collRightTypeCd" when="collTypeCd" map="11:12;12:11,12;13-20:11;21:11;22-28,38:12,11;*:11,12,14,16" level="warn" desc="Loại quyền bảo đảm phù hợp loại tài sản (BĐS thế chấp, giấy tờ có giá cầm cố)"/>
+    <rule type="dateOrder" a="evalDt" b="occrDt" gap="0-90" adjust="a" level="warn" desc="Thẩm định giá trước khi ký hợp đồng bảo đảm"/>
+    <rule type="lte" small="collAmt" big="evalAmt" ratio="0.5-0.8" level="warn" desc="Số tiền được bảo đảm ≤ giá trị thẩm định"/>
+    <rule type="dateOrder" a="occrDt" b="chgClsDt" gap="0-1500" errCode="E309"/>
+</layout>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout infoCd="COID" delimiter="|:" fieldCount="19">
+    <field name="recordType" type="String" index="0" desc="Record Type (Y, String, 1)" values="D"/>
+    <field name="evtCd" type="String" index="1" desc="Registration Event (Y, String, 1) - 등록구분. 1:신규등록, 2:해지, 3:변경, 7:삭제 (NCI Code Master C04 참조)" errCode="E143" weights="1:80,3:15,2:3,7:2"/>
+    <field name="instCd" type="String" index="2" desc="Institution Code (Y, String, 7) - 회원기관 식별코드 (NICE 발급)"/>
+    <field name="branchCd" type="String" index="3" desc="Branch Code (N, String, 20) - 정보를 등록한 지점코드"/>
+    <field name="branchNm" type="String" index="4" desc="Branch Name (N, String, 200) - 정보를 등록한 지점명"/>
+    <field name="custCd" type="String" index="5" desc="Customer Code (Y, String, 30) - 회원기관이 부여한 고객 식별코드" errCodeMissing="E127" default="CORP{cust:06d}"/>
+    <field name="subjectType" type="String" index="6" desc="Subject Type (Y, String, 1) - 조회·등록 대상 구분. 본 API에서는 3(법인/단체) 고정 (NCI Code Master C01 참조)" values="3" errCode="E101"/>
+    <field name="taxCode" type="String" index="7" desc="Tax Code (Y, String, 15) - 법인등록번호(사업자 세금코드)" gen="taxCorp" pattern="^\d{10}(-\d{3})?$" errCode="E145"/>
+    <field name="bizRegDt" type="String" index="8" desc="Business Registration Date (N, String, 8) - 사업자등록증 발급일 (yyyymmdd)" notFuture="Y" errCode="E318"/>
+    <field name="membNm" type="String" index="9" desc="Member Name (Y, String, 200) - 법인명(상호) 또는 단체명" gen="companyName" errCode="E176" errCodeMissing="E177"/>
+    <field name="custLstUpdtDt" type="String" index="10" desc="Customer Last Update Date (Y, String, 8) - 회원기관이 해당 고객정보를 마지막으로 갱신한 날짜 (yyyymmdd)" notFuture="Y" errCode="E315"/>
+    <field name="corpTypeCd" type="String" index="11" desc="Corporate Type Code (N, String, 2) - 법인 조직형태 코드 (NCI Code Master C07 참조)" gen="corpType" errCode="E302"/>
+    <field name="corpBusinessLineCd" type="String" index="12" desc="Corporate Business Line Code (N, String, 3) - 법인 주업종 코드(VSIC 2018 기준) (NCI Code Master C08 참조)" errCode="E301"/>
+    <field name="corpAdr" type="String" index="13" desc="Corporate Address (Y, String, 500) - 법인 본점(등록) 주소"/>
+    <field name="corpZipCd" type="String" index="14" desc="Corporate Zip Code (Y, String, 5) - 법인 우편번호" pattern="^\d{5}$"/>
+    <field name="provincialCd" type="String" index="15" desc="Provincial Code (N, String, 2) - 법인 소재지 성(省)/시(市) 코드 (NCI Code Master C32 참조)" errCode="E188"/>
+    <field name="corpTelNo" type="String" index="16" desc="Corporate Telephone Number (N, String, 15) - 법인 대표 전화번호" pattern="^0\d{9,10}$"/>
+    <field name="corpFaxNo" type="String" index="17" desc="Corporate Fax Number (N, String, 15) - 법인 팩스번호" pattern="^0\d{9,10}$" fillRate="0.5"/>
+    <field name="corpWebAdr" type="String" index="18" desc="Corporate Web Address (N, String, 100) - 법인 홈페이지 주소" fillRate="0.6"/>
+
+    <rule type="dateOrder" a="bizRegDt" b="custLstUpdtDt" gap="30-3000" level="warn" desc="Ngày cập nhật KH không trước ngày cấp ĐKKD"/>
+</layout>

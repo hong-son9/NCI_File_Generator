@@ -1,0 +1,1126 @@
+﻿group,code,desc_vi,desc_en
+C01,1,Cá nhân,Individual Person
+C01,3,Doanh nghiệp / Tổ chức khác,Corporate / Organization
+C02,M,Nam,Male
+C02,F,Nữ,Female
+C03,1,CCCD,CCCD
+C03,2,CMND,CMND
+C03,3,Bằng lái xe,Driving License
+C03,4,Hộ chiếu,Passport
+C03,5,Thẻ quân nhân / Sĩ quan,Military Card
+C03,6,Thẻ sinh viên,Student Card
+C03,7,Sổ hộ khẩu,Household Registration Book
+C03,8,Thẻ cư trú / Thẻ tạm trú,Foreigner ID Card (TRC)
+C04,1,Đăng ký mới,New Registration
+C04,2,Đóng / Chấm dứt,Closing / Termination
+C04,3,Thay đổi / Cập nhật,Change / Update
+C04,7,Xóa (sửa lỗi),Delete (Error Correction)
+C05,MST,Dữ liệu đầy đủ — toàn bộ bản ghi hợp lệ,Full data — all valid records
+C05,INF,Delta — chỉ bản ghi thay đổi từ lần gửi trước,"Delta — only records changed 
+since last submission"
+C06,INID,Thông tin nhận dạng cá nhân,Individual Identification Information
+C06,COID,Thông tin nhận dạng doanh nghiệp,Corporate Identification Information
+C06,LOAN,Thông tin hợp đồng tín dụng,Loan Information
+C06,LRPY,Thông tin thanh toán khoản vay,Loan Repayment Information
+C06,CARD,Thông tin thẻ tín dụng,Credit Card Information
+C06,CRPY,Thông tin thanh toán thẻ tín dụng,Card Repayment Information
+C06,DELQ,Thông tin nợ quá hạn,Delinquency Information
+C06,GUAR,Thông tin bảo lãnh,Guarantee Information
+C06,COLL,Thông tin tài sản đảm bảo,Collateral Information
+C06,EWST,Thông tin đối tượng cảnh báo sớm,EWS Target Information
+C06,TOCR,Thông tin giao dịch phát sinh,Transaction Open Information
+C06,DFLT,Thông tin vi phạm nghĩa vụ,Default Information
+C06,RTPS,Thông tin người liên quan,Related Person Information
+C06,COBO,Thông tin đồng người vay,Co-Borrower Information
+C07,11,Doanh nghiệp nhà nước,State-owned company
+C07,12,Công ty cổ phần,Joint-stock company
+C07,13,Công ty TNHH hai thành viên trở lên,Limited liability company (2+ members)
+C07,14,Công ty TNHH một thành viên,One-member limited liability company
+C07,15,Doanh nghiệp tư nhân,Private enterprise
+C07,16,Công ty hợp danh,Partnership company
+C07,17,Doanh nghiệp có vốn đầu tư nước ngoài,Company with foreign investment (FDI)
+C07,18,Hợp tác xã / Liên hiệp hợp tác xã,Cooperative / Union of cooperatives
+C07,19,Hộ kinh doanh cá thể,Individual (Household) Business
+C07,20,"Đơn vị hành chính sự nghiệp, đảng, đoàn thể","Non-business admin unit, party, mass org"
+C07,99,Khác,Other
+C08,011,Trồng cây hàng năm,Growing of non-perennial crops
+C08,012,Trồng cây lâu năm,Growing of perennial crops
+C08,013,Nhân và chăm sóc cây giống nông nghiệp,Plant propagation
+C08,014,Chăn nuôi,Animal production
+C08,015,"Trồng trọt, chăn nuôi hỗn hợp",Mixed farming
+C08,016,Hoạt động dịch vụ nông nghiệp và dịch vụ sau thu hoạch,Support activities to agriculture and post-harvest crop activities
+C08,017,"Săn bắt, đánh bẫy và hoạt động dịch vụ có liên quan","Hunting, trapping and related service activities"
+C08,021,"Trồng rừng, chăm sóc rừng và ươm giống cây lâm nghiệp",Silviculture and other forestry activities
+C08,022,Khai thác gỗ,Logging
+C08,023,"Khai thác, thu nhặt lâm sản khác trừ gỗ",Gathering of non-wood forest products
+C08,024,Hoạt động dịch vụ lâm nghiệp,Support services to forestry
+C08,031,Khai thác thủy sản,Fishing
+C08,032,Nuôi trồng thủy sản,Aquaculture
+C08,051,Khai thác và thu gom than cứng,Mining of hard coal
+C08,052,Khai thác và thu gom than non,Mining of lignite
+C08,061,Khai thác dầu thô,Extraction of crude petroleum
+C08,062,Khai thác khí đốt tự nhiên,Extraction of natural gas
+C08,071,Khai thác quặng sắt,Mining of iron ores
+C08,072,Khai thác quặng không chứa sắt,Mining of non-ferrous metal ores
+C08,081,"Khai thác đá, cát, sỏi, đất sét","Quarrying of stone, sand and clay"
+C08,089,Khai khoáng khác chưa được phân vào đâu,Mining and quarrying n.e.c.
+C08,091,Hoạt động dịch vụ hỗ trợ khai thác dầu thô và khí tự nhiên,Support activities for petroleum and natural gas extraction
+C08,099,Hoạt động dịch vụ hỗ trợ khai thác mỏ và quặng khác,Support activities for other mining and quarrying
+C08,101,"Chế biến, bảo quản thịt và các sản phẩm từ thịt",Processing and preserving of meat
+C08,102,"Chế biến, bảo quản thủy sản và các sản phẩm từ thủy sản","Processing and preserving of fish, crustaceans and molluscs"
+C08,103,Chế biến và bảo quản rau quả,Processing and preserving of fruit and vegetables
+C08,104,"Sản xuất dầu, mỡ động, thực vật",Manufacture of vegetable and animal oils and fats
+C08,105,Chế biến sữa và các sản phẩm từ sữa,Manufacture of dairy products
+C08,106,"Xay xát, sản xuất bột và tinh bột","Manufacture of grain mill products, starches and starch products"
+C08,107,Sản xuất các sản phẩm bánh và sản phẩm từ tinh bột,Manufacture of bakery and starchy products
+C08,108,Sản xuất các loại thực phẩm khác chưa được phân vào đâu,Manufacture of other food products
+C08,109,"Sản xuất thức ăn gia súc, gia cầm và thủy sản",Manufacture of prepared animal feeds
+C08,110,Sản xuất đồ uống,Manufacture of beverages
+C08,120,Sản xuất sản phẩm thuốc lá,Manufacture of tobacco products
+C08,131,Chuẩn bị và kéo sợi dệt,Preparation and spinning of textile fibres
+C08,132,Dệt vải,Weaving of textiles
+C08,139,Sản xuất hàng dệt khác,Manufacture of other textiles
+C08,141,May trang phục (trừ trang phục từ da lông thú),"Manufacture of wearing apparel, except fur apparel"
+C08,142,Sản xuất sản phẩm từ da lông thú,Manufacture of articles of fur
+C08,143,"Sản xuất trang phục dệt kim, đan móc",Manufacture of knitted and crocheted apparel
+C08,151,"Thuộc, sơ chế da; sản xuất va li, túi xách, yên đệm","Tanning and dressing of leather; manufacture of luggage, handbags, saddlery and harness"
+C08,152,Sản xuất giày dép,Manufacture of footwear
+C08,161,"Cưa, xẻ, bào gỗ và bảo quản gỗ",Sawmilling and planing of wood
+C08,162,"Sản xuất sản phẩm từ gỗ, tre, nứa, rơm, rạ và vật liệu tết bện","Manufacture of products of wood, cork, straw and plaiting materials"
+C08,170,Sản xuất giấy và sản phẩm từ giấy,Manufacture of paper and paper products
+C08,181,In ấn và dịch vụ liên quan đến in,Printing and service activities related to printing
+C08,182,Sao chép bản ghi các loại,Reproduction of recorded media
+C08,191,Sản xuất than cốc,Manufacture of coke oven products
+C08,192,Sản xuất sản phẩm dầu mỏ tinh chế,Manufacture of refined petroleum products
+C08,201,"Sản xuất hóa chất cơ bản, phân bón và hợp chất nitơ, plastic và cao su tổng hợp","Manufacture of basic chemicals, fertilisers and nitrogen compounds, plastics and synthetic rubber"
+C08,202,Sản xuất sản phẩm hóa chất khác,Manufacture of other chemical products
+C08,203,Sản xuất sợi nhân tạo,Manufacture of man-made fibres
+C08,210,"Sản xuất thuốc, hóa dược và dược liệu","Manufacture of pharmaceuticals, medicinal chemical and botanical products"
+C08,221,Sản xuất sản phẩm từ cao su,Manufacture of rubber products
+C08,222,Sản xuất sản phẩm từ plastic,Manufacture of plastics products
+C08,231,Sản xuất thủy tinh và sản phẩm từ thủy tinh,Manufacture of glass and glass products
+C08,239,Sản xuất sản phẩm từ khoáng phi kim loại khác chưa được phân vào đâu,Manufacture of non-metallic mineral products n.e.c.
+C08,241,"Sản xuất sắt, thép",Manufacture of basic iron and steel
+C08,242,Sản xuất kim loại quý và kim loại màu,Manufacture of basic precious and other non-ferrous metals
+C08,243,Đúc kim loại,Casting of metals
+C08,251,"Sản xuất sản phẩm kim loại kết cấu, thùng, bể chứa và nồi hơi","Manufacture of structural metal products, tanks, reservoirs and steam generators"
+C08,252,Sản xuất vũ khí và đạn dược,Manufacture of weapons and ammunition
+C08,259,"Sản xuất sản phẩm khác từ kim loại; các hoạt động dịch vụ xử lý, gia công kim loại",Manufacture of other fabricated metal products; metalworking service activities
+C08,261,Sản xuất linh kiện điện tử và bảng mạch,Manufacture of electronic components and boards
+C08,262,Sản xuất máy vi tính và thiết bị ngoại vi của máy vi tính,Manufacture of computers and peripheral equipment
+C08,263,Sản xuất thiết bị truyền thông,Manufacture of communication equipment
+C08,264,Sản xuất sản phẩm điện tử dân dụng,Manufacture of consumer electronics
+C08,265,"Sản xuất thiết bị đo lường, kiểm tra, định vị và điều khiển; sản xuất đồng hồ","Manufacture of measuring, testing, navigating and control equipment; watches and clocks"
+C08,266,"Sản xuất thiết bị bức xạ, thiết bị điện tử trong y học, điện liệu pháp","Manufacture of irradiation, electromedical and electrotherapeutic equipment"
+C08,267,Sản xuất thiết bị và dụng cụ quang học,Manufacture of optical instruments and photographic equipment
+C08,268,"Sản xuất băng, đĩa từ tính và quang học",Manufacture of magnetic and optical media
+C08,271,"Sản xuất mô tơ, máy phát, biến thế điện, thiết bị phân phối và điều khiển điện","Manufacture of electric motors, generators, transformers and electricity distribution and control apparatus"
+C08,272,Sản xuất pin và ắc quy,Manufacture of batteries and accumulators
+C08,273,Sản xuất dây và thiết bị dây dẫn,Manufacture of wiring and wiring devices
+C08,274,Sản xuất thiết bị điện chiếu sáng,Manufacture of electric lighting equipment
+C08,275,Sản xuất đồ điện dân dụng,Manufacture of domestic appliances
+C08,279,Sản xuất thiết bị điện khác,Manufacture of other electrical equipment
+C08,281,Sản xuất máy thông dụng,Manufacture of general-purpose machinery
+C08,282,Sản xuất máy chuyên dụng,Manufacture of special-purpose machinery
+C08,291,Sản xuất xe có động cơ,Manufacture of motor vehicles
+C08,292,"Sản xuất thân xe có động cơ, rơ moóc và bán rơ moóc",Manufacture of bodies (coachwork) for motor vehicles; manufacture of trailers and semi-trailers
+C08,293,Sản xuất phụ tùng và bộ phận phụ trợ của xe có động cơ,Manufacture of parts and accessories for motor vehicles
+C08,301,Đóng tàu và thuyền,Building of ships and boats
+C08,302,"Sản xuất đầu máy xe lửa, xe điện và toa xe",Manufacture of railway locomotives and rolling stock
+C08,303,"Sản xuất máy bay, tàu vũ trụ và máy móc liên quan",Manufacture of air and spacecraft and related machinery
+C08,304,Sản xuất xe cơ giới chiến đấu dùng trong quân đội,Manufacture of military fighting vehicles
+C08,309,Sản xuất phương tiện và thiết bị vận tải khác chưa được phân vào đâu,Manufacture of transport equipment n.e.c.
+C08,310,"Sản xuất giường, tủ, bàn, ghế",Manufacture of furniture
+C08,321,"Sản xuất đồ kim hoàn, đồ giả kim hoàn và các chi tiết liên quan","Manufacture of jewellery, bijouterie and related articles"
+C08,322,Sản xuất nhạc cụ,Manufacture of musical instruments
+C08,323,"Sản xuất dụng cụ thể dục, thể thao",Manufacture of sports goods
+C08,324,"Sản xuất đồ chơi, trò chơi",Manufacture of games and toys
+C08,325,"Sản xuất thiết bị, dụng cụ y tế, nha khoa, chỉnh hình và phục hồi chức năng",Manufacture of medical and dental instruments and supplies
+C08,329,Sản xuất khác chưa được phân vào đâu,Other manufacturing n.e.c.
+C08,331,"Sửa chữa sản phẩm kim loại đúc sẵn, máy móc và thiết bị","Repair of fabricated metal products, machinery and equipment"
+C08,332,Lắp đặt máy móc và thiết bị công nghiệp,Installation of industrial machinery and equipment
+C08,351,"Sản xuất, truyền tải và phân phối điện","Electric power generation, transmission and distribution"
+C08,352,Sản xuất khí đốt; phân phối nhiên liệu khí bằng đường ống,Manufacture of gas; distribution of gaseous fuels through mains
+C08,353,"Sản xuất, phân phối hơi nước, nước nóng, nước đá và điều hòa không khí",Steam and air conditioning supply
+C08,360,"Khai thác, xử lý và cung cấp nước","Water collection, treatment and supply"
+C08,370,Thoát nước và xử lý nước thải,Sewerage
+C08,381,Thu gom rác thải,Waste collection
+C08,382,Xử lý và tiêu hủy rác thải,Waste treatment and disposal
+C08,383,Tái chế phế liệu,Materials recovery
+C08,390,Xử lý ô nhiễm và hoạt động quản lý chất thải khác,Remediation activities and other waste management services
+C08,410,Xây dựng nhà các loại,Construction of buildings
+C08,421,Xây dựng công trình đường sắt và đường bộ,Construction of roads and railways
+C08,422,Xây dựng công trình công ích,Construction of utility projects
+C08,429,Xây dựng công trình kỹ thuật dân dụng khác,Construction of other civil engineering projects
+C08,431,Phá dỡ và chuẩn bị mặt bằng,Demolition and site preparation
+C08,432,"Lắp đặt hệ thống điện, hệ thống cấp thoát nước và lắp đặt xây dựng khác","Electrical, plumbing and other construction installation activities"
+C08,433,Hoàn thiện công trình xây dựng,Building completion and finishing
+C08,439,Hoạt động xây dựng chuyên dụng khác,Other specialised construction activities
+C08,451,Bán buôn và bán lẻ ô tô và xe có động cơ khác,Sale of motor vehicles
+C08,452,Bảo dưỡng và sửa chữa ô tô và xe có động cơ khác,Maintenance and repair of motor vehicles
+C08,453,Bán phụ tùng và các bộ phận phụ trợ của ô tô và xe có động cơ khác,Sale of motor vehicle parts and accessories
+C08,454,"Bán, bảo dưỡng và sửa chữa mô tô, xe máy và phụ tùng, bộ phận phụ trợ của mô tô, xe máy","Sale, maintenance and repair of motorcycles and related parts and accessories"
+C08,461,"Đại lý, môi giới, đấu giá hàng hóa",Wholesale on a fee or contract basis
+C08,462,"Bán buôn nông, lâm sản nguyên liệu (trừ gỗ, tre, nứa) và động vật sống",Wholesale of agricultural raw materials and live animals
+C08,463,"Bán buôn lương thực, thực phẩm, đồ uống và sản phẩm thuốc lá, thuốc lào","Wholesale of food, beverages and tobacco"
+C08,464,Bán buôn đồ dùng gia đình,Wholesale of household goods
+C08,465,"Bán buôn máy móc, thiết bị thông tin và truyền thông",Wholesale of information and communication equipment
+C08,466,"Bán buôn máy móc, thiết bị và phụ tùng máy khác","Wholesale of other machinery, equipment and supplies"
+C08,469,Bán buôn tổng hợp,Non-specialised wholesale trade
+C08,471,Bán lẻ trong các cửa hàng kinh doanh tổng hợp,Retail sale in non-specialised stores
+C08,472,"Bán lẻ lương thực, thực phẩm, đồ uống, thuốc lá, thuốc lào trong các cửa hàng chuyên doanh","Retail sale of food, beverages and tobacco in specialised stores"
+C08,473,Bán lẻ nhiên liệu động cơ trong các cửa hàng chuyên doanh,Retail sale of automotive fuel in specialised stores
+C08,474,Bán lẻ thiết bị công nghệ thông tin liên lạc trong các cửa hàng chuyên doanh,Retail sale of information and communication equipment in specialised stores
+C08,475,Bán lẻ thiết bị gia đình khác trong các cửa hàng chuyên doanh,Retail sale of other household equipment in specialised stores
+C08,476,"Bán lẻ hàng văn hóa, giải trí trong các cửa hàng chuyên doanh",Retail sale of cultural and recreation goods in specialised stores
+C08,477,Bán lẻ hàng hóa khác trong các cửa hàng chuyên doanh,Retail sale of other goods in specialised stores
+C08,478,Bán lẻ lưu động hoặc bán tại chợ,Retail sale via stalls and markets
+C08,479,"Bán lẻ hình thức khác (không bán tại cửa hàng, lưu động hoặc tại chợ)","Retail trade not in stores, stalls or markets"
+C08,491,Vận tải đường sắt,Transport via railways
+C08,492,Vận tải đường bộ khác,Other land transport
+C08,493,Vận tải đường ống,Transport via pipeline
+C08,501,Vận tải đường biển và ven biển,Sea and coastal water transport
+C08,502,Vận tải đường thủy nội địa,Inland water transport
+C08,511,Vận tải hành khách hàng không,Passenger air transport
+C08,512,Vận tải hàng hóa hàng không,Freight air transport
+C08,521,Kho bãi và lưu giữ hàng hóa,Warehousing and storage
+C08,522,Hoạt động dịch vụ hỗ trợ cho vận tải,Support activities for transportation
+C08,531,Bưu chính,Postal activities
+C08,532,Chuyển phát,Courier activities
+C08,551,Dịch vụ lưu trú ngắn ngày,Accommodation
+C08,559,Cơ sở lưu trú khác,Other accommodation
+C08,561,Nhà hàng và các dịch vụ ăn uống phục vụ lưu động,Restaurants and mobile food service activities
+C08,562,Cung cấp dịch vụ ăn uống theo hợp đồng không thường xuyên và dịch vụ ăn uống khác,Catering and other food service activities
+C08,563,Dịch vụ phục vụ đồ uống,Drinking places for beverages
+C08,581,"Xuất bản sách, ấn phẩm định kỳ và các hoạt động xuất bản khác","Publishing of books, periodicals and other publishing activities"
+C08,582,Xuất bản phần mềm,Software publishing
+C08,591,"Hoạt động sản xuất phim điện ảnh, phim video và chương trình truyền hình","Motion picture, video and television programme production activities"
+C08,592,Hoạt động ghi âm và xuất bản âm nhạc,Sound recording and music publishing activities
+C08,601,Hoạt động phát thanh,Radio broadcasting
+C08,602,Hoạt động truyền hình và phát sóng,Television programming and broadcasting activities
+C08,611,Hoạt động viễn thông có dây,Wired telecommunications activities
+C08,612,Hoạt động viễn thông không dây,Wireless telecommunications activities
+C08,613,Hoạt động viễn thông vệ tinh,Satellite telecommunications activities
+C08,619,Hoạt động viễn thông khác,Other telecommunications activities
+C08,620,"Lập trình máy vi tính, dịch vụ tư vấn và các hoạt động khác liên quan đến máy vi tính","Computer programming, consultancy and related activities"
+C08,631,"Xử lý dữ liệu, cho thuê và các hoạt động liên quan; cổng thông tin","Data processing, hosting and related activities; web portals"
+C08,639,Dịch vụ thông tin khác,Other information service activities
+C08,641,Hoạt động trung gian tiền tệ,Monetary intermediation
+C08,642,Hoạt động của các công ty nắm giữ vốn,Activities of holding companies
+C08,643,"Hoạt động quỹ tín thác, các quỹ và các tổ chức tài chính khác có liên quan","Trusts, funds and similar financial entities"
+C08,649,Hoạt động dịch vụ tài chính khác (trừ bảo hiểm và bảo hiểm xã hội),Other financial service activities
+C08,651,Bảo hiểm,Insurance
+C08,652,Tái bảo hiểm,Reinsurance
+C08,653,Bảo hiểm xã hội,Pension funding
+C08,661,Hoạt động hỗ trợ dịch vụ tài chính (trừ bảo hiểm và bảo hiểm xã hội),"Activities auxiliary to financial services, except insurance and pension funding"
+C08,662,Hoạt động hỗ trợ bảo hiểm và bảo hiểm xã hội,Activities auxiliary to insurance and pension funding
+C08,663,Hoạt động quản lý quỹ,Fund management activities
+C08,681,Kinh doanh bất động sản với quyền sở hữu hoặc đi thuê,Real estate activities with own or leased property
+C08,682,Kinh doanh bất động sản trên cơ sở phí hoặc hợp đồng,Real estate activities on a fee or contract basis
+C08,691,Hoạt động pháp luật,Legal activities
+C08,692,"Hoạt động liên quan đến kế toán, kiểm toán và tư vấn về thuế","Accounting, bookkeeping and auditing activities; tax consultancy"
+C08,701,Hoạt động của trụ sở văn phòng,Activities of head offices
+C08,702,Hoạt động tư vấn quản lý,Management consultancy activities
+C08,711,Hoạt động kiến trúc và tư vấn kỹ thuật có liên quan,Architectural and engineering activities and related technical consultancy
+C08,712,Kiểm tra và phân tích kỹ thuật,Technical testing and analysis
+C08,721,Nghiên cứu và phát triển thực nghiệm khoa học tự nhiên và kỹ thuật,Research and experimental development on natural sciences and engineering
+C08,722,Nghiên cứu và phát triển thực nghiệm khoa học xã hội và nhân văn,Research and experimental development on social sciences and humanities
+C08,731,Quảng cáo,Advertising
+C08,732,Nghiên cứu thị trường và thăm dò dư luận,Market research and public opinion polling
+C08,741,Hoạt động thiết kế chuyên dụng,Specialised design activities
+C08,742,Hoạt động nhiếp ảnh,Photographic activities
+C08,749,"Hoạt động chuyên môn, khoa học và công nghệ khác chưa được phân vào đâu","Other professional, scientific and technical activities n.e.c."
+C08,750,Hoạt động thú y,Veterinary activities
+C08,771,Cho thuê xe có động cơ,Renting and leasing of motor vehicles
+C08,772,Cho thuê đồ dùng cá nhân và gia đình,Renting and leasing of personal and household goods
+C08,773,"Cho thuê máy móc, thiết bị và đồ dùng hữu hình khác","Renting and leasing of other machinery, equipment and tangible goods"
+C08,774,Cho thuê sản phẩm sở hữu trí tuệ và sản phẩm tương tự,Leasing of intellectual property and similar products
+C08,781,"Hoạt động của các trung tâm, đại lý tư vấn, giới thiệu và môi giới lao động, việc làm",Activities of employment placement agencies
+C08,782,Cung ứng lao động tạm thời,Temporary employment agency activities
+C08,783,Cung ứng và quản lý nguồn lao động,Other human resources provision
+C08,791,Hoạt động của các đại lý du lịch và công ty tổ chức tua du lịch,Travel agency and tour operator activities
+C08,799,"Dịch vụ hỗ trợ liên quan đến quảng bá và tổ chức tua du lịch, dịch vụ đặt chỗ khác",Other reservation service and related activities
+C08,801,Hoạt động bảo vệ tư nhân,Private security activities
+C08,802,Dịch vụ hệ thống bảo đảm an toàn,Security systems service activities
+C08,803,Dịch vụ điều tra,Investigation activities
+C08,811,Dịch vụ hỗ trợ tổng hợp,Combined facilities support activities
+C08,812,Dịch vụ vệ sinh,Cleaning activities
+C08,813,Dịch vụ chăm sóc và duy trì cảnh quan,Landscape care and maintenance service activities
+C08,821,Hoạt động hành chính và hỗ trợ văn phòng,Office administrative and support activities
+C08,822,Hoạt động của các trung tâm gọi điện thoại,Activities of call centres
+C08,823,"Tổ chức hội nghị, hội chợ và triển lãm thương mại",Organisation of conventions and trade shows
+C08,829,Hoạt động dịch vụ hỗ trợ kinh doanh khác chưa được phân vào đâu,Business support service activities n.e.c.
+C08,841,"Hoạt động quản lý nhà nước và chính sách kinh tế, xã hội của cộng đồng",Administration of the State and the economic and social policy of the community
+C08,842,Hoạt động cung cấp dịch vụ công cộng cho toàn xã hội,Provision of services to the community as a whole
+C08,843,Hoạt động bảo đảm xã hội bắt buộc,Compulsory social security activities
+C08,851,Giáo dục mầm non và tiểu học,Pre-primary and primary education
+C08,852,Giáo dục trung học,Secondary education
+C08,853,Giáo dục đại học,Higher education
+C08,854,Giáo dục khác,Other education
+C08,855,Dịch vụ hỗ trợ giáo dục,Educational support activities
+C08,861,Hoạt động của các bệnh viện,Hospital activities
+C08,862,"Hoạt động của các phòng khám đa khoa, chuyên khoa và nha khoa",Medical and dental practice activities
+C08,869,Hoạt động y tế khác,Other human health activities
+C08,871,"Hoạt động của các cơ sở nuôi dưỡng, điều dưỡng",Residential nursing care facilities
+C08,872,"Hoạt động chăm sóc sức khỏe người bị thiểu năng, tâm thần và người nghiện","Residential care activities for mental retardation, mental health and substance abuse"
+C08,873,"Hoạt động chăm sóc sức khỏe người có công, người già và người khuyết tật không có khả năng tự chăm sóc",Residential care activities for the elderly and disabled
+C08,879,Hoạt động chăm sóc tập trung khác,Other residential care activities
+C08,881,"Hoạt động trợ giúp xã hội không tập trung đối với người có công, thương bệnh binh, người già và người khuyết tật",Social work activities without accommodation for the elderly and disabled
+C08,889,Hoạt động trợ giúp xã hội không tập trung khác,Other social work activities without accommodation n.e.c.
+C08,900,"Hoạt động sáng tác, nghệ thuật và giải trí","Creative, arts and entertainment activities"
+C08,910,"Hoạt động của thư viện, lưu trữ, bảo tàng và các hoạt động văn hóa khác","Libraries, archives, museums and other cultural activities"
+C08,920,"Hoạt động xổ số, cá cược và đánh bạc",Gambling and betting activities
+C08,931,Hoạt động thể thao,Sports activities
+C08,932,Hoạt động vui chơi giải trí khác,Other amusement and recreation activities
+C08,941,"Hoạt động của các hiệp hội kinh doanh, hiệp hội giới chủ và hiệp hội nghề nghiệp","Activities of business, employers and professional membership organisations"
+C08,942,Hoạt động của các tổ chức công đoàn,Activities of trade unions
+C08,949,Hoạt động của các tổ chức thành viên khác,Activities of other membership organisations
+C08,951,Sửa chữa máy vi tính và thiết bị liên lạc,Repair of computers and communication equipment
+C08,952,Sửa chữa đồ dùng cá nhân và gia đình,Repair of personal and household goods
+C08,960,Hoạt động dịch vụ phục vụ cá nhân khác,Other personal service activities
+C08,970,Hoạt động làm thuê công việc gia đình trong các hộ gia đình,Activities of households as employers of domestic personnel
+C08,981,Hoạt động sản xuất sản phẩm vật chất tự tiêu dùng của hộ gia đình,Undifferentiated goods-producing activities of private households for own use
+C08,982,Hoạt động sản xuất sản phẩm dịch vụ tự tiêu dùng của hộ gia đình,Undifferentiated service-producing activities of private households for own use
+C08,990,Hoạt động của các tổ chức và cơ quan quốc tế,Activities of extraterritorial organisations and bodies
+C08,000,Các hoạt động khác chưa được phân vào đâu,Other activities not classified elsewhere
+C09,11,Chủ tịch,Chairman
+C09,12,Chủ tịch Hội đồng quản trị / thành viên,Chairman of Management Board
+C09,13,Thành viên Hội đồng quản trị,Member of Management Board
+C09,14,Giám đốc / Tổng giám đốc,Director or General Director (CEO)
+C09,15,Trưởng Ban kiểm soát,Head of Board of Supervisors
+C09,16,Thành viên Ban kiểm soát,Member of Board of Supervisors
+C09,17,Cổ đông sáng lập / cổ đông lớn,Founding / Primary Shareholder
+C09,18,Thành viên hợp danh,General Partner
+C09,19,Thành viên góp vốn,Limited Partner
+C09,20,Thành viên Hội đồng thành viên,Member of Members' Council
+C09,21,Chủ tịch Hội đồng thành viên,Chairman of Members' Council
+C09,22,Chủ nhiệm hợp tác xã,Cooperative Manager
+C09,23,Phó chủ nhiệm hợp tác xã,Cooperative Deputy Manager
+C10,11,Xe mô tô / Xe máy / Xe dưới 50cc,Motorbike
+C10,12,Ô tô con,Car
+C10,13,Xe tải / Xe thương mại,Truck / Commercial vehicle
+C10,14,Xe khách / Xe buýt,Bus / Minibus
+C10,15,Xe điện,Electric Vehicle
+C10,99,Phương tiện khác,Other vehicle
+C11,11,Xe máy dưới 50cc,Motorcycles under 50cc
+C11,12,Xe máy từ 50cc đến dưới 175cc,Motorcycles 50cc to under 175cc
+C11,13,Xe máy từ 175cc trở lên,Motorcycles 175cc and over
+C11,14,"Ô tô dưới 1,500cc (1.5L)","Cars 1,500cc (1.5L) and under"
+C11,15,"Ô tô trên 1,500cc đến 2,000cc","Cars over 1,500cc to 2,000cc"
+C11,16,"Ô tô trên 2,000cc đến 2,500cc","Cars over 2,000cc to 2,500cc"
+C11,17,"Ô tô trên 2,500cc đến 3,000cc","Cars over 2,500cc to 3,000cc"
+C11,18,"Ô tô trên 3,000cc","Cars over 3,000cc"
+C11,19,Xe Hybrid (HEV/PHEV),Hybrid Vehicles (HEV/PHEV)
+C11,20,Xe điện (BEV),Electric Vehicles (BEV)
+C12,1,Nhóm 1 — Nợ đủ tiêu chuẩn,Group 1 — Standard Debt
+C12,2,Nhóm 2 — Nợ cần chú ý,Group 2 — Special Mention
+C12,3,Nhóm 3 — Nợ dưới tiêu chuẩn,Group 3 — Substandard Debt
+C12,4,Nhóm 4 — Nợ nghi ngờ,Group 4 — Doubtful Debt
+C12,5,Nhóm 5 — Nợ có khả năng mất vốn,Group 5 — Loss (Potentially Irrecoverable)
+C13,00,Không có thông tin,N/A
+C13,11,Đang hoạt động,Active
+C13,12,Đã đóng (bình thường),Closed
+C13,13,Quá hạn / Nợ xấu,Delinquency
+C13,14,Bên thứ ba trả thay,Subrogation
+C13,15,Xử lý rủi ro / Xóa nợ,Loss/Write-off
+C13,16,Bán cho công ty quản lý nợ,Transfer to AMC
+C13,17,Cơ cấu lại nợ,Debt Restructuring
+C13,18,Phá sản,Bankruptcy
+C13,19,Khác,Other
+C16,11,Vay tiêu dùng,Consumption loan
+C16,12,"Vay cưới hỏi, lễ tết",Wedding / ceremony loan
+C16,13,"Vay học tập, du học",Education / student loan
+C16,14,"Vay sinh hoạt, chi phí thiết yếu",Livelihood / essential needs
+C16,15,Vay mua xe máy,Motorcycle purchase loan
+C16,16,Vay mua ô tô,Car purchase loan
+C16,17,"Vay bất động sản, nhà ở",Real estate / housing loan
+C16,18,Vay đầu tư chứng khoán,Securities investment
+C16,19,Vay hoạt động kinh doanh tổng hợp,Business operation (general)
+C16,20,Vay thương mại và dịch vụ,Trading and service
+C16,21,"Vay y tế, sức khỏe",Medical / healthcare loan
+C16,22,Vay du lịch,Travel / vacation loan
+C16,23,Vay sản xuất công nghiệp,Industrial production
+C16,24,"Vay nông, lâm nghiệp",Agricultural & forestry
+C16,25,"Vay thủy sản, nuôi trồng",Fishery / aquaculture
+C16,26,Vay xây dựng công trình,Construction project loan
+C16,27,"Vay mua máy móc, thiết bị",Machinery / equipment purchase
+C16,28,Vay vốn lưu động,Working capital
+C16,29,"Vay lương, ứng lương",Payroll / salary advance
+C16,30,Vay xuất nhập khẩu,Import / export financing
+C16,31,Vay chuỗi cung ứng,Supply chain finance
+C16,32,Vay xanh / ESG,Green / ESG loan
+C16,33,Vay khởi nghiệp,Start-up loan
+C16,34,Vay đảo nợ / tái cơ cấu,Debt consolidation / refinancing
+C16,35,Vay chính sách xã hội,Social policy loan
+C16,99,Khác,Other
+C17,110,Vay thông thường (trả gốc 1 lần cuối kỳ),Normal loan (lump-sum principal at maturity)
+C17,120,Thấu chi / Hạn mức tín dụng,Overdraft / Line of credit
+C17,130,Vay trả góp (chia đều gốc),Installment loan (equal principal)
+C17,140,Vay trả góp (đều gốc+lãi),Installment loan (equal principal+interest)
+C17,150,Vay cải tạo nhà,Home renovation loan
+C17,160,Vay thế chấp bất động sản,Mortgage loan
+C17,170,Vay hộ kinh doanh / SME,Small business / SME loan
+C17,180,Vay tín chấp cá nhân,Unsecured personal loan
+C17,190,Vay trừ lương,Salary-deducted loan
+C17,195,Vay chính sách xã hội (VBSP),Social policy loan (VBSP)
+C17,210,Thẻ tín dụng thông thường,Credit card (Normal / Charge)
+C17,220,Thẻ tín dụng quay vòng (revolving),Credit card (Revolving)
+C17,230,Vay qua thẻ tín dụng,Credit card loan (card loan)
+C17,240,Thẻ ghi nợ,Debit card
+C17,320,Vay mua xe mới (trả góp),Installment — New vehicle
+C17,330,Vay mua xe cũ (trả góp),Installment — Used vehicle
+C17,340,Vay mua hàng tiêu dùng lâu bền mới,Installment — New durable goods
+C17,350,Vay mua hàng lâu bền cũ / khác,Installment — Used durable goods / Other
+C17,410,Thuê tài chính (tổng quát),Finance lease (general)
+C17,411,Thuê tài chính — Ô tô,Finance lease — Car
+C17,412,Thuê tài chính — Xe máy,Finance lease — Motorbike
+C17,413,Thuê tài chính — Xe tải,Finance lease — Truck 
+C17,414,"Thuê tài chính — Máy móc, thiết bị",Finance lease — Machinery/Equipment
+C17,415,Thuê tài chính — Bất động sản,Finance lease — Real estate
+C17,416,Hàng tiêu dùng lâu bền,Finance lease — Consumer Goods
+C17,417,Thuê tài chính — Khác,Finance lease — Other
+C17,418,"Khác (chiết khấu, bao thanh toán...)","Other (bill discount, factoring, etc.)"
+C18,11,Trả gốc đều theo kỳ,Equal principal installments
+C18,12,Trả gốc và lãi đều theo kỳ,Equal principal + interest installments
+C18,13,Trả toàn bộ gốc lãi cuối kỳ,Lump-sum repayment at maturity
+C18,14,Hạn mức tín dụng quay vòng,Line of credit (revolving)
+C18,15,Quay vòng (thẻ tín dụng),Revolving (credit card)
+C18,16,Trả nợ linh hoạt theo khả năng,Free installment repayment
+C18,99,Khác,Other
+C19,11,Hằng ngày,Daily
+C19,12,Hằng tuần,Weekly
+C19,13,Hai tuần một lần,Biweekly
+C19,14,Hằng tháng,Monthly
+C19,15,Hai tháng một lần,Bimonthly
+C19,16,Hàng quý,Quarterly
+C19,17,Bốn tháng một lần,Four-monthly
+C19,18,Năm tháng một lần,Five-monthly
+C19,19,Sáu tháng một lần,Semiannually
+C19,20,Hàng năm,Annually
+C19,21,Một lần cuối kỳ,Lump-sum (at maturity only)
+C19,22,Không đều,Irregular
+C19,99,Khác,Other
+C22,11,Mới,New
+C22,12,Cũ,Used
+C23,11,Bảo lãnh thanh toán,Payment Guarantee
+C23,12,Bảo lãnh thông thường,General Guarantee
+C23,13,Bảo lãnh hối phiếu (không bảo lãnh thanh toán),Bill of Exchange Guarantee (no payment guarantee)
+C23,14,Bảo lãnh trách nhiệm hữu hạn không giới hạn,Unlimited Corporate Liability
+C23,15,Bảo lãnh trách nhiệm có giới hạn,Specific / Limited Corporate Liability
+C23,16,Cầm cố tín thác,Pledge of Trust
+C24,11,Quyền sử dụng đất và tài sản gắn liền với đất,Land-use right and assets attached to land
+C24,12,Phương tiện vận tải,Means of transport
+C24,13,Giấy tờ có giá (tổng quát),Valuable papers (general)
+C24,14,Trái phiếu,Bonds
+C24,15,Cổ phiếu,Stocks / Shares
+C24,16,Hối phiếu,Bills of exchange
+C24,17,Kỳ phiếu,Promissory notes
+C24,18,Sổ tiết kiệm / Chứng chỉ tiền gửi,Deposit certificates / Savings book
+C24,19,Thương phiếu,Commercial papers
+C24,20,Giấy tờ có giá khác,Other papers valued as money
+C24,21,"Kim loại quý, đá quý",Metals / Precious stones
+C24,22,"Máy móc, thiết bị, nguyên liệu","Machinery, equipment, raw materials"
+C24,23,"Máy móc, thiết bị (riêng)",Machines / Equipment only
+C24,24,Dây chuyền sản xuất,Production lines
+C24,25,"Nguyên, nhiên liệu, vật liệu",Raw materials
+C24,26,Hàng tiêu dùng,Consumption goods
+C24,27,Hàng hóa khác,Other goods
+C24,28,Tài sản khác có đăng ký quyền sở hữu/sử dụng,Other registered assets
+C24,29,Tài sản từ quyền tác giả,Copyright assets
+C24,30,Quyền sở hữu công nghiệp,Industrial property rights
+C24,31,Quyền đòi nợ,Right of debt collection
+C24,32,Quyền thụ hưởng bảo hiểm,Right to insurance proceeds
+C24,33,Quyền góp vốn vào doanh nghiệp,Capital contribution rights
+C24,34,Quyền khai thác tài nguyên thiên nhiên,Natural resource exploitation rights
+C24,35,"Thu nhập, quyền từ tài sản thế chấp",Income and rights from pledged assets
+C24,36,Quyền tài sản khác,Other asset rights
+C24,37,Tài sản khác,Other assets
+C24,38,Hàng tồn kho,Inventory 
+C25,11,Cầm cố tài sản,Pledge (Cầm cố)
+C25,12,Thế chấp tài sản,Mortgage (Thế chấp)
+C25,13,Bảo lãnh,Guarantee (Bảo lãnh)
+C25,14,Chuyển nhượng/chuyển giao quyền,Assignment (Chuyển nhượng quyền)
+C25,15,Tín thác bảo đảm,Trust (Ủy thác tín thác)
+C25,16,Khác,Other
+C26,00,Bình thường (không quá hạn),Normal (no delinquency)
+C26,11,Quá hạn lãi suất,Delinquency on interest
+C26,12,Quá hạn kỳ trả gốc,Delinquency on installment (principal)
+C26,13,Vượt hạn mức thấu chi,Exceed limit on overdraft
+C26,14,Quá hạn nợ gốc (mất lợi ích về thời hạn),Principal delinquency (loss of the benefit of the term)
+C26,15,Quá hạn do quá ngày đến hạn (quá ngày đáo hạn),Delinquency after due date (maturity date has passed)
+C26,16,Thẻ tín dụng — trước mất lợi ích đáo hạn,Credit card — before loss of due benefit
+C26,17,Thẻ tín dụng — sau mất lợi ích đáo hạn,Credit card — after loss of due benefit
+C26,99,Vi phạm nghĩa vụ khác,Other delinquency
+C28,1001,Nợ quá hạn trên 90 ngày (Nhóm 3 trở lên),Overdue 90+ days (Debt Group 3 or above)
+C28,1002,Người bảo lãnh đồng trả nợ của khách hàng vi phạm,Joint guarantor of defaulted borrower
+C28,1003,Người liên quan của người vi phạm,Related party of defaulted borrower
+C28,1004,Làm hồ sơ vay giả mạo gây thiệt hại,Fraudulent credit application causing loss
+C28,1005,Báo mất thẻ/tài sản gian lận gây thiệt hại,False loss/theft report causing loss
+C28,1006,Giao dịch thẻ gian lận,Fraudulent card transaction
+C28,1099,Vi phạm nghĩa vụ khác,Other default
+C29,1001,Mua trả góp,Installment purchase
+C29,1002,Thuê tài chính,Finance lease
+C29,1003,Thuê hoạt động,Operating rental
+C29,1004,Dịch vụ internet / băng thông rộng,Internet / broadband service
+C29,1005,Hợp đồng truyền hình cáp / vệ tinh,Cable / satellite TV contract
+C29,1006,"Dịch vụ tiện ích (điện, nước, gas)","Utility (electricity, water, gas)"
+C29,1007,Thuê bất động sản,Real estate rental
+C29,1008,Dịch vụ đăng ký định kỳ,Subscription service
+C29,1009,Mua hàng qua TV / thương mại điện tử,Home shopping / e-commerce
+C29,1010,Công ty quản lý tài sản,Asset management company
+C29,1012,Ví điện tử / tiền di động,Mobile money / e-wallet
+C29,1013,Phí bảo hiểm,Insurance premium
+C29,1014,Dịch vụ viễn thông (điện thoại di động),Telecom (mobile phone)
+C29,1015,Học phí trả góp,Education fee installment
+C29,1099,Hợp đồng khác,Other contract
+C30,101,Vỡ nợ,Default 
+C30,102,Nợ quá hạn,Delinquency
+C30,103,Tra cứu thông tin,Inquiry 
+C30,104,Khoản vay,Loan 
+C30,105,Thẻ tín dụng,Credit Card
+C31,11,Ngân hàng thương mại (trong nước),Commercial Bank (domestic)
+C31,12,Ngân hàng nước ngoài / Chi nhánh,Foreign Bank / Branch
+C31,13,Ngân hàng chính sách nhà nước,State-owned Bank (policy bank)
+C31,14,Công ty tài chính,Finance Company
+C31,15,Công ty tài chính tiêu dùng,Consumer Credit Company
+C31,16,Tổ chức tài chính vi mô,Microfinance Institution (MFI)
+C31,17,Hợp tác xã tín dụng / Quỹ tín dụng,Cooperative / Credit Union
+C31,18,Công ty cho thuê tài chính,Finance Lease Company
+C31,19,Nền tảng cho vay ngang hàng P2P,P2P Lending Platform
+C31,20,Công ty Fintech / Cho vay kỹ thuật số,Fintech / Digital Lender
+C31,21,Công ty bảo hiểm,Insurance Company
+C31,22,Tổ chức tín dụng khác,Other financial institution
+C32,01,Hà Nội,Hanoi
+C32,04,Cao Bằng,Cao Bang
+C32,08,Tuyên Quang,Tuyen Quang
+C32,11,Điện Biên,Dien Bien
+C32,12,Lai Châu,Lai Chau
+C32,14,Sơn La,Son La
+C32,15,Lào Cai,Lao Cai
+C32,19,Thái Nguyên,Thai Nguyen
+C32,20,Lạng Sơn,Lang Son
+C32,22,Quảng Ninh,Quang Ninh
+C32,24,Bắc Ninh,Bac Ninh
+C32,25,Phú Thọ,Phu Tho
+C32,31,Hải Phòng,Hai Phong
+C32,33,Hưng Yên,Hung Yen
+C32,37,Ninh Bình,Ninh Binh
+C32,38,Thanh Hóa,Thanh Hoa
+C32,40,Nghệ An,Nghe An
+C32,42,Hà Tĩnh,Ha Tinh
+C32,44,Quảng Trị,Quang Tri
+C32,46,Huế,Hue
+C32,48,Đà Nẵng,Da Nang
+C32,51,Quảng Ngãi,Quang Ngai
+C32,52,Gia Lai,Gia Lai
+C32,56,Khánh Hòa,Khanh Hoa
+C32,66,Đắk Lắk,Dak Lak
+C32,68,Lâm Đồng,Lam Dong
+C32,75,Đồng Nai,Dong Nai
+C32,79,Hồ Chí Minh,Ho Chi Minh
+C32,80,Tây Ninh,Tay Ninh
+C32,82,Đồng Tháp,Dong Thap
+C32,86,Vĩnh Long,Vinh Long
+C32,91,An Giang,An Giang
+C32,92,Cần Thơ,Can Tho
+C32,96,Cà Mau,Ca Mau
+C33,AED,Dirham UAE,UAE Dirham
+C33,AFN,Afghani Afghanistan,Afghani
+C33,ALL,Lek Albania,Lek
+C33,AMD,Dram Armenia,Armenian Dram
+C33,ANG,Guilder Antilles Hà Lan,Netherlands Antillean Guilder
+C33,AOA,Kwanza Angola,Kwanza
+C33,ARS,Peso Argentina,Argentine Peso
+C33,AUD,Đô la Úc,Australian Dollar
+C33,AWG,Florin Aruba,Aruban Florin
+C33,AZN,Manat Azerbaijan,Azerbaijan Manat
+C33,BAM,Mark chuyển đổi (Bosnia và Herzegovina),Convertible Mark
+C33,BBD,Đô la Barbados,Barbados Dollar
+C33,BDT,Taka Bangladesh,Taka
+C33,BGN,Lev Bulgaria,Bulgarian Lev
+C33,BHD,Dinar Bahrain,Bahraini Dinar
+C33,BIF,Franc Burundi,Burundi Franc
+C33,BMD,Đô la Bermuda,Bermudian Dollar
+C33,BND,Đô la Brunei,Brunei Dollar
+C33,BOB,Boliviano Bolivia,Boliviano
+C33,BRL,Real Brazil,Brazilian Real
+C33,BSD,Đô la Bahamas,Bahamian Dollar
+C33,BTN,Ngultrum Bhutan,Ngultrum
+C33,BWP,Pula Botswana,Pula
+C33,BYN,Rúp Belarus,Belarusian Ruble
+C33,BZD,Đô la Belize,Belize Dollar
+C33,CAD,Đô la Canada,Canadian Dollar
+C33,CDF,Franc Congo,Congolese Franc
+C33,CHF,Franc Thụy Sĩ,Swiss Franc
+C33,CLP,Peso Chile,Chilean Peso
+C33,CNY,Nhân dân tệ (Renminbi) Trung Quốc,Yuan Renminbi
+C33,COP,Peso Colombia,Colombian Peso
+C33,CRC,Colón Costa Rica,Costa Rican Colon
+C33,CUP,Peso Cuba,Cuban Peso
+C33,CVE,Escudo Cabo Verde,Cabo Verde Escudo
+C33,CZK,Koruna Cộng hòa Séc,Czech Koruna
+C33,DJF,Franc Djibouti,Djibouti Franc
+C33,DKK,Krone Đan Mạch,Danish Krone
+C33,DOP,Peso Dominica,Dominican Peso
+C33,DZD,Dinar Algeria,Algerian Dinar
+C33,EGP,Bảng Ai Cập,Egyptian Pound
+C33,ERN,Nakfa Eritrea,Nakfa
+C33,ETB,Birr Ethiopia,Ethiopian Birr
+C33,EUR,Euro,Euro
+C33,FJD,Đô la Fiji,Fiji Dollar
+C33,FKP,Bảng quần đảo Falkland,Falkland Islands Pound
+C33,GBP,Bảng Anh,Pound Sterling
+C33,GEL,Lari Georgia,Lari
+C33,GHS,Cedi Ghana,Ghana Cedi
+C33,GIP,Bảng Gibraltar,Gibraltar Pound
+C33,GMD,Dalasi Gambia,Dalasi
+C33,GNF,Franc Guinea,Guinean Franc
+C33,GTQ,Quetzal Guatemala,Quetzal
+C33,GYD,Đô la Guyana,Guyana Dollar
+C33,HKD,Đô la Hồng Kông,Hong Kong Dollar
+C33,HNL,Lempira Honduras,Lempira
+C33,HTG,Gourde Haiti,Gourde
+C33,HUF,Forint Hungary,Forint
+C33,IDR,Rupiah Indonesia,Rupiah
+C33,ILS,Shekel mới Israel,New Israeli Sheqel
+C33,INR,Rupee Ấn Độ,Indian Rupee
+C33,IQD,Dinar Iraq,Iraqi Dinar
+C33,IRR,Rial Iran,Iranian Rial
+C33,ISK,Króna Iceland,Iceland Krona
+C33,JMD,Đô la Jamaica,Jamaican Dollar
+C33,JOD,Dinar Jordan,Jordanian Dinar
+C33,JPY,Yên Nhật,Yen
+C33,KES,Shilling Kenya,Kenyan Shilling
+C33,KGS,Som Kyrgyzstan,Som
+C33,KHR,Riel Campuchia,Riel
+C33,KMF,Franc Comoros,Comorian Franc
+C33,KPW,Won Triều Tiên,North Korean Won
+C33,KRW,Won Hàn Quốc,Won
+C33,KWD,Dinar Kuwait,Kuwaiti Dinar
+C33,KYD,Đô la quần đảo Cayman,Cayman Islands Dollar
+C33,KZT,Tenge Kazakhstan,Tenge
+C33,LAK,Kíp Lào,Lao Kip
+C33,LBP,Bảng Li-băng,Lebanese Pound
+C33,LKR,Rupee Sri Lanka,Sri Lanka Rupee
+C33,LRD,Đô la Liberia,Liberian Dollar
+C33,LSL,Loti Lesotho,Loti
+C33,LYD,Dinar Libya,Libyan Dinar
+C33,MAD,Dirham Maroc,Moroccan Dirham
+C33,MDL,Leu Moldova,Moldovan Leu
+C33,MGA,Ariary Madagascar,Malagasy Ariary
+C33,MKD,Denar Bắc Macedonia,Denar
+C33,MMK,Kyat Myanmar,Kyat
+C33,MNT,Tugrik Mông Cổ,Tugrik
+C33,MOP,Pataca Ma Cao,Pataca
+C33,MRU,Ouguiya Mauritania,Ouguiya
+C33,MUR,Rupee Mauritius,Mauritius Rupee
+C33,MVR,Rufiyaa Maldives,Rufiyaa
+C33,MWK,Kwacha Malawi,Malawi Kwacha
+C33,MXN,Peso Mexico,Mexican Peso
+C33,MYR,Ringgit Malaysia,Malaysian Ringgit
+C33,MZN,Metical Mozambique,Mozambique Metical
+C33,NAD,Đô la Namibia,Namibia Dollar
+C33,NGN,Naira Nigeria,Naira
+C33,NIO,Córdoba vàng Nicaragua,Cordoba Oro
+C33,NOK,Krone Na Uy,Norwegian Krone
+C33,NPR,Rupee Nepal,Nepalese Rupee
+C33,NZD,Đô la New Zealand,New Zealand Dollar
+C33,OMR,Rial Oman,Rial Omani
+C33,PAB,Balboa Panama,Balboa
+C33,PEN,Sol Peru,Sol
+C33,PGK,Kina Papua New Guinea,Kina
+C33,PHP,Peso Philippines,Philippine Peso
+C33,PKR,Rupee Pakistan,Pakistan Rupee
+C33,PLN,Zloty Ba Lan,Zloty
+C33,PYG,Guaraní Paraguay,Guarani
+C33,QAR,Riyal Qatar,Qatari Rial
+C33,RON,Leu Romania,Romanian Leu
+C33,RSD,Dinar Serbia,Serbian Dinar
+C33,RUB,Rúp Nga,Russian Ruble
+C33,RWF,Franc Rwanda,Rwanda Franc
+C33,SAR,Riyal Ả Rập Xê Út,Saudi Riyal
+C33,SBD,Đô la quần đảo Solomon,Solomon Islands Dollar
+C33,SCR,Rupee Seychelles,Seychelles Rupee
+C33,SDG,Bảng Sudan,Sudanese Pound
+C33,SEK,Krona Thụy Điển,Swedish Krona
+C33,SGD,Đô la Singapore,Singapore Dollar
+C33,SHP,Bảng Saint Helena,Saint Helena Pound
+C33,SLE,Leone Sierra Leone,Leone
+C33,SOS,Shilling Somalia,Somali Shilling
+C33,SRD,Đô la Suriname,Surinam Dollar
+C33,SSP,Bảng Nam Sudan,South Sudanese Pound
+C33,STN,Dobra São Tomé và Príncipe,Dobra
+C33,SVC,Colón El Salvador,El Salvador Colon
+C33,SYP,Bảng Syria,Syrian Pound
+C33,SZL,Lilangeni Eswatini,Lilangeni
+C33,THB,Baht Thái Lan,Baht
+C33,TJS,Somoni Tajikistan,Somoni
+C33,TMT,Manat mới Turkmenistan,Turkmenistan New Manat
+C33,TND,Dinar Tunisia,Tunisian Dinar
+C33,TOP,Pa'anga Tonga,Pa'anga
+C33,TRY,Lira Thổ Nhĩ Kỳ,Turkish Lira
+C33,TTD,Đô la Trinidad và Tobago,Trinidad and Tobago Dollar
+C33,TWD,Đô la Đài Loan mới,New Taiwan Dollar
+C33,TZS,Shilling Tanzania,Tanzanian Shilling
+C33,UAH,Hryvnia Ukraina,Hryvnia
+C33,UGX,Shilling Uganda,Uganda Shilling
+C33,USD,Đô la Mỹ,US Dollar
+C33,UYU,Peso Uruguay,Peso Uruguayo
+C33,UZS,Som Uzbekistan,Uzbekistan Sum
+C33,VES,Bolívar Soberano Venezuela,Bolívar Soberano
+C33,VND,Đồng Việt Nam,Dong
+C33,VUV,Vatu Vanuatu,Vatu
+C33,WST,Tala Samoa,Tala
+C33,XAF,Franc CFA BEAC (Trung Phi),CFA Franc BEAC
+C33,XCD,Đô la Đông Caribe,East Caribbean Dollar
+C33,XDR,Quyền rút vốn đặc biệt (SDR),SDR (Special Drawing Right)
+C33,XOF,Franc CFA BCEAO (Tây Phi),CFA Franc BCEAO
+C33,XPF,Franc CFP (Thái Bình Dương),CFP Franc
+C33,YER,Rial Yemen,Yemeni Rial
+C33,ZAR,Rand Nam Phi,Rand
+C33,ZMW,Kwacha Zambia,Zambian Kwacha
+C33,ZWG,Vàng Zimbabwe (ZiG),Zimbabwe Gold
+C34,F002,Lỗi mã phân loại dữ liệu,Data classification code error
+C34,F004,Số lượng Data trong Trailer không khớp với số lượng bản ghi Data,Number of Data in the Trailer does not match the number of Data records
+C34,F006,Cần đăng ký Header và Trailer,Header and Trailer must be registered
+C34,F008,Giá trị các mục tập trung (lệch) ở các cột chính,Item values are concentrated (skewed) in key columns
+C34,F009,"Khi đăng ký master, tồn tại bản ghi có ""Registration Event"" khác ""1""","In master registration, records exist whose ""Registration Event"" is not ""1"""
+C34,F010,"Khi đăng ký master thông tin quá hạn, tồn tại bản ghi có ""Event Reason Code"" khác ""11""","In delinquency information master registration, records exist whose ""Event Reason Code"" is not ""11"""
+C34,F021,Tên tệp và loại thông tin trong Header không khớp,File name and the information type in the Header do not match
+C34,F022,Tên tệp và mã tổ chức trong Header không khớp,File name and the institution code in the Header do not match
+C34,F023,Số lượng trường được định nghĩa trong layout không khớp với số lượng trường trong file dữ liệu đầu vào.,Mismatch between the number of items defined in the layout and the number of items in the imported file.
+C34,F024,User ID không hợp lệ.,User ID is invalid
+C35,P000,Xử lý thành công (đăng ký hoặc tra cứu thông tin được xử lý bình thường),Processed normally (information registration or inquiry processed successfully)
+C35,E001,Không có quyền sử dụng dịch vụ,No authority to use the service
+C35,E002,Cần xác thực để tra cứu dịch vụ,Authentication is required to inquire the service
+C35,E003,Lỗi định dạng dữ liệu yêu cầu dịch vụ API,API service request data format error
+C35,E004,Lỗi khóa xác thực (API Key) của dịch vụ API,API service authentication key error
+C35,E005,Dịch vụ được yêu cầu không tồn tại,The requested service does not exist
+C35,E006,Phương thức (Method) không được phép,Method not allowed
+C35,E007,ID người dùng không được phép,User ID not allowed
+C35,E008,Hết thời gian chờ (time out),Time out
+C35,E009,Lỗi máy chủ nội bộ (Internal Server Error),Internal Server Error
+C35,E100,Xử lý thất bại: lỗi tra cứu NICE ID,Processing failed: NICE ID inquiry error
+C35,E101,"Lỗi nhập ""Subject Type""","""Subject Type"" input error"
+C35,E102,"Xử lý thất bại: thiếu ""ID Type"" hoặc nhập giá trị không được phép","Processing failed: ""ID Type"" is missing or a value that is not allowed was entered"
+C35,E103,Xử lý thất bại: lỗi mã lý do đồng ý tra cứu,Processing failed: inquiry consent reason code error
+C35,E104,Xử lý thất bại: lỗi mã lý do tra cứu,Processing failed: inquiry reason code error
+C35,E105,Xử lý thất bại: lỗi họ tên / tên doanh nghiệp,Processing failed: name / corporate name error
+C35,E106,Xử lý thất bại: tra cứu ra đối tượng trùng lặp,Processing failed: duplicate subjects were found in the inquiry
+C35,E107,Xử lý thất bại: thiếu ngày bắt đầu tra cứu hoặc lỗi ngày,Processing failed: inquiry start date is missing or is a date error
+C35,E108,Xử lý thất bại: thiếu ngày kết thúc tra cứu hoặc lỗi ngày,Processing failed: inquiry end date is missing or is a date error
+C35,E109,Xử lý thất bại: ngày bắt đầu và ngày kết thúc tra cứu không cùng một ngày,Processing failed: inquiry start date and end date are not the same date
+C35,E110,"Xử lý thất bại: nhập giá trị không được phép vào ""Registration Event"" của cảnh báo sớm (EWS)","Processing failed: a value not allowed was entered in EWS ""Registration Event"""
+C35,E111,Không tồn tại hợp đồng dịch vụ cảnh báo sớm (EWS),No EWS (Early Warning Service) contract exists
+C35,E112,Xử lý thất bại: lỗi nhập Score code,Processing failed: Score code input error
+C35,E113,Xử lý thất bại: tra cứu Repayment Information không có thông tin đối tượng khớp với số hợp đồng đã nhập,Processing failed: no matching subject information for the contract number entered in the Repayment Information inquiry
+C35,E121,"Xử lý thất bại: khi xử lý sự kiện ""Change"", ngày ""Date Changed"" nhập vào là ngày trong tương lai","Processing failed: on a ""Change"" event, the entered ""Date Changed"" is a future date"
+C35,E122,"Xử lý thất bại: khi xử lý sự kiện ""Change"", ""Date Open"" nhập vào sớm hơn ""Date Open"" đã đăng ký","Processing failed: on a ""Change"" event, the entered ""Date Open"" is earlier than the registered ""Date Open"""
+C35,E123,"Xử lý thất bại: thông tin đã đăng ký là đối tượng của ""Change"", ""Closing"", ""Delete"" không tồn tại trong DB","Processing failed: the registered information targeted by ""Change"", ""Closing"" or ""Delete"" does not exist in the DB"
+C35,E124,"Xử lý thất bại: thông tin đã đăng ký là đối tượng của ""Change"", ""Closing"", ""Delete"" đã được xử lý ""Closing"" hoặc ""Delete"" trong DB","Processing failed: the registered information targeted by ""Change"", ""Closing"" or ""Delete"" has already been processed as ""Closing"" or ""Delete"" in the DB"
+C35,E125,"Lỗi giá trị nhập ""Consent to use of Information""","""Consent to use of Information"" input value error"
+C35,E126,"Lỗi giá trị nhập ""Consent to use of Information""","""Consent to use of Information"" input value error"
+C35,E127,"Xử lý thất bại: thiếu nhập ""Customer Code""","Processing failed: ""Customer Code"" was not entered"
+C35,E128,"Xử lý thất bại: thiếu ""Date of Delinquency"" hoặc lỗi ngày","Processing failed: ""Date of Delinquency"" is missing or has a date error"
+C35,E129,"Xử lý thất bại: thiếu ""Date Open"" hoặc ""Date of Delinquency"", hoặc nhập ngày muộn hơn ngày hôm nay","Processing failed: ""Date Open"" or ""Date of Delinquency"" is missing, or a date later than today was entered"
+C35,E130,"Xử lý thất bại: lỗi nhập ""Event reason code""","Processing failed: ""Event reason code"" input error"
+C35,E131,"Lỗi thiếu nhập ""Loan Type""","""Loan Type"" input missing error"
+C35,E132,"Nhập giá trị không được định nghĩa trong mã ""Loan Type""","Value not defined in the ""Loan Type"" code was entered"
+C35,E133,"Xử lý thất bại: khi xử lý sự kiện ""New Registration"", ""Change"", thiếu ""Maturity Date"" hoặc lỗi ngày","Processing failed: on a ""New Registration"" or ""Change"" event, ""Maturity Date"" is missing or has a date error"
+C35,E134,"Xử lý thất bại: khi xử lý Closing, ngày chấm dứt sớm hơn ""Date of Delinquency"" đã đăng ký","Processing failed: on Closing, the closing date is earlier than the registered ""Date of Delinquency"""
+C35,E135,"Xử lý thất bại: khi xử lý Closing, ngày chấm dứt sớm hơn ""Date Open"" đã đăng ký","Processing failed: on Closing, the closing date is earlier than the registered ""Date Open"""
+C35,E136,"Xử lý thất bại: khi đăng ký thông tin Guarantee, ""Guarantee maturity date"" sớm hơn ""Date opened guarantee""","Processing failed: when registering Guarantee information, ""Guarantee maturity date"" is earlier than ""Date opened guarantee"""
+C35,E137,"Xử lý thất bại: khi đăng ký thông tin Guarantee, không tồn tại thông tin hợp đồng của người vay gốc","Processing failed: when registering Guarantee information, the contract information of the original debtor does not exist"
+C35,E138,"Xử lý thất bại: khi đăng ký Individual Identification Information, không nhập cả địa chỉ nhà riêng lẫn địa chỉ nơi làm việc","Processing failed: when registering Individual Identification Information, neither the home address nor the work address was entered"
+C35,E139,"Xử lý thất bại: khi đăng ký thông tin Loan Repayment, ""Base Date"" sớm hơn ""Date Opened"" của Loan Information","Processing failed: when registering Loan Repayment information, ""Base Date"" is earlier than ""Date Opened"" of Loan Information"
+C35,E140,"Xử lý thất bại: khi đăng ký thông tin Loan Repayment, ""Base Date"" là ngày trong tương lai","Processing failed: when registering Loan Repayment information, ""Base Date"" is a future date"
+C35,E141,"Xử lý thất bại: khi đăng ký thông tin Loan Repayment, chưa đăng ký Loan Information có cùng khóa","Processing failed: when registering Loan Repayment information, no Loan Information with the same key is registered"
+C35,E142,"Xử lý thất bại: khi xử lý sự kiện New Registration, thông tin giống hệt đã được đăng ký trong DB","Processing failed: on a New Registration event, the same information is already registered in the DB"
+C35,E143,"Lỗi nhập Registration Event (1, 2, 3, 7)","Registration Event input error (1, 2, 3, 7)"
+C35,E144,"Lỗi nhập Registration Event (1, 3, 7)","Registration Event input error (1, 3, 7)"
+C35,E145,Lỗi mã số doanh nghiệp (mã số thuế),Corporate number (tax code) error
+C35,E146,Chưa nhập ngày phát sinh lý do đăng ký hoặc lỗi ngày (sự kiện thay đổi),Registration reason occurrence date is not entered or is a date error (change event)
+C35,E147,Lỗi khi đăng ký xử lý tệp: ngày cơ sở sớm hơn ngày thao tác cuối cùng trong DB (kiểm tra nhập sự kiện phát sinh),Error in file processing registration: base date is earlier than the last work date in the DB (occurrence event input validation)
+C35,E153,Lỗi xử lý DB nội bộ (cần liên hệ NCI),Internal DB processing error (contact NCI)
+C35,E154,Lỗi xử lý DB nội bộ (cần liên hệ NCI),Internal DB processing error (contact NCI)
+C35,E155,Lỗi xử lý DB nội bộ (cần liên hệ NCI),Internal DB processing error (contact NCI)
+C35,E156,Lỗi mô-đun xử lý nội bộ (cần liên hệ NCI),Internal processing module error (contact NCI)
+C35,E157,Lỗi mô-đun xử lý nội bộ (cần liên hệ NCI),Internal processing module error (contact NCI)
+C35,E158,Lỗi mô-đun xử lý nội bộ (cần liên hệ NCI),Internal processing module error (contact NCI)
+C35,E159,Lỗi mô-đun xử lý nội bộ (cần liên hệ NCI),Internal processing module error (contact NCI)
+C35,E160,Lỗi mô-đun xử lý nội bộ (cần liên hệ NCI),Internal processing module error (contact NCI)
+C35,E161,Lỗi mô-đun xử lý nội bộ (cần liên hệ NCI),Internal processing module error (contact NCI)
+C35,E162,Lỗi mô-đun xử lý nội bộ (cần liên hệ NCI),Internal processing module error (contact NCI)
+C35,E163,Lỗi mô-đun xử lý nội bộ (cần liên hệ NCI),Internal processing module error (contact NCI)
+C35,E164,Lỗi mô-đun xử lý nội bộ (cần liên hệ NCI),Internal processing module error (contact NCI)
+C35,E165,Lỗi mô-đun xử lý nội bộ (cần liên hệ NCI),Internal processing module error (contact NCI)
+C35,E166,Lỗi mô-đun xử lý nội bộ (cần liên hệ NCI),Internal processing module error (contact NCI)
+C35,E167,Lỗi mô-đun xử lý nội bộ (cần liên hệ NCI),Internal processing module error (contact NCI)
+C35,E168,Lỗi mô-đun xử lý nội bộ (cần liên hệ NCI),Internal processing module error (contact NCI)
+C35,E169,Lỗi mô-đun xử lý nội bộ (cần liên hệ NCI),Internal processing module error (contact NCI)
+C35,E170,Lỗi mô-đun xử lý nội bộ (cần liên hệ NCI),Internal processing module error (contact NCI)
+C35,E171,Lỗi mô-đun xử lý nội bộ (cần liên hệ NCI),Internal processing module error (contact NCI)
+C35,E172,Lỗi mô-đun xử lý nội bộ (cần liên hệ NCI),Internal processing module error (contact NCI)
+C35,E173,Lỗi mô-đun xử lý nội bộ (cần liên hệ NCI),Internal processing module error (contact NCI)
+C35,E174,Không tồn tại mã khách hàng đã đăng ký tương ứng với Customer Code nhận được,No registered customer code corresponds to the received Customer Code
+C35,E175,"Lỗi định dạng của ""CCCD"" nhận được","Format error in the received ""CCCD"""
+C35,E176,"Lỗi định dạng của ""Name"" nhận được","Format error in the received ""Name"""
+C35,E177,"Lỗi thiếu nhập ""Name""","""Name"" input missing error"
+C35,E178,"Lỗi nhập ""Gender""","""Gender"" input error"
+C35,E179,"Nhập giá trị không được định nghĩa trong mã ""Nationality""","Value not defined in the ""Nationality"" code was entered"
+C35,E180,"Lỗi nhập ""Email Address""","""Email Address"" input error"
+C35,E181,"Lỗi nhập ""Department""","""Department"" input error"
+C35,E182,"Lỗi nhập ""Debtor's Contract Number""","""Debtor's Contract Number"" input error"
+C35,E183,"Lỗi nhập ""Contract Number""","""Contract Number"" input error"
+C35,E184,"Nhập giá trị không được định nghĩa trong mã ""Debt Group""","Value not defined in the ""Debt Group"" code was entered"
+C35,E185,"Nhập giá trị không được định nghĩa trong mã ""Delinquency code""","Value not defined in the ""Delinquency code"" code was entered"
+C35,E186,"Nhập giá trị không được định nghĩa trong mã ""Loan Purpose""","Value not defined in the ""Loan Purpose"" code was entered"
+C35,E187,"Nhập giá trị không được định nghĩa trong mã ""Transaction Type""","Value not defined in the ""Transaction Type"" code was entered"
+C35,E188,"Nhập giá trị không được định nghĩa trong mã ""Provincial Code""","Value not defined in the ""Provincial Code"" code was entered"
+C35,E189,"Nhập giá trị không được định nghĩa trong mã ""Guarantee Status""","Value not defined in the ""Guarantee Status"" code was entered"
+C35,E190,"Nhập giá trị không được định nghĩa trong mã ""Collateral Status""","Value not defined in the ""Collateral Status"" code was entered"
+C35,E191,"Lỗi nhập ""Consent of information collection""","""Consent of information collection"" input error"
+C35,E192,"Nhập giá trị không được định nghĩa trong mã ""Default code""","Value not defined in the ""Default code"" code was entered"
+C35,E193,"Nhập giá trị không được định nghĩa trong mã ""Repayment Type""","Value not defined in the ""Repayment Type"" code was entered"
+C35,E194,"Nhập giá trị không được định nghĩa trong mã ""Interest repayment cycle""","Value not defined in the ""Interest repayment cycle"" code was entered"
+C35,E195,"Nhập giá trị không được định nghĩa trong mã ""Principal repayment cycle""","Value not defined in the ""Principal repayment cycle"" code was entered"
+C35,E196,"Nhập giá trị không được định nghĩa trong mã ""Guarantee Type""","Value not defined in the ""Guarantee Type"" code was entered"
+C35,E197,"Nhập giá trị không được định nghĩa trong mã ""Collateral Right Type""","Value not defined in the ""Collateral Right Type"" code was entered"
+C35,E198,"Nhập giá trị không được định nghĩa trong mã ""Collateral Type""","Value not defined in the ""Collateral Type"" code was entered"
+C35,E199,Lỗi nhập ở phần yêu cầu khác,Other request section input error
+C35,E201,Lỗi DB (lỗi tra cứu thông tin tín dụng),DB error (credit information inquiry error)
+C35,E202,Lỗi DB (lỗi tính điểm),DB error (score calculation error)
+C35,E203,Lỗi DB (khác; vui lòng liên hệ NCI),DB error (other; please contact NCI)
+C35,E300,"Nhập giá trị không được định nghĩa trong mã ""Engine Displacement""","Value not defined in the ""Engine Displacement"" code was entered"
+C35,E301,"Nhập giá trị không được định nghĩa trong mã ""Corporate Business Line""","Value not defined in the ""Corporate Business Line"" code was entered"
+C35,E302,"Nhập giá trị không được định nghĩa trong mã ""Corporate Type""","Value not defined in the ""Corporate Type"" code was entered"
+C35,E303,"Nhập giá trị không được định nghĩa trong mã ""Lease condition""","Value not defined in the ""Lease condition"" code was entered"
+C35,E304,"Nhập giá trị không được định nghĩa trong mã ""Vehicle Type""","Value not defined in the ""Vehicle Type"" code was entered"
+C35,E305,"Nhập giá trị không được định nghĩa trong mã ""Transaction reason code""","Value not defined in the ""Transaction reason code"" code was entered"
+C35,E306,"Xử lý thất bại: ""Maturity date"" sớm hơn ""Date opened""","Processing failed: ""Maturity date"" is earlier than ""Date opened"""
+C35,E307,"Xử lý thất bại: khi xử lý sự kiện ""Closing"", ""Date closed"" muộn hơn ngày hôm nay hoặc lỗi ngày","Processing failed: on a ""Closing"" event, ""Date closed"" is later than today or is a date error"
+C35,E308,"Xử lý thất bại: ""Grace period beginning date"" sớm hơn ""Date opened""","Processing failed: ""Grace period beginning date"" is earlier than ""Date opened"""
+C35,E309,"Xử lý thất bại: lỗi ngày ""Date of collateral released""","Processing failed: ""Date of collateral released"" date error"
+C35,E310,"Xử lý thất bại: lỗi ngày ""Date of collateral valuation""","Processing failed: ""Date of collateral valuation"" date error"
+C35,E311,"Xử lý thất bại: ""Payment due date"" muộn hơn ngày hôm nay hoặc lỗi ngày","Processing failed: ""Payment due date"" is later than today or is a date error"
+C35,E312,"Xử lý thất bại: ""Latest repayment date"" muộn hơn ngày hôm nay hoặc lỗi ngày","Processing failed: ""Latest repayment date"" is later than today or is a date error"
+C35,E313,"Xử lý thất bại: lỗi ngày ""Next Payment due date""","Processing failed: ""Next Payment due date"" date error"
+C35,E314,"Xử lý thất bại: khi xử lý sự kiện ""Change"", ""Latest Update Date"" nhập vào sớm hơn ""Latest Update Date"" đã đăng ký","Processing failed: on a ""Change"" event, the entered ""Latest Update Date"" is earlier than the registered ""Latest Update Date"""
+C35,E315,"Xử lý thất bại: ""Latest Update Date"" muộn hơn ngày hôm nay hoặc lỗi ngày","Processing failed: ""Latest Update Date"" is later than today or is a date error"
+C35,E316,"Xử lý thất bại: ""Date of Employment"" muộn hơn ngày hôm nay hoặc lỗi ngày","Processing failed: ""Date of Employment"" is later than today or is a date error"
+C35,E317,"Xử lý thất bại: ""Date of manufacture"" muộn hơn ngày hôm nay hoặc lỗi ngày","Processing failed: ""Date of manufacture"" is later than today or is a date error"
+C35,E318,"Xử lý thất bại: ""Date of issuing Business Registration"" muộn hơn ngày hôm nay hoặc lỗi ngày","Processing failed: ""Date of issuing Business Registration"" is later than today or is a date error"
+C35,E319,"Xử lý thất bại: ""Date of issuing ID card"" muộn hơn ngày hôm nay hoặc lỗi ngày","Processing failed: ""Date of issuing ID card"" is later than today or is a date error"
+C35,E320,"Xử lý thất bại: ""Birthday"" muộn hơn ngày hôm nay hoặc lỗi ngày","Processing failed: ""Birthday"" is later than today or is a date error"
+C35,E321,Chưa nhập ngày giải trừ quá hạn hoặc lỗi ngày,Delinquency release date not entered or is a date error
+C36,AFG,Afghanistan,Afghanistan
+C36,ALB,Albania,Albania
+C36,DZA,Algeria,Algeria
+C36,ASM,Samoa thuộc Mỹ,American Samoa
+C36,AND,Andorra,Andorra
+C36,AGO,Angola,Angola
+C36,AIA,Anguilla,Anguilla
+C36,ATA,Nam Cực,Antarctica
+C36,ATG,Antigua và Barbuda,Antigua and Barbuda
+C36,ARG,Argentina,Argentina
+C36,ARM,Armenia,Armenia
+C36,ABW,Aruba,Aruba
+C36,AUS,Úc,Australia
+C36,AUT,Áo,Austria
+C36,AZE,Azerbaijan,Azerbaijan
+C36,BHS,Bahamas,Bahamas
+C36,BHR,Bahrain,Bahrain
+C36,BGD,Bangladesh,Bangladesh
+C36,BRB,Barbados,Barbados
+C36,BLR,Belarus,Belarus
+C36,BEL,Bỉ,Belgium
+C36,BLZ,Belize,Belize
+C36,BEN,Benin,Benin
+C36,BMU,Bermuda,Bermuda
+C36,BTN,Bhutan,Bhutan
+C36,BOL,Bolivia,Bolivia
+C36,BES,"Bonaire, Sint Eustatius và Saba","Bonaire, Sint Eustatius and Saba"
+C36,BIH,Bosnia và Herzegovina,Bosnia and Herzegovina
+C36,BWA,Botswana,Botswana
+C36,BVT,Đảo Bouvet,Bouvet Island
+C36,BRA,Brazil,Brazil
+C36,IOT,Lãnh thổ Ấn Độ Dương thuộc Anh,British Indian Ocean Territory
+C36,BRN,Brunei,Brunei Darussalam
+C36,BGR,Bulgaria,Bulgaria
+C36,BFA,Burkina Faso,Burkina Faso
+C36,BDI,Burundi,Burundi
+C36,CPV,Cabo Verde,Cabo Verde
+C36,KHM,Campuchia,Cambodia
+C36,CMR,Cameroon,Cameroon
+C36,CAN,Canada,Canada
+C36,CYM,Quần đảo Cayman,Cayman Islands
+C36,CAF,Cộng hòa Trung Phi,Central African Republic
+C36,TCD,Chad,Chad
+C36,CHL,Chile,Chile
+C36,CHN,Trung Quốc,China
+C36,CXR,Đảo Christmas,Christmas Island
+C36,CCK,Quần đảo Cocos (Keeling),Cocos (Keeling) Islands
+C36,COL,Colombia,Colombia
+C36,COM,Comoros,Comoros
+C36,COG,Cộng hòa Congo,Congo
+C36,COD,Cộng hòa Dân chủ Congo,Congo (Democratic Republic of the)
+C36,COK,Quần đảo Cook,Cook Islands
+C36,CRI,Costa Rica,Costa Rica
+C36,HRV,Croatia,Croatia
+C36,CUB,Cuba,Cuba
+C36,CUW,Curaçao,Curaçao
+C36,CYP,Síp,Cyprus
+C36,CZE,Cộng hòa Séc,Czechia
+C36,CIV,Bờ Biển Ngà,Côte d'Ivoire
+C36,DNK,Đan Mạch,Denmark
+C36,DJI,Djibouti,Djibouti
+C36,DMA,Dominica,Dominica
+C36,DOM,Cộng hòa Dominica,Dominican Republic
+C36,ECU,Ecuador,Ecuador
+C36,EGY,Ai Cập,Egypt
+C36,SLV,El Salvador,El Salvador
+C36,GNQ,Guinea Xích Đạo,Equatorial Guinea
+C36,ERI,Eritrea,Eritrea
+C36,EST,Estonia,Estonia
+C36,SWZ,Eswatini,Eswatini
+C36,ETH,Ethiopia,Ethiopia
+C36,FLK,Quần đảo Falkland,Falkland Islands
+C36,FRO,Quần đảo Faroe,Faroe Islands
+C36,FJI,Fiji,Fiji
+C36,FIN,Phần Lan,Finland
+C36,FRA,Pháp,France
+C36,GUF,Guiana thuộc Pháp,French Guiana
+C36,PYF,Polynesia thuộc Pháp,French Polynesia
+C36,ATF,Vùng đất phía Nam thuộc Pháp,French Southern Territories
+C36,GAB,Gabon,Gabon
+C36,GMB,Gambia,Gambia
+C36,GEO,Georgia,Georgia
+C36,DEU,Đức,Germany
+C36,GHA,Ghana,Ghana
+C36,GIB,Gibraltar,Gibraltar
+C36,GRC,Hy Lạp,Greece
+C36,GRL,Greenland,Greenland
+C36,GRD,Grenada,Grenada
+C36,GLP,Guadeloupe,Guadeloupe
+C36,GUM,Guam,Guam
+C36,GTM,Guatemala,Guatemala
+C36,GGY,Guernsey,Guernsey
+C36,GIN,Guinea,Guinea
+C36,GNB,Guinea-Bissau,Guinea-Bissau
+C36,GUY,Guyana,Guyana
+C36,HTI,Haiti,Haiti
+C36,HMD,Đảo Heard và quần đảo McDonald,Heard Island and McDonald Islands
+C36,VAT,Tòa Thánh (Vatican),Holy See
+C36,HND,Honduras,Honduras
+C36,HKG,Hồng Kông,Hong Kong
+C36,HUN,Hungary,Hungary
+C36,ISL,Iceland,Iceland
+C36,IND,Ấn Độ,India
+C36,IDN,Indonesia,Indonesia
+C36,IRN,Iran,Iran
+C36,IRQ,Iraq,Iraq
+C36,IRL,Ireland,Ireland
+C36,IMN,Đảo Man,Isle of Man
+C36,ISR,Israel,Israel
+C36,ITA,Ý,Italy
+C36,JAM,Jamaica,Jamaica
+C36,JPN,Nhật Bản,Japan
+C36,JEY,Jersey,Jersey
+C36,JOR,Jordan,Jordan
+C36,KAZ,Kazakhstan,Kazakhstan
+C36,KEN,Kenya,Kenya
+C36,KIR,Kiribati,Kiribati
+C36,PRK,Triều Tiên (CHDCND Triều Tiên),Korea (Democratic People's Republic of)
+C36,KOR,Hàn Quốc (Đại Hàn Dân Quốc),Korea (Republic of)
+C36,KWT,Kuwait,Kuwait
+C36,KGZ,Kyrgyzstan,Kyrgyzstan
+C36,LAO,Lào (CHDCND Lào),Lao People's Democratic Republic
+C36,LVA,Latvia,Latvia
+C36,LBN,Li-băng,Lebanon
+C36,LSO,Lesotho,Lesotho
+C36,LBR,Liberia,Liberia
+C36,LBY,Libya,Libya
+C36,LIE,Liechtenstein,Liechtenstein
+C36,LTU,Litva (Lithuania),Lithuania
+C36,LUX,Luxembourg,Luxembourg
+C36,MAC,Ma Cao,Macao
+C36,MDG,Madagascar,Madagascar
+C36,MWI,Malawi,Malawi
+C36,MYS,Malaysia,Malaysia
+C36,MDV,Maldives,Maldives
+C36,MLI,Mali,Mali
+C36,MLT,Malta,Malta
+C36,MHL,Quần đảo Marshall,Marshall Islands
+C36,MTQ,Martinique,Martinique
+C36,MRT,Mauritania,Mauritania
+C36,MUS,Mauritius,Mauritius
+C36,MYT,Mayotte,Mayotte
+C36,MEX,Mexico,Mexico
+C36,FSM,Micronesia,Micronesia
+C36,MDA,Moldova,Moldova
+C36,MCO,Monaco,Monaco
+C36,MNG,Mông Cổ,Mongolia
+C36,MNE,Montenegro,Montenegro
+C36,MSR,Montserrat,Montserrat
+C36,MAR,Maroc,Morocco
+C36,MOZ,Mozambique,Mozambique
+C36,MMR,Myanmar,Myanmar
+C36,NAM,Namibia,Namibia
+C36,NRU,Nauru,Nauru
+C36,NPL,Nepal,Nepal
+C36,NLD,Hà Lan,Netherlands
+C36,NCL,New Caledonia,New Caledonia
+C36,NZL,New Zealand,New Zealand
+C36,NIC,Nicaragua,Nicaragua
+C36,NER,Niger,Niger
+C36,NGA,Nigeria,Nigeria
+C36,NIU,Niue,Niue
+C36,NFK,Đảo Norfolk,Norfolk Island
+C36,MKD,Bắc Macedonia,North Macedonia
+C36,MNP,Quần đảo Bắc Mariana,Northern Mariana Islands
+C36,NOR,Na Uy,Norway
+C36,OMN,Oman,Oman
+C36,PAK,Pakistan,Pakistan
+C36,PLW,Palau,Palau
+C36,PSE,Nhà nước Palestine,"Palestine, State of"
+C36,PAN,Panama,Panama
+C36,PNG,Papua New Guinea,Papua New Guinea
+C36,PRY,Paraguay,Paraguay
+C36,PER,Peru,Peru
+C36,PHL,Philippines,Philippines
+C36,PCN,Quần đảo Pitcairn,Pitcairn
+C36,POL,Ba Lan,Poland
+C36,PRT,Bồ Đào Nha,Portugal
+C36,PRI,Puerto Rico,Puerto Rico
+C36,QAT,Qatar,Qatar
+C36,ROU,Romania,Romania
+C36,RUS,Liên bang Nga,Russian Federation
+C36,RWA,Rwanda,Rwanda
+C36,REU,Réunion,Réunion
+C36,BLM,Saint Barthélemy,Saint Barthélemy
+C36,SHN,"Saint Helena, Ascension và Tristan da Cunha","Saint Helena, Ascension and Tristan da Cunha"
+C36,KNA,Saint Kitts và Nevis,Saint Kitts and Nevis
+C36,LCA,Saint Lucia,Saint Lucia
+C36,MAF,Saint Martin (thuộc Pháp),Saint Martin (French part)
+C36,SPM,Saint Pierre và Miquelon,Saint Pierre and Miquelon
+C36,VCT,Saint Vincent và Grenadines,Saint Vincent and the Grenadines
+C36,WSM,Samoa,Samoa
+C36,SMR,San Marino,San Marino
+C36,STP,São Tomé và Príncipe,Sao Tome and Principe
+C36,SAU,Ả Rập Xê Út,Saudi Arabia
+C36,SEN,Senegal,Senegal
+C36,SRB,Serbia,Serbia
+C36,SYC,Seychelles,Seychelles
+C36,SLE,Sierra Leone,Sierra Leone
+C36,SGP,Singapore,Singapore
+C36,SXM,Sint Maarten (thuộc Hà Lan),Sint Maarten (Dutch part)
+C36,SVK,Slovakia,Slovakia
+C36,SVN,Slovenia,Slovenia
+C36,SLB,Quần đảo Solomon,Solomon Islands
+C36,SOM,Somalia,Somalia
+C36,ZAF,Nam Phi,South Africa
+C36,SGS,Nam Georgia và quần đảo Nam Sandwich,South Georgia and the South Sandwich Islands
+C36,SSD,Nam Sudan,South Sudan
+C36,ESP,Tây Ban Nha,Spain
+C36,LKA,Sri Lanka,Sri Lanka
+C36,SDN,Sudan,Sudan
+C36,SUR,Suriname,Suriname
+C36,SJM,Svalbard và Jan Mayen,Svalbard and Jan Mayen
+C36,SWE,Thụy Điển,Sweden
+C36,CHE,Thụy Sĩ,Switzerland
+C36,SYR,Syria,Syrian Arab Republic
+C36,TWN,Đài Loan (Trung Quốc),"Taiwan, Province of China"
+C36,TJK,Tajikistan,Tajikistan
+C36,TZA,Tanzania,"Tanzania, United Republic of"
+C36,THA,Thái Lan,Thailand
+C36,TLS,Timor-Leste,Timor-Leste
+C36,TGO,Togo,Togo
+C36,TKL,Tokelau,Tokelau
+C36,TON,Tonga,Tonga
+C36,TTO,Trinidad và Tobago,Trinidad and Tobago
+C36,TUN,Tunisia,Tunisia
+C36,TUR,Thổ Nhĩ Kỳ,Turkey
+C36,TKM,Turkmenistan,Turkmenistan
+C36,TCA,Quần đảo Turks và Caicos,Turks and Caicos Islands
+C36,TUV,Tuvalu,Tuvalu
+C36,UGA,Uganda,Uganda
+C36,UKR,Ukraina,Ukraine
+C36,ARE,Các Tiểu vương quốc Ả Rập Thống nhất,United Arab Emirates
+C36,GBR,Vương quốc Anh và Bắc Ireland,United Kingdom of Great Britain and Northern Ireland
+C36,UMI,Các tiểu đảo xa xôi thuộc Hoa Kỳ,United States Minor Outlying Islands
+C36,USA,Hoa Kỳ,United States of America
+C36,URY,Uruguay,Uruguay
+C36,UZB,Uzbekistan,Uzbekistan
+C36,VUT,Vanuatu,Vanuatu
+C36,VEN,Venezuela,Venezuela
+C36,VNM,Việt Nam,Viet Nam
+C36,VGB,Quần đảo Virgin thuộc Anh,Virgin Islands (British)
+C36,VIR,Quần đảo Virgin thuộc Mỹ,Virgin Islands (U.S.)
+C36,WLF,Wallis và Futuna,Wallis and Futuna
+C36,ESH,Tây Sahara,Western Sahara
+C36,YEM,Yemen,Yemen
+C36,ZMB,Zambia,Zambia
+C36,ZWE,Zimbabwe,Zimbabwe
+C36,ALA,Quần đảo Åland,Åland Islands
+C37,11,Đăng ký mới khoản vay,New Registration
+C37,12,Thay đổi số tiền (như hạn mức),Amount Change(like Limit)
+C37,13,Thay đổi khác (ngoài số tiền),Other Changes
+C37,14,Nhận nợ / tiếp nhận nghĩa vụ nợ,Debt Assumption / Debt Takeover
+C37,21,Tất toán toàn bộ khoản vay,Full Repayment
+C37,22,Thanh toán thế quyền (vay đảo nợ xử lý nợ quá hạn),Subrogation Payment
+C37,23,Xóa nợ (write-off),Write-off
+C37,24,Bán tài sản (như bán cho VAMC),Sale of Assets / Sale(like VAMC)
+C37,25,Thu hồi bắt buộc / xử lý tài sản bảo đảm theo pháp luật,Compulsory Recovery / Foreclosure
+C37,26,Con nợ trả một phần và tổ chức tín dụng ghi nhận tổn thất,Debtor Repayment and Loss Recognition
+C37,27,Bên bảo lãnh trả một phần và tổ chức tín dụng ghi nhận tổn thất,Guarantor Repayment and Loss Recognition
+C37,28,Thu hồi bắt buộc và ghi nhận tổn thất,Compulsory Recovery and Loss Recognition
+C37,29,Cơ cấu lại nợ,Debt Restructuring
+C37,30,Chuyển giao nợ cho bên thứ ba,Debt Transfer
+C37,31,Chấm dứt vì lý do khác,Other Termination
+C37,32,Tuyên bố phá sản,Bankruptcy
+C37,33,Thủ tục phục hồi (phá sản) cá nhân,Individual Rehabilitation
+C37,99,Xử lý thông tin cho mục đích quản trị hệ thống hoặc sửa lỗi,Other
+C38,11,Đăng ký mới thông tin nợ quá hạn,New Registration
+C38,12,Tăng số tiền quá hạn (do tiếp tục quá hạn),Increase in Overdue Amount
+C38,13,Giảm số tiền quá hạn (do trả một phần),Decrease in Overdue Amount
+C38,14,"Thay đổi khác (ngoài số tiền quá hạn, số dư, ngày phát sinh quá hạn)",Other Changes
+C38,21,Tất toán toàn bộ khoản vay,Full Repayment
+C38,22,Thanh toán thế quyền (đại vị thanh toán),Subrogation Payment
+C38,23,Xóa nợ (write-off),Write-off
+C38,24,Bán tài sản (như bán cho công ty quản lý tài sản),Sale of Assets
+C38,25,Thu hồi bắt buộc theo thủ tục pháp lý,Compulsory Collection
+C38,26,Con nợ trả một phần và tổ chức tín dụng ghi nhận tổn thất,Debtor Settlement & Loss Write-off
+C38,27,Bên bảo lãnh trả một phần và tổ chức tín dụng ghi nhận tổn thất,Guarantor Settlement & Loss Write-off
+C38,28,Thu hồi bắt buộc và ghi nhận tổn thất,Compulsory Collection & Loss Write-off
+C38,29,Cơ cấu lại nợ,Debt Restructuring
+C38,30,Chuyển giao nợ cho bên thứ ba,Transfer of Debt
+C38,31,Chấm dứt vì lý do khác,Other Cancellation
+C38,32,Tuyên bố phá sản,Bankruptcy
+C38,33,Thủ tục phục hồi (phá sản) cá nhân,Personal Rehabilitation
+C38,99,Xử lý thông tin cho mục đích quản trị hệ thống hoặc sửa lỗi,Other System Processing
+C39,0,Đang sử dụng,Active
+C39,8,Đang thẩm tra (đối chiếu ID),Under Review(Inactive)
+C39,9,Ngừng sử dụng,Inactive
+C40,0,Không có thông tin,Unknown
+C40,1,Người trong nước,Domestic
+C40,2,Người nước ngoài,Foreigner 
+C40,3,Việt kiều (thường trú ở nước ngoài),Overseas Vietnamese Resident
+C40,4,Người gốc Việt mang quốc tịch nước ngoài,Foreign National Overseas Vietnamese
+C41,11,Vợ / chồng,Spouse
+C41,12,"Họ hàng trực hệ (cha mẹ, con cái, v.v.)",Lineal Ascendant / Descendant
+C41,13,Anh chị em ruột,Sibling
+C41,14,Họ hàng khác,Other Relative
+C41,15,Đối tác kinh doanh / Đồng sở hữu,Business Partner / Co-owner
+C41,99,Khác / Không có quan hệ đặc biệt,Other / No Special Relationship
+C42,11,Người đại diện theo pháp luật (quản trị doanh nghiệp),Legal Representative (Corporate Governance)
+C42,12,Chủ tịch Hội đồng quản trị (quản trị doanh nghiệp),Chairman of the Board (Corporate Governance)
+C42,13,Thành viên Hội đồng quản trị (quản trị doanh nghiệp),Member of the Board (Corporate Governance)
+C42,14,(Tổng) Giám đốc (quản trị doanh nghiệp),(General) Director (Corporate Governance)
+C42,15,Trưởng ban kiểm soát (quản trị doanh nghiệp),Head of Supervisory Board (Corporate Governance)
+C42,16,Thành viên ban kiểm soát (quản trị doanh nghiệp),Member of Supervisory Board (Corporate Governance)
+C42,17,Cổ đông sáng lập / cổ đông lớn (quan hệ sở hữu vốn),Founding / Major Shareholder (Ownership)
+C42,18,Chủ tịch Hội đồng thành viên (quản trị doanh nghiệp),Chairman of Member's Council (Corporate Governance)
+C42,19,Thành viên Hội đồng thành viên (quản trị doanh nghiệp),Member of Member's Council (Corporate Governance)
+C42,99,Khác,Other
+C43,1,Nợ liên đới (mỗi bên chịu trách nhiệm toàn bộ khoản vay),Joint and several liability
+C43,2,Nợ chia phần (chỉ chịu trách nhiệm theo tỷ lệ phần đã thỏa thuận),Divided(pro-rata) liability

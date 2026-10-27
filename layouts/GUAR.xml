@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout infoCd="GUAR" delimiter="|:" fieldCount="16">
+    <field name="recordType" type="String" index="0" desc="Record Type (Y, String, 1)" values="D"/>
+    <field name="evtCd" type="String" index="1" desc="Registration Event (Y, String, 1) - 등록구분. 1:신규등록, 2:해지, 3:변경, 7:삭제 (NCI Code Master C04 참조)" errCode="E143" weights="1:75,3:15,2:8,7:2"/>
+    <field name="instCd" type="String" index="2" desc="Institution Code (Y, String, 7) - 회원기관 식별코드 (NICE 발급)"/>
+    <field name="branchCd" type="String" index="3" desc="Branch Code (N, String, 20) - 보증을 취급한 지점코드"/>
+    <field name="branchNm" type="String" index="4" desc="Branch Name (N, String, 200) - 보증 취급 지점명"/>
+    <field name="custCd" type="String" index="5" desc="Customer Code (Y, String, 30) - 보증인(보증을 제공한 사람/법인)의 고객코드" errCodeMissing="E127" default="CUST{cust+500000:06d}"/>
+    <field name="ctrtNo" type="String" index="6" desc="Contract Number (Y, String, 50) - 보증 건을 식별하는 고유번호(보증계약번호)" errCode="E183" default="GR{seq:08d}"/>
+    <field name="debtorCustCd" type="String" index="7" desc="Debtor Customer Code (Y, String, 20) - 보증의 대상이 되는 주채무자의 고객코드 (Individual/Corporate Identification Info와 연결)" default="CUST{cust:06d}"/>
+    <field name="debtorCtrtNo" type="String" index="8" desc="Debtor Contract Number (Y, String, 50) - 보증 대상이 되는 주채무자의 대출(여신) 계약번호 (Loan Info와 연결)" errCode="E182" default="LN{seq:08d}"/>
+    <field name="occrDt" type="String" index="9" desc="Occurrence Date (Y, String, 8) - 보증 계약 개시일 (yyyymmdd)" notFuture="Y" errCode="E129"/>
+    <field name="guarTypeCd" type="String" index="10" desc="Guarantee Type Code (Y, String, 2) - 보증의 유형 코드. 예: 11:지급보증, 12:일반보증, 14:무한책임 법인보증 등 (NCI Code Master C23 참조)" errCode="E196" weights="12:55,11:25,15:10,14:5,13:3,16:2"/>
+    <field name="matuDt" type="String" index="11" desc="Maturity Date (Y, String, 8) - 보증 계약 만기일 (yyyymmdd)" errCode="E133"/>
+    <field name="lmtAmt" type="BigDecimal" index="12" desc="Limit Amount (Y, Number, 18) - 보증인이 책임지기로 약정한 보증 한도금액 (VND)" genRange="50000000-3000000000"/>
+    <field name="bal" type="BigDecimal" index="13" desc="Balance (Y, Number, 18) - 조회 시점 기준 보증인이 실제로 부담해야 할 잔여 보증 채무액 (VND)" genRange="10000000-2000000000"/>
+    <field name="chgClsDt" type="String" index="14" desc="Change/Close Date (M, String, 8) - 보증 내용이 변경되거나 보증이 해지(주채무 완제 등)된 날짜 (yyyymmdd). evtCd가 2(해지) 또는 3(변경)인 경우 필수" notFuture="Y" errCode="E307"/>
+    <field name="consentFg" type="String" index="15" desc="Consent Flag (Y, String, 1) - 정보수집동의여부(보증인 본인의 동의). 1:동의, 0:미동의" errCode="E191" weights="1:97,0:3"/>
+
+    <rule type="dateOrder" a="occrDt" b="matuDt" strict="Y" gap="180-3650" errCode="E136"/>
+    <rule type="lte" small="bal" big="lmtAmt" ratio="0.1-1.0" level="warn" desc="Dư nợ bảo lãnh ≤ hạn mức bảo lãnh"/>
+    <rule type="requiredWhen" field="chgClsDt" when="evtCd" in="2,3" errCode="E146"/>
+    <rule type="dateOrder" a="occrDt" b="chgClsDt" gap="30-1500" errCode="E135"/>
+</layout>
