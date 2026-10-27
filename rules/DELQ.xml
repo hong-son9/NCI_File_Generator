@@ -23,5 +23,5 @@
     <rule type="valueMap" field="dlqTypeCd" when="loanTypeCd" map="210,220,230,240:16,17;*:11,12,14,15" level="warn" desc="Loại quá hạn phù hợp sản phẩm (thẻ 16/17, khoản vay 11-15)"/>
     <rule type="requiredWhen" field="chgClsDt" when="evtCd" in="2,3" errCode="E321"/>
     <rule type="dateOrder" a="occrDt" b="chgClsDt" gap="10-700" errCode="E134"/>
-    <rule type="valueMap" field="eventReasonCode" when="evtCd" map="1:11;3:12-14;2:21-33,99" level="warn" desc="Lý do sự kiện phù hợp evtCd (11=mới, 12-14=thay đổi, 21-33=chấm dứt)"/>
+    <rule type="valueMap" field="eventReasonCode" when="evtCd" map="1:11;3:12-14;2:21-33,99;7:99" level="warn" desc="Lý do sự kiện phù hợp evtCd (11=mới, 12-14=thay đổi, 21-33=chấm dứt, 99=xóa)"/>
 </rules>

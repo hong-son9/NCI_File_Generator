@@ -1060,6 +1060,7 @@ class Lifecycle:
     change_date: str | None  # ngày thay đổi/tất toán, tăng dần theo sự kiện
     history: bool            # thông tin lịch sử theo kỳ (LRPY/CRPY): mỗi tháng 1 dòng evtCd=1
     can_close: bool
+    can_delete: bool         # evtCd=7: xóa bản ghi đăng ký sai (lý do C37 99)
 
 
 def lifecycle_info(layout: Layout) -> Lifecycle:
@@ -1068,7 +1069,7 @@ def lifecycle_info(layout: Layout) -> Lifecycle:
     allowed = (layout.get(evt).allowed or []) if evt else []
     return Lifecycle(evt, cust, "ctrtNo" if layout.get("ctrtNo") else cust,
                      next((n for n in CHANGE_DATE_FIELDS if layout.get(n)), None),
-                     bool(layout.get("baseDt")) and "2" not in allowed, "2" in allowed)
+                     bool(layout.get("baseDt")) and "2" not in allowed, "2" in allowed, "7" in allowed)
 
 
 def _plan_rows(n: int, lc: Lifecycle, customers: int, lifecycle: bool, mst: bool, rnd) -> list[tuple]:
@@ -1090,11 +1091,18 @@ def _plan_rows(n: int, lc: Lifecycle, customers: int, lifecycle: bool, mst: bool
             cust = g                                        # tránh trùng đăng ký mới cùng 1 khách hàng
         else:
             cust = ((g - 1) % customers) + 1 if customers else g
-        if lc.history or not seq_ok:
+        if not seq_ok:
             evts = ["1"] * k
+        elif lc.history:                                    # mỗi tháng 1 dòng; đôi khi sửa (3) / xóa (7) tháng cuối
+            evts = ["1"] * k
+            if k >= 2 and lc.can_delete and rnd.random() < 0.25:
+                evts[-1] = rnd.choice(["3", "7"])
         else:
             evts = ["1"] + ["3"] * (k - 1)
-            if k >= 2 and lc.can_close and rnd.random() < (0.2 if by_customer else 0.5):
+            r = rnd.random()
+            if k >= 2 and lc.can_delete and r < 0.25:      # đăng ký sai -> xóa (7), kết thúc chuỗi
+                evts[-1] = "7"
+            elif k >= 2 and lc.can_close and r < 0.25 + (0.2 if by_customer else 0.45):
                 evts[-1] = "2"
         plan.extend((g, cust, j, k, e) for j, e in enumerate(evts))
     return plan[:n]
@@ -1106,6 +1114,10 @@ INFO_CHANGE_FIELDS = ("mobileNo", "email", "homeAdr", "officeAdr", "officeNm", "
                       "corpAdr", "corpTelNo", "corpWebAdr")   # INID/COID: cập nhật thông tin khách hàng
 GOOD_CLOSE = {"21": 88, "29": 4, "30": 4, "31": 4}  # tất toán bình thường (C37)
 BAD_CLOSE = ("23", "24", "26", "32")                 # xóa nợ, bán nợ, ghi nhận tổn thất, phá sản
+DELETE_REASON = "99"                                 # evtCd=7: xử lý quản trị hệ thống / sửa lỗi (C37)
+BAD_DEBT_REASONS = set(BAD_CLOSE) | {"25", "27", "28"}
+NO_GRACE_REPAY = ("13", "14")                        # C18: trả gốc cuối kỳ / hạn mức quay vòng
+MAX_GRADE_STEP = 2                                   # nhóm nợ tăng tối đa 2 bậc mỗi lần thay đổi
 
 
 @dataclass
@@ -1179,6 +1191,8 @@ def _fit_contract(layout: Layout, lc: Lifecycle, ctx: _Ctx, evts: list[str]) -> 
         d_gs, d_mt = _parse_date(row[gs.name], gs.fmt), _parse_date(row.get(mt.name, ""), mt.fmt)
         d_oc = _parse_date(row.get(occ.name, ""), occ.fmt)
         cap = min(_months(d_gs, d_mt) - 1, _months(d_oc, d_mt) // 3) if d_gs and d_mt and d_oc else 0
+        if row.get("repayTypeCd") in NO_GRACE_REPAY:   # không trả gốc định kỳ -> không có ân hạn gốc
+            cap = 0
         if cap < 1:                                     # kỳ hạn quá ngắn -> không có ân hạn
             _set(ctx, gs.name, "")
             _set(ctx, gp.name, "")
@@ -1202,10 +1216,14 @@ def _plan_story(layout: Layout, lc: Lifecycle, row: dict, evts: list[str], rnd) 
     info = [n for n in INFO_CHANGE_FIELDS if layout.get(n)]
     n_chg = evts.count("3")
     grade = int(row["debtGrpCd"]) if grp and row.get("debtGrpCd", "").isdigit() else 0
-    bad = bool(grade) and evts[-1] == "2" and n_chg >= 1 and rnd.random() < 0.25
-    target = rnd.choice([4, 5]) if bad else grade
+    # nợ xấu dần lên nhóm 4-5 cần đủ số lần thay đổi (mỗi lần tăng tối đa MAX_GRADE_STEP bậc)
+    bad = bool(grade) and evts[-1] == "2" and grade + MAX_GRADE_STEP * n_chg >= 4 and rnd.random() < 0.3
+    target = min(rnd.choice([4, 5]), grade + MAX_GRADE_STEP * n_chg) if bad else grade
     steps = []
     for i, e in enumerate(evts[1:]):
+        if e == "7":                                    # xóa bản ghi sai: giữ nguyên nội dung, lý do 99
+            steps.append(_Step(DELETE_REASON if reason else ""))
+            continue
         if e == "2":
             if not reason:
                 steps.append(_Step())
@@ -1252,6 +1270,8 @@ def _event_dates(layout: Layout, lc: Lifecycle, base: dict, rnd, evts: list[str]
         close = max(mat - timedelta(days=rnd.randint(0, 10)), lo + timedelta(days=count - 1))
     m = count - (1 if close else 0)
     hi = close - timedelta(days=1) if close else today
+    if mat and not close and not (story and story[-1].reason in BAD_DEBT_REASONS):
+        hi = min(hi, mat - timedelta(days=1))           # chỉ nợ xấu mới còn sự kiện sau ngày đáo hạn
     room = (hi - lo).days + 1
     offs = sorted(rnd.sample(range(room), m)) if room >= m else list(range(m))
     days = [lo + timedelta(days=o) for o in offs]
@@ -1295,6 +1315,24 @@ def _fit_history(layout: Layout, ctx: _Ctx, months: int) -> None:
     bal, paid = _num(ctx.row.get("bal", "")), _num(ctx.row.get("principalRepayAmt", ""))
     if bal is not None and paid is not None and bal < paid * (months + 1):
         _set(ctx, "bal", _num_str(_round_amount(paid * (months + 1) * Decimal(ctx.rnd.uniform(1.5, 20)))))
+
+
+HISTORY_FIX_AMOUNTS = ("interestRepayAmt", "payAmt")   # LRPY / CRPY: số tiền tháng được sửa khi evtCd=3
+
+
+def _history_fix(layout: Layout, lc: Lifecycle, ctx: _Ctx, prev: dict, evt: str, fixed: dict) -> list[str]:
+    """Sửa (3) / xóa (7) bản ghi tháng vừa gửi: cùng hợp đồng, cùng baseDt. Sửa thì tính lại số tiền đã trả
+    trong tháng (giảm nhẹ để vẫn thỏa các quy tắc ≤); xóa thì giữ nguyên nội dung bản ghi."""
+    row = dict(prev)
+    ctx.row, ctx.locked = row, {f.name for f in layout.fields}
+    row[lc.evt] = evt
+    if evt == "3":
+        name = next((n for n in HISTORY_FIX_AMOUNTS if row.get(n) and n not in fixed), None)
+        if name:
+            row[name] = _num_str(_round_amount(Decimal(row[name]) * Decimal(ctx.rnd.uniform(0.85, 0.98))))
+            ctx.locked -= _lte_smalls(layout, name) - set(fixed)
+    _repair(layout, ctx)
+    return [row[f.name] for f in layout.fields]
 
 
 def _next_month(layout: Layout, lc: Lifecycle, prev: dict, fixed: dict) -> dict:
@@ -1378,12 +1416,15 @@ def generate(layout: Layout, header_layout: Layout, trailer_layout: Layout,
             if j > 0 and not lc.history:
                 vals = _change_event(layout, lc, ctx, prev, evt, dates[j - 1] if j - 1 < len(dates) else None,
                                      story[j - 1], fixed)
+            elif j > 0 and evt in ("3", "7"):              # LRPY/CRPY: sửa / xóa bản ghi tháng vừa gửi
+                vals = _history_fix(layout, lc, ctx, prev, evt, fixed)
             else:
                 src = {}
                 if lc.evt and (lifecycle or i == 1) and lc.evt not in fixed:
                     src[lc.evt] = evt                       # dòng đầu tiên / đầu mỗi hợp đồng luôn là 1
                 if lc.history and "baseDt" not in fixed:     # LRPY/CRPY: mỗi dòng 1 tháng, tăng dần
-                    src["baseDt"] = _month_end(-(k - j)).strftime("%Y%m%d")
+                    months = [p[4] for p in plan[i - 1 - j:i - 1 - j + k]].count("1")
+                    src["baseDt"] = _month_end(-(months - j)).strftime("%Y%m%d")
                 if j > 0 and lc.history:                    # tháng tiếp theo của cùng hợp đồng
                     src.update(_next_month(layout, lc, prev, fixed))
                 vals = _build_row(layout, ctx, src or None, fixed, mst)
@@ -1637,19 +1678,17 @@ def validate_lines(lines: list[str], repo: dict[str, Layout], info_cd: str | Non
             key = (kv, row.get("baseDt", "")) if lc.history else kv
             st, at = seen.get(key, (None, None))
             label = f"{lc.key}={kv}" + (f", baseDt={row.get('baseDt')}" if lc.history else "")
-            if evt == "1":
-                if st:
+            if evt == "1":                  # sau tất toán/xóa được đăng ký mới lại (vòng đời mới)
+                if st == "open":
                     add(no, lc.evt, f"Đăng ký mới trùng: {label} đã có evtCd=1 ở dòng {at}", evt, "E142")
-                seen[key] = ("open", at or no)
-            elif evt in ("2", "3"):
+                seen[key] = ("open", at if st == "open" else no)
+            elif evt in ("2", "3", "7"):
                 if st == "closed":
                     add(no, lc.evt, f"{label} đã tất toán/xóa trước đó trong file", evt, "E124")
                 elif st is None:
                     add(no, lc.evt, f"Chưa có đăng ký mới (evtCd=1) cho {label} trong file "
                                     f"(chỉ hợp lệ nếu đã đăng ký từ trước)", evt, "E123", "Cảnh báo")
-                seen[key] = ("closed" if evt == "2" else "open", at)
-            elif evt == "7":
-                seen[key] = ("closed", at)
+                seen[key] = ("closed" if evt in ("2", "7") else "open", at)
         if mst:
             evt = next((row[n] for n in EVT_FIELDS if n in row), "1")
             if evt != "1":

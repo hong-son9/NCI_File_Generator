@@ -37,7 +37,7 @@
     <rule type="dateOrder" a="occrDt" b="chgClsDt" gap="30-1500" errCode="E135"/>
     <rule type="dateOrder" a="occrDt" b="graceStrtDt" gap="0-60" errCode="E308"/>
     <rule type="requiredWhen" field="gracePeriod" when="graceStrtDt" notEmpty="Y" level="warn"/>
-    <rule type="valueMap" field="eventReasonCode" when="evtCd" map="1:11;3:12-14;2:21-33,99" level="warn" desc="Lý do sự kiện phù hợp evtCd (11=mới, 12-14=thay đổi, 21-33=chấm dứt)"/>
+    <rule type="valueMap" field="eventReasonCode" when="evtCd" map="1:11;3:12-14;2:21-33,99;7:99" level="warn" desc="Lý do sự kiện phù hợp evtCd (11=mới, 12-14=thay đổi, 21-33=chấm dứt, 99=xóa)"/>
     <rule type="valueMap" field="repayTypeCd" when="loanTypeCd" map="110:13;120:14;130:11;140,320,330,340,350,410-418:12;*:11,12,13" level="warn" desc="Phương thức trả nợ phù hợp loại khoản vay"/>
     <rule type="valueMap" field="principalRepayCycle" when="repayTypeCd" map="13:21;14:22;*:14,16" level="warn"/>
     <rule type="valueMap" field="interestRepayCycle" when="repayTypeCd" map="13:14,16,21;*:14" level="warn"/>

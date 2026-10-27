@@ -25,5 +25,5 @@
     <rule type="lte" small="cadvLmtAmt" big="lmtAmt" ratio="0.2-0.5" level="warn"/>
     <rule type="requiredWhen" field="minPayRate" when="loanTypeCd" in="220" level="warn" desc="Thẻ revolving (220) phải có tỷ lệ thanh toán tối thiểu"/>
     <rule type="requiredWhen" field="minPayAmt" when="loanTypeCd" in="220" level="warn"/>
-    <rule type="valueMap" field="eventReasonCode" when="evtCd" map="1:11;3:12-14;2:21-33,99" level="warn" desc="Lý do sự kiện phù hợp evtCd (11=mới, 12-14=thay đổi, 21-33=chấm dứt)"/>
+    <rule type="valueMap" field="eventReasonCode" when="evtCd" map="1:11;3:12-14;2:21-33,99;7:99" level="warn" desc="Lý do sự kiện phù hợp evtCd (11=mới, 12-14=thay đổi, 21-33=chấm dứt, 99=xóa)"/>
 </rules>

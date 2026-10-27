@@ -60,14 +60,14 @@
     </section>
 
     <nav class="tabs" role="tablist">
-      <button role="tab" data-tab="header"><span class="num">1</span>Header &amp; file</button>
-      <button role="tab" data-tab="cols" class="active"><span class="num">2</span>Giá trị cột</button>
+      <button role="tab" data-tab="header" class="active"><span class="num">1</span>Header &amp; file</button>
+      <button role="tab" data-tab="cols"><span class="num">2</span>Giá trị cột</button>
       <button role="tab" data-tab="errors"><span class="num">3</span>Lỗi dữ liệu</button>
       <button role="tab" data-tab="preview"><span class="num">4</span>Xem trước</button>
     </nav>
 
     <main>
-      <section id="tab-header" class="tab two-col">
+      <section id="tab-header" class="tab two-col active">
         <div class="card">
           <h2>Dòng Header (H)</h2>
           <div id="header-fields" class="form-grid"></div>
@@ -85,7 +85,7 @@
         </div>
       </section>
 
-      <section id="tab-cols" class="tab active">
+      <section id="tab-cols" class="tab">
         <div class="card flush">
           <div class="table-wrap">
             <table id="cols-table">

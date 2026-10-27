@@ -19,6 +19,7 @@ import datagen_core as core
 
 APP_DIR = Path(__file__).resolve().parent
 LAYOUT_DIR = APP_DIR / "layouts"
+DEFAULT_INFO = "LOAN"   # loại dữ liệu khi mới mở app
 CONFIG_DIR = APP_DIR / "configs"
 GLOBAL_CFG = CONFIG_DIR / "_app.json"
 ROW_LEVEL_LABEL = "(Cả dòng)"
@@ -287,7 +288,7 @@ class App(tk.Tk):
         types = sorted(k for k in repo if k not in (core.HEADER_CD, core.TRAILER_CD))
         self.info_cb["values"] = types
         missing = [c for c in (core.HEADER_CD, core.TRAILER_CD) if c not in repo]
-        cur = self.info_var.get()
+        cur = self.info_var.get() or DEFAULT_INFO
         self.layout = None
         if types:
             self.select_layout(cur if cur in types else types[0])

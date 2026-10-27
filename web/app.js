@@ -7,6 +7,7 @@ const $ = (id) => document.getElementById(id);
 const PREVIEW_LIMIT = 1000;
 const ROW_LEVEL_LABEL = "(Cả dòng)";
 const STORE_PREFIX = "nice-datagen:";
+const DEFAULT_INFO = "LOAN"; // loại dữ liệu khi mới mở trang
 
 const state = {
   py: null,
@@ -89,7 +90,7 @@ function init(meta) {
   sel.replaceChildren(...meta.types.map((t) => new Option(t, t)));
   buildHeader(g.header || {});
   buildFileErrors();
-  if (meta.types.length) selectLayout(meta.types.includes(g.info) ? g.info : meta.types[0]);
+  if (meta.types.length) selectLayout(meta.types.includes(DEFAULT_INFO) ? DEFAULT_INFO : meta.types[0]);
 
   let msg = `Đã nạp ${meta.types.length} loại dữ liệu`;
   if (!meta.hasCodes) msg += "   ⚠ Thiếu codes/nci_codes.csv";
