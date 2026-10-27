@@ -324,6 +324,7 @@ function renderErrors() {
     }
     const del = document.createElement("button");
     del.type = "button";
+    del.className = "btn ghost";
     del.textContent = "Xóa";
     del.addEventListener("click", () => {
       state.errors.splice(i, 1);
@@ -479,7 +480,15 @@ function showResult(res) {
     ln.className = "ln";
     ln.textContent = String(i).padStart(width) + "  ";
     const text = document.createElement("span");
-    text.textContent = line;
+    line.split("|:").forEach((part, j) => {     // làm mờ dấu phân cách để dễ đọc từng giá trị
+      if (j) {
+        const sep = document.createElement("span");
+        sep.className = "sep";
+        sep.textContent = "|:";
+        text.append(sep);
+      }
+      text.append(part);
+    });
     if (errLines.has(i)) text.classList.add("err");
     if ("HT".includes(line[0]) && (i === 1 || i === res.lines.length)) text.classList.add("ht");
     div.append(ln, text);
