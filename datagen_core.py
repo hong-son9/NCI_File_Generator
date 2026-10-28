@@ -416,6 +416,7 @@ class _Ctx:
     locked: set = dc_field(default_factory=set)
     cust: int = 1        # số thứ tự khách hàng  -> {cust}
     row_no: int = 1      # số thứ tự dòng        -> {row}
+    run: str = ""        # mã lần chạy           -> {run}
 
 
 def _digits(rnd, n: int) -> str:
@@ -539,6 +540,7 @@ _SEQ_RE = re.compile(r"(seq|cust|row)\s*([+-]\s*\d+)?$")
 def render_template(tpl: str, ctx: _Ctx) -> str:
     """
     {seq} {seq:4} {seq+40:4}  số thứ tự hợp đồng   {cust} số thứ tự khách hàng   {row} số thứ tự dòng
+    {run}  mã lần chạy (vd 2610281530), cùng 1 giá trị cho mọi file sinh cùng lúc
     {rand:6}  6 chữ số ngẫu nhiên
     {today}  {monthend:-1} (cuối tháng trước)      {date:20250101-20261231}  ngày ngẫu nhiên
     {dateadd:baseDt:-20:-5}  baseDt cộng ngẫu nhiên -20..-5 ngày
@@ -557,6 +559,8 @@ def render_template(tpl: str, ctx: _Ctx) -> str:
             arg = arg.lstrip("0d") if arg.endswith("d") else arg
             width = int(re.sub(r"\D", "", arg) or 0)
             return str(n).zfill(width)
+        if key == "run":
+            return ctx.run
         if key == "rand":
             return _digits(ctx.rnd, int(arg or 6))
         if key == "today":
@@ -1037,10 +1041,20 @@ def header_defaults() -> dict[str, str]:
     }
 
 
+def file_mode(header: dict) -> str:
+    """INF / MST trong tên file: hệ thống nhận file lấy chế độ xử lý từ tên file, không từ Header."""
+    return "MST" if header.get("registrationType", "").upper() == "MST" else "INF"
+
+
 def default_filename(header: dict, info_cd: str, suffix: str | None = None) -> str:
     inst = header.get("institutionCode") or "INST"
     suffix = suffix or date.today().strftime("%y%m%d")
-    return f"{inst}_{info_cd}INF_NICE.{suffix}"
+    return f"{inst}_{info_cd}{file_mode(header)}_NICE.{suffix}"
+
+
+def new_run_id() -> str:
+    """Mã lần chạy {run}: ghép vào số hợp đồng để mỗi lần chạy là hợp đồng mới (tránh E142 khi gửi lại)."""
+    return datetime.now().strftime("%y%m%d%H%M")
 
 
 def read_csv(path) -> list[dict]:
@@ -1395,7 +1409,8 @@ def generate(layout: Layout, header_layout: Layout, trailer_layout: Layout,
              csv_rows: list[dict] | None = None, seed: int | None = None,
              file_suffix: str | None = None, filename: str | None = None,
              customers: int = 1, lifecycle: bool = True,
-             groups: list[dict] | None = None, personas: dict | None = None, keep_open: bool = False) -> GenResult:
+             groups: list[dict] | None = None, personas: dict | None = None, keep_open: bool = False,
+             run_id: str | None = None) -> GenResult:
     """
     customers: số khách hàng trong file (custCd dùng chung); 0 = mỗi hợp đồng 1 khách hàng.
     lifecycle: mỗi hợp đồng là chuỗi sự kiện 1 (mới) -> 3 (thay đổi) ... -> 2 (tất toán), ngày tăng dần.
@@ -1403,8 +1418,10 @@ def generate(layout: Layout, header_layout: Layout, trailer_layout: Layout,
             values (vd custCd, ctrtNo) giữ cố định cho cả chuỗi. Khi có groups thì bỏ qua n_rows và customers.
     personas: dùng chung giữa các file của bộ liên kết (cùng khách hàng -> cùng tên, tỉnh, chi nhánh).
     keep_open: không tất toán / xóa (khách hàng còn hợp đồng tham chiếu).
+    run_id: mã lần chạy cho {run} trong mẫu (vd số hợp đồng LN{run}{seq:06d}); trống = thời điểm hiện tại.
     """
     rnd = random.Random(seed)
+    run = run_id or new_run_id()
     fixed = fixed or {}
     errors = errors or []
     file_errors = set(file_errors or [])
@@ -1418,7 +1435,7 @@ def generate(layout: Layout, header_layout: Layout, trailer_layout: Layout,
     lc = lifecycle_info(layout)
     if csv_rows is not None:
         for i, src in enumerate(csv_rows, 1):
-            ctx = _Ctx(rnd, i, header, _make_persona(rnd), cust=i, row_no=i)
+            ctx = _Ctx(rnd, i, header, _make_persona(rnd), cust=i, row_no=i, run=run)
             rows.append(_build_row(layout, ctx, src, fixed, mst))
             ctxs.append(ctx)
     else:
@@ -1427,7 +1444,7 @@ def generate(layout: Layout, header_layout: Layout, trailer_layout: Layout,
         plan = _plan_rows(n_rows, lc, customers, lifecycle, mst, rnd, groups, keep_open)
         for i, (g, cust, j, k, evt) in enumerate(plan, 1):
             persona = personas.setdefault(cust, _make_persona(rnd))
-            ctx = _Ctx(rnd, g, header, persona, cust=cust, row_no=i)
+            ctx = _Ctx(rnd, g, header, persona, cust=cust, row_no=i, run=run)
             if j > 0 and not lc.history:
                 vals = _change_event(layout, lc, ctx, prev, evt, dates[j - 1] if j - 1 < len(dates) else None,
                                      story[j - 1], fixed)
@@ -1624,42 +1641,60 @@ def _chain_cap(layout: Layout, occr: str) -> int:
 
 def generate_set(repo: dict[str, Layout], header_values: dict, types, individuals: int = 1, corporates: int = 0,
                  loans_per_cust: int = 1, cards_per_cust: int = 1, seed: int | None = None,
-                 lifecycle: bool = True, file_suffix: str | None = None) -> SetResult:
+                 lifecycle: bool = True, file_suffix: str | None = None, run_id: str | None = None,
+                 existing_individuals: list[str] | None = None,
+                 existing_corporates: list[str] | None = None) -> SetResult:
     """
     Bộ file liên kết theo thứ tự gửi: INID / COID (khách hàng) -> LOAN / CARD (hợp đồng) ->
     LRPY / CRPY / DELQ / GUAR / COLL (thông tin gắn với hợp đồng). custCd, ctrtNo, debtorCustCd, debtorCtrtNo
-    khớp nhau giữa các file: KH cá nhân CUST000001..., doanh nghiệp CORP000001...; người bảo lãnh là KH cá nhân
-    đánh số tiếp theo và cũng được đăng ký trong INID. Chọn thông tin con thì tự kèm file gốc (LRPY -> LOAN...),
-    khách hàng luôn được đăng ký. Thông tin con chỉ gắn với hợp đồng còn hiệu lực; KH không bị tất toán / xóa.
+    khớp nhau giữa các file; người bảo lãnh là KH cá nhân mới, cũng được đăng ký trong INID.
+    Chọn thông tin con thì tự kèm file gốc (LRPY -> LOAN...). Thông tin con chỉ gắn với hợp đồng còn hiệu lực;
+    KH không bị tất toán / xóa.
+
+    Để hệ thống nhận file xử lý được:
+    - existing_individuals / existing_corporates: mã KH đã đăng ký sẵn. LOAN chỉ đăng ký được với
+      custNo có sẵn (E157), nên khi có danh sách thì hợp đồng dùng các mã này, không đăng ký lại KH,
+      và bỏ qua số lượng individuals / corporates.
+    - Luôn có file INID (kể cả chỉ Header/Trailer): file khác chỉ được xử lý khi đã xử lý xong INID cùng tổ chức,
+      cùng đuôi ngày trong tên file.
+    - Số hợp đồng / mã KH mới có {run} (mã lần chạy) để gửi lại không bị E142.
     """
     sel = {t for t in types if t in SET_TYPES}
     sel |= {SET_PARENT[t] for t in sel if t in SET_PARENT}
     if not sel:
         raise ValueError("Chưa chọn loại dữ liệu nào cho bộ file.")
-    if individuals < 0 or corporates < 0 or individuals + corporates == 0:
+    old_ind = list(dict.fromkeys(c.strip() for c in existing_individuals or [] if c.strip()))
+    old_corp = list(dict.fromkeys(c.strip() for c in existing_corporates or [] if c.strip()))
+    if old_ind or old_corp:
+        individuals, corporates = 0, 0
+    if individuals < 0 or corporates < 0 or individuals + corporates + len(old_ind) + len(old_corp) == 0:
         raise ValueError("Cần ít nhất 1 khách hàng (cá nhân hoặc doanh nghiệp).")
     if loans_per_cust < 1 or cards_per_cust < 1:
         raise ValueError("Số hợp đồng mỗi khách hàng phải ≥ 1.")
-    if individuals:
-        sel.add("INID")
+    sel.add("INID")
     if corporates:
         sel.add("COID")
     missing = [t for t in sorted(sel) + [HEADER_CD, TRAILER_CD] if t not in repo]
     if missing:
         raise ValueError(f"Thiếu layout {', '.join(missing)}.")
 
+    run = run_id or new_run_id()
     rnd, personas, out, notes = random.Random(seed), {}, {}, []
-    borrowers = [(f"CUST{i:06d}", i) for i in range(1, individuals + 1)] \
-        + [(f"CORP{i:06d}", CORP_PERSONA + i) for i in range(1, corporates + 1)]
+    new_ind = [(f"CUST{run}{i:04d}", i) for i in range(1, individuals + 1)]
+    new_corp = [(f"CORP{run}{i:04d}", CORP_PERSONA + i) for i in range(1, corporates + 1)]
+    borrowers = (new_ind + new_corp + [(c, len(new_ind) + i) for i, c in enumerate(old_ind, 1)]
+                 + [(c, CORP_PERSONA + len(new_corp) + i) for i, c in enumerate(old_corp, 1)])
     persona_of = dict(borrowers)
+    if old_ind or old_corp:
+        notes.append(f"Dùng {len(old_ind) + len(old_corp)} KH đã đăng ký sẵn, không đăng ký lại.")
 
-    def gen(info: str, groups: list[dict], keep_open: bool = False) -> None:
-        if not groups:
+    def gen(info: str, groups: list[dict], keep_open: bool = False, allow_empty: bool = False) -> None:
+        if not groups and not allow_empty:
             notes.append(f"{info}: không có hợp đồng phù hợp nên không tạo file.")
             return
         out[info] = generate(repo[info], repo[HEADER_CD], repo[TRAILER_CD], header_values,
                              seed=rnd.randrange(2 ** 31), lifecycle=lifecycle, file_suffix=file_suffix,
-                             groups=groups, personas=personas, keep_open=keep_open)
+                             groups=groups, personas=personas, keep_open=keep_open, run_id=run)
 
     # ---- sinh hợp đồng trước (để biết bảo lãnh / TSBĐ / người bảo lãnh); thứ tự gửi xếp lại ở cuối
     contracts = {}
@@ -1667,7 +1702,7 @@ def generate_set(repo: dict[str, Layout], header_values: dict, types, individual
         if info not in sel:
             continue
         owners = [(code, key) for code, key in borrowers for _ in range(per)]
-        groups = [{"cust": key, "values": {"custCd": code, "ctrtNo": f"{prefix}{n:08d}"}}
+        groups = [{"cust": key, "values": {"custCd": code, "ctrtNo": f"{prefix}{run}{n:06d}"}}
                   for n, (code, key) in enumerate(owners, 1)]
         for child, flag in SET_FLAG.items():             # hợp đồng có bảo lãnh / TSBĐ: cờ = 1, giữ hiệu lực
             if info == "LOAN" and child in sel and repo["LOAN"].get(flag):
@@ -1693,32 +1728,42 @@ def generate_set(repo: dict[str, Layout], header_values: dict, types, individual
         pick = bad + rnd.sample(rest, min(max(extra, 0), len(rest)))
         gen("DELQ", [link("DELQ", r, ctrtNo=r["ctrtNo"], occrDt=_date_after(rnd, r.get("occrDt", "")))
                      for r in cand if r in pick])
-    guarantors = []
+    guarantors = []                                      # (mã KH, khóa persona) của người bảo lãnh mới
     if "GUAR" in sel:                                    # mỗi khoản bảo lãnh 1 người bảo lãnh (KH cá nhân mới)
         groups = []
         for r in (r for r in loans if r.get("guarStatFg") == "1"):
             no = individuals + len(guarantors) + 1
-            guarantors.append(no)
-            gr = link("GUAR", r, ctrtNo=f"GR{len(groups) + 1:08d}", debtorCustCd=r["custCd"],
+            guarantors.append((f"CUST{run}{no:04d}", 2 * CORP_PERSONA + no))
+            gr = link("GUAR", r, ctrtNo=f"GR{run}{len(groups) + 1:06d}", debtorCustCd=r["custCd"],
                       debtorCtrtNo=r["ctrtNo"])
-            gr["values"]["custCd"], gr["cust"] = f"CUST{no:06d}", no
+            gr["values"]["custCd"], gr["cust"] = guarantors[-1]
             groups.append(gr)
         gen("GUAR", groups)
     if "COLL" in sel:                                    # bên bảo đảm là chính người vay
-        gen("COLL", [link("COLL", r, ctrtNo=f"CL{n:08d}", debtorCustCd=r["custCd"], debtorCtrtNo=r["ctrtNo"])
+        gen("COLL", [link("COLL", r, ctrtNo=f"CL{run}{n:06d}", debtorCustCd=r["custCd"], debtorCtrtNo=r["ctrtNo"])
                      for n, r in enumerate((r for r in loans if r.get("collStatFg") == "1"), 1)])
 
-    # ---- khách hàng: cá nhân (kể cả người bảo lãnh) / doanh nghiệp, không tất toán / xóa
-    if "INID" in sel:
-        gen("INID", [{"cust": i, "values": {"custCd": f"CUST{i:06d}"}}
-                     for i in list(range(1, individuals + 1)) + guarantors], keep_open=True)
+    # ---- KH mới: cá nhân (kể cả người bảo lãnh) / doanh nghiệp, không tất toán / xóa.
+    # INID luôn có (kể cả rỗng): các file khác cần INID cùng đuôi ngày xử lý xong trước.
+    ind_groups = [{"cust": key, "values": {"custCd": code}} for code, key in new_ind + guarantors]
+    gen("INID", ind_groups, keep_open=True, allow_empty=True)
+    if not ind_groups:
+        notes.append("INID chỉ có Header/Trailer: dùng để mở cổng cho các file sau.")
     if "COID" in sel:
-        gen("COID", [{"cust": CORP_PERSONA + i, "values": {"custCd": f"CORP{i:06d}"}}
-                     for i in range(1, corporates + 1)], keep_open=True)
+        gen("COID", [{"cust": key, "values": {"custCd": code}} for code, key in new_corp], keep_open=True)
 
     files = [SetFile(s, t, out[t], f"{SET_STEP_DIRS[s - 1]}/{out[t].filename}")
              for s, step in enumerate(SET_STEPS, 1) for t in step if t in out]
     return SetResult(files, notes)
+
+
+SEND_NOTES = (
+    "Mọi file cùng tổ chức và cùng đuôi ngày trong tên file; INID phải xử lý xong trước, "
+    "GUAR / COLL cần thêm LOAN xử lý xong.",
+    "Không gửi khi tổ chức còn file trước đó chưa xử lý xong hoặc bị lỗi.",
+    "Header: userId phải là tài khoản hợp lệ của tổ chức; baseDateTo không ở tương lai (F025).",
+    "LOAN: custCd phải là khách hàng đã đăng ký (E157); ctrtNo chưa từng đăng ký (E142).",
+)
 
 
 def set_manifest(res: SetResult) -> str:
@@ -1731,6 +1776,7 @@ def set_manifest(res: SetResult) -> str:
             lines += [f"    {f.path}  ({len(f.result.lines) - 2} dòng)" for f in files]
     if res.notes:
         lines += ["", "Ghi chú:"] + [f"    {n}" for n in res.notes]
+    lines += ["", "Điều kiện để xử lý được:"] + [f"    - {n}" for n in SEND_NOTES]
     return "\n".join(lines) + "\n"
 
 
@@ -1793,11 +1839,15 @@ def check_value(f: Field, v: str) -> tuple[str, str] | None:
         digits = len(re.sub(r"\D", "", v))
         if f.max_len and digits > f.max_len:
             return f"{digits} chữ số > tối đa {f.max_len}", f.err_code
-    elif f.max_len and len(v) > f.max_len:
-        return f"Độ dài {len(v)} > tối đa {f.max_len}", f.err_code
+    elif f.max_len and len(v.encode("utf-8")) > f.max_len:      # NICE đếm theo byte UTF-8 (tiếng Việt 2-3 byte)
+        return f"Độ dài {len(v.encode('utf-8'))} byte > tối đa {f.max_len}", f.err_code
     if f.pattern and not re.fullmatch(f.pattern.strip("^$"), v):
         return "Sai định dạng", f.err_code
     return None
+
+
+# mẫu tên file được nhận: <mã TC>_<loại 4><INF|MST>_<xxx>.<yymmdd>
+FILENAME_RE = re.compile(r"^([A-Za-z0-9]{5,7})_(\w{4})(\w{3})_([A-Za-z0-9]{3,})\.\d{6}$")
 
 
 def validate_lines(lines: list[str], repo: dict[str, Layout], info_cd: str | None = None,
@@ -1849,6 +1899,17 @@ def validate_lines(lines: list[str], repo: dict[str, Layout], info_cd: str | Non
             add("", "(tên file)", f"Tên file '{base}' không khớp mã tổ chức {inst} ở Header", base, "F022")
         if info and f"_{info}" not in base:
             add("", "(tên file)", f"Tên file '{base}' không khớp loại dữ liệu {info} ở Header", base, "F021")
+        m = FILENAME_RE.match(base)
+        if not m:
+            add("", "(tên file)", f"Tên file '{base}' không đúng mẫu <mã TC>_<loại><INF|MST>_<xxx>.<yymmdd>: "
+                                  "file sẽ không được nhận", base)
+        elif m.group(3) != file_mode(hd):
+            add("", "(tên file)", f"Tên file ghi {m.group(3)} nhưng Header registrationType="
+                                  f"{hd.get('registrationType', '')}: file được xử lý theo tên file", base, level="Cảnh báo")
+    if hd:
+        to = _parse_date(hd.get("baseDateTo", ""), None)
+        if to and to > date.today():
+            add(1, "baseDateTo", "Ngày dữ liệu đến ở tương lai", hd["baseDateTo"], "F025")
 
     layout = repo.get(info_cd) if info_cd else None
     if layout is None:
@@ -1886,6 +1947,9 @@ def validate_lines(lines: list[str], repo: dict[str, Layout], info_cd: str | Non
             res = check_value(f, v)
             if res:
                 add(no, f.name, res[0], v, res[1])
+        inst = hd.get("institutionCode", "")
+        if inst and row.get("instCd", inst) != inst:
+            add(no, "instCd", f"Mã tổ chức khác Header ({inst})", row["instCd"], "E322")
         for rule in layout.rules:
             msg = check_rule(rule, row, layout)
             if msg:

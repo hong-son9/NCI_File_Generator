@@ -6,7 +6,7 @@
     <field name="branchCd" required="N" maxLen="20"/>
     <field name="branchNm" required="N" maxLen="200"/>
     <field name="custCd" required="Y" maxLen="30" errCodeMissing="E127" default="CUST{cust:06d}"/>
-    <field name="ctrtNo" required="Y" maxLen="50" errCode="E183" default="LN{seq:08d}"/>
+    <field name="ctrtNo" required="Y" maxLen="50" errCode="E183" default="LN{run}{seq:06d}"/>
     <field name="debtGrpCd" required="Y" maxLen="1" codeRef="C12" errCode="E184" weights="2:45,3:25,4:15,5:15"/>
     <field name="loanTypeCd" required="Y" maxLen="3" codeRef="C17" errCode="E132" errCodeMissing="E131" weights="140:30,180:20,110:15,160:10,210:15,220:10"/>
     <field name="loanAmt" required="Y" maxLen="18" genRange="20000000-2000000000"/>

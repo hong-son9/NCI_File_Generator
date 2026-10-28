@@ -6,9 +6,9 @@
     <field name="branchCd" required="N" maxLen="20"/>
     <field name="branchNm" required="N" maxLen="200"/>
     <field name="custCd" required="Y" maxLen="30" errCodeMissing="E127" default="CUST{cust:06d}"/>
-    <field name="ctrtNo" required="Y" maxLen="50" errCode="E183" default="CL{seq:08d}"/>
+    <field name="ctrtNo" required="Y" maxLen="50" errCode="E183" default="CL{run}{seq:06d}"/>
     <field name="debtorCustCd" required="Y" maxLen="20" default="CUST{cust:06d}"/>
-    <field name="debtorCtrtNo" required="Y" maxLen="50" errCode="E182" default="LN{seq:08d}"/>
+    <field name="debtorCtrtNo" required="Y" maxLen="50" errCode="E182" default="LN{run}{seq:06d}"/>
     <field name="collRightTypeCd" required="Y" maxLen="2" codeRef="C25" errCode="E197"/>
     <field name="collTypeCd" required="Y" maxLen="2" codeRef="C24" errCode="E198" weights="11:45,12:25,18:15,22:5,15:4,38:3,21:3"/>
     <field name="occrDt" required="Y" maxLen="8" format="yyyymmdd" notFuture="Y" errCode="E129"/>

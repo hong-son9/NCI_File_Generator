@@ -71,6 +71,7 @@ class App(tk.Tk):
         self.lifecycle_var = tk.BooleanVar(value=True)
         self.suffix_var = tk.StringVar(value=date.today().strftime("%y%m%d"))
         self.filename_var = tk.StringVar()
+        self.run_var = tk.StringVar(value=core.new_run_id())
         self.crlf_var = tk.BooleanVar(value=g.get("crlf", False))
         self.report_var = tk.BooleanVar(value=g.get("report", True))
         self.file_err_vars = {k: tk.BooleanVar() for k in core.FILE_ERROR_LABELS}
@@ -174,10 +175,17 @@ class App(tk.Tk):
         ttk.Entry(fbox, textvariable=self.suffix_var, width=12).grid(row=0, column=1, sticky="w", padx=8)
         ttk.Label(fbox, text="Tên file (trống = tự đặt)").grid(row=1, column=0, sticky="w", pady=2)
         ttk.Entry(fbox, textvariable=self.filename_var, width=40).grid(row=1, column=1, sticky="w", padx=8)
+        ttk.Label(fbox, text="Mã lần chạy {run}").grid(row=2, column=0, sticky="w", pady=2)
+        rf = ttk.Frame(fbox)
+        rf.grid(row=2, column=1, sticky="w", padx=8)
+        ttk.Entry(rf, textvariable=self.run_var, width=14).pack(side="left")
+        ttk.Button(rf, text="Mới", width=5, command=lambda: self.run_var.set(core.new_run_id())).pack(side="left", padx=4)
+        ttk.Label(rf, text="ghép vào số hợp đồng (LN{run}000001) để gửi lại không bị E142",
+                  foreground="#555").pack(side="left", padx=4)
         ttk.Checkbutton(fbox, text="Xuống dòng CRLF", variable=self.crlf_var).grid(
-            row=2, column=0, columnspan=2, sticky="w", pady=(6, 0))
+            row=3, column=0, columnspan=2, sticky="w", pady=(6, 0))
         ttk.Checkbutton(fbox, text="Xuất kèm .errors.csv", variable=self.report_var).grid(
-            row=3, column=0, columnspan=2, sticky="w")
+            row=4, column=0, columnspan=2, sticky="w")
 
     def _build_cols_tab(self):
         cols = ("idx", "name", "type", "rule", "value")
@@ -541,6 +549,7 @@ class App(tk.Tk):
             customers=self._customers(), lifecycle=self.lifecycle_var.get(),
             file_suffix=self.suffix_var.get().strip() or None,
             filename=self.filename_var.get().strip() or None,
+            run_id=self.run_var.get().strip() or None,
         )
 
     def _seed(self) -> int | None:
@@ -648,9 +657,15 @@ class App(tk.Tk):
             nums[key] = tk.StringVar(value=str(cfg.get(key, default)))
             ttk.Spinbox(body, from_=0, to=100_000, textvariable=nums[key], width=8).grid(
                 row=i, column=1, sticky="w", padx=8)
+        lists = {}      # mã KH đã đăng ký sẵn: LOAN chỉ đăng ký được với KH đã có (E157)
+        for i, (key, label) in enumerate([("existingInd", "Mã KH cá nhân có sẵn trong DB"),
+                                          ("existingCorp", "Mã KH doanh nghiệp có sẵn trong DB")], 5):
+            ttk.Label(body, text=label).grid(row=i, column=0, sticky="w", pady=2)
+            lists[key] = tk.StringVar(value=cfg.get(key, ""))
+            ttk.Entry(body, textvariable=lists[key], width=40).grid(row=i, column=1, sticky="w", padx=8)
 
         box = ttk.LabelFrame(body, text="Loại cần tạo", padding=8)
-        box.grid(row=5, column=0, columnspan=2, sticky="ew", pady=(10, 0))
+        box.grid(row=7, column=0, columnspan=2, sticky="ew", pady=(10, 0))
         chosen = set(cfg.get("types", core.SET_TYPES))
         type_vars: dict[str, tk.BooleanVar] = {}
         for s, (step, name) in enumerate(zip(core.SET_STEPS, core.SET_STEP_NAMES)):
@@ -665,9 +680,12 @@ class App(tk.Tk):
                                 state="normal" if t in self.repo else "disabled").grid(
                     row=s, column=j + 1, sticky="w", padx=(8, 0))
         ttk.Label(body, foreground="#555", justify="left", wraplength=520,
-                  text="Chọn LRPY / DELQ / GUAR / COLL thì tự kèm LOAN, CRPY thì kèm CARD. Seed, vòng đời, Header, "
-                       "đuôi tên file và CRLF lấy theo màn hình chính. Bộ file không chèn lỗi.").grid(
-            row=6, column=0, columnspan=2, sticky="w", pady=(8, 0))
+                  text="Mã KH có sẵn (cách nhau bằng dấu phẩy / khoảng trắng): hợp đồng dùng các mã này thay cho số "
+                       "lượng ở trên và không đăng ký lại KH; LOAN chỉ đăng ký được với KH đã có. "
+                       "Luôn có file INID (có thể chỉ Header/Trailer) cùng đuôi ngày để mở cổng cho các file sau. "
+                       "Chọn LRPY / DELQ / GUAR / COLL thì tự kèm LOAN, CRPY thì kèm CARD. Seed, vòng đời, Header, "
+                       "đuôi tên file, mã lần chạy và CRLF lấy theo màn hình chính. Bộ file không chèn lỗi.").grid(
+            row=8, column=0, columnspan=2, sticky="w", pady=(8, 0))
 
         def build() -> tuple[core.SetResult, str] | None:
             try:
@@ -676,7 +694,8 @@ class App(tk.Tk):
                 messagebox.showwarning("Số không hợp lệ", "Các ô số phải là số nguyên.", parent=win)
                 return None
             types = [t for t, v in type_vars.items() if v.get()]
-            self.set_cfg = {**vals, "types": types}
+            codes = {k: v.get().strip() for k, v in lists.items()}
+            self.set_cfg = {**vals, **codes, "types": types}
             suffix = self.suffix_var.get().strip() or date.today().strftime("%y%m%d")
             try:
                 return core.generate_set(
@@ -684,7 +703,10 @@ class App(tk.Tk):
                     individuals=vals["individuals"], corporates=vals["corporates"],
                     loans_per_cust=vals["loans"], cards_per_cust=vals["cards"],
                     seed=self._seed() if self.seed_var.get().strip() else auto_seed,
-                    lifecycle=self.lifecycle_var.get(), file_suffix=suffix), suffix
+                    lifecycle=self.lifecycle_var.get(), file_suffix=suffix,
+                    run_id=self.run_var.get().strip() or None,
+                    existing_individuals=codes["existingInd"].replace(",", " ").split(),
+                    existing_corporates=codes["existingCorp"].replace(",", " ").split()), suffix
             except Exception as e:
                 messagebox.showerror("Không tạo được bộ file", str(e), parent=win)
                 return None
@@ -707,7 +729,7 @@ class App(tk.Tk):
                 win.destroy()
 
         btns = ttk.Frame(body)
-        btns.grid(row=7, column=0, columnspan=2, sticky="e", pady=(12, 0))
+        btns.grid(row=9, column=0, columnspan=2, sticky="e", pady=(12, 0))
         ttk.Button(btns, text="Đóng", command=win.destroy).pack(side="right")
         ttk.Button(btns, text="★ Tạo bộ file", command=run).pack(side="right", padx=6)
         ttk.Button(btns, text="Xem trước", command=preview).pack(side="right")

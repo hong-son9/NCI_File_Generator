@@ -85,6 +85,7 @@ function init(meta) {
   $("crlf").checked = !!g.crlf;
   $("report").checked = g.report !== false;
   $("suffix").value = yymmdd(new Date());
+  $("run-id").value = meta.runId;
 
   const sel = $("info");
   sel.replaceChildren(...meta.types.map((t) => new Option(t, t)));
@@ -416,6 +417,7 @@ function generateParams() {
     csvPath: state.csvPath,
     suffix: $("suffix").value.trim(),
     filename: $("filename").value.trim(),
+    runId: $("run-id").value.trim(),
     crlf: $("crlf").checked,
     report: $("report").checked,
   };
@@ -562,6 +564,7 @@ function openSetDialog() {
   for (const [id, def] of [["individuals", 1], ["corporates", 0], ["loans", 1], ["cards", 1]]) {
     $("set-" + id).value = cfg[id] ?? def;
   }
+  for (const id of ["existingInd", "existingCorp"]) $("set-" + id).value = cfg[id] || "";
   for (const box of document.querySelectorAll("#set-types input")) box.checked = !box.disabled && chosen.has(box.value);
   // seed trống: xem trước rồi mở lại hộp thoại để tạo file vẫn ra đúng bộ đã xem
   state.setSeed ??= Math.floor(Math.random() * 2 ** 31);
@@ -580,6 +583,8 @@ async function runSet(ev, write = true) {
     params[id] = n;
   }
   params.types = [...document.querySelectorAll("#set-types input:checked")].map((x) => x.value);
+  // mã KH đã đăng ký sẵn: LOAN chỉ đăng ký được với KH đã có (E157)
+  for (const id of ["existingInd", "existingCorp"]) params[id] = $("set-" + id).value.trim();
   saveStore("set", params);
   const seedText = $("seed").value.trim();
   if (seedText && !/^-?\d+$/.test(seedText)) {
@@ -587,7 +592,8 @@ async function runSet(ev, write = true) {
     return;
   }
   // seed chốt lúc xem trước: bấm "★ Tải bộ file" sau đó ra đúng bộ đã xem
-  if (await doSet({ ...params, seed: seedText ? Number(seedText) : state.setSeed }, write)) $("set-dialog").close();
+  const run = { seed: seedText ? Number(seedText) : state.setSeed, runId: $("run-id").value.trim() };
+  if (await doSet({ ...params, ...run }, write)) $("set-dialog").close();
 }
 
 function setSetMode(params) {
@@ -720,6 +726,9 @@ $("btn-generate").addEventListener("click", generateFile);
 $("check-file").addEventListener("change", (e) => checkFile(e.target.files[0]));
 $("check-close").addEventListener("click", () => $("check-dialog").close());
 $("btn-set").addEventListener("click", openSetDialog);
+$("run-new").addEventListener("click", () => {
+  $("run-id").value = call("new_run_id");
+});
 $("set-form").addEventListener("submit", runSet);
 $("set-preview").addEventListener("click", (e) => runSet(e, false));
 for (const id of ["set-close", "set-cancel"]) $(id).addEventListener("click", () => $("set-dialog").close());

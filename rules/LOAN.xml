@@ -6,7 +6,7 @@
     <field name="branchCd" required="N" maxLen="20"/>
     <field name="branchNm" required="N" maxLen="200"/>
     <field name="custCd" required="Y" maxLen="30" errCodeMissing="E127" default="CUST{cust:06d}"/>
-    <field name="ctrtNo" required="Y" maxLen="50" errCode="E183" default="LN{seq:08d}"/>
+    <field name="ctrtNo" required="Y" maxLen="50" errCode="E183" default="LN{run}{seq:06d}"/>
     <field name="debtGrpCd" required="Y" maxLen="1" codeRef="C12" errCode="E184" weights="1:86,2:7,3:3,4:2,5:2"/>
     <field name="loanAmt" required="Y" maxLen="18" genRange="20000000-3000000000"/>
     <field name="occrDt" required="Y" maxLen="8" format="yyyymmdd" notFuture="Y" errCode="E129"/>
@@ -27,7 +27,7 @@
     <field name="collStatFg" required="N" maxLen="1" values="0,1" errCode="E190" weights="0:60,1:40"/>
     <field name="leaseCollPropertyAmt" required="M" maxLen="18" genRange="200000000-3000000000"/>
     <field name="leaseCollStatCd" required="M" maxLen="2" codeRef="C22" errCode="E303" weights="11:75,12:25"/>
-    <field name="leaseCollbrand" required="M" maxLen="100" gen="brand"/>
+    <field name="leaseCollbrand" required="M" maxLen="50" gen="brand"/>
     <field name="leaseCollRegNo" required="M" maxLen="20" gen="plate"/>
     <field name="leaseCollManuDt" required="M" maxLen="8" format="yyyymmdd" notFuture="Y" errCode="E317"/>
     <field name="consentFg" required="Y" maxLen="1" values="1,0" errCode="E191" weights="1:97,0:3"/>

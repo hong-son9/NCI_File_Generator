@@ -53,6 +53,7 @@ def load() -> dict:
         "hasCodes": core.find_code_file(LAYOUT_DIR) is not None,
         "header": [{"name": f.name, "desc": f.desc} for f in H.fields] if H else [],
         "headerDefaults": core.header_defaults(),
+        "runId": core.new_run_id(),
         "fileErrors": core.FILE_ERROR_LABELS,
         "errorLabels": ALL_ERROR_LABELS,
         "rowErrors": core.applicable_errors(None),
@@ -82,6 +83,7 @@ def generate(params: str) -> dict:
         file_errors=p.get("fileErrors", []), csv_rows=csv_rows,
         seed=p.get("seed"), customers=int(p.get("customers", 1)), lifecycle=bool(p.get("lifecycle", True)),
         file_suffix=p.get("suffix") or None, filename=p.get("filename") or None,
+        run_id=p.get("runId") or None,
     )
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     data_path = OUT_DIR / res.filename
@@ -103,6 +105,9 @@ def generate_set(params: str) -> dict:
         individuals=int(p.get("individuals", 1)), corporates=int(p.get("corporates", 0)),
         loans_per_cust=int(p.get("loans", 1)), cards_per_cust=int(p.get("cards", 1)),
         seed=p.get("seed"), lifecycle=bool(p.get("lifecycle", True)), file_suffix=p.get("suffix") or None,
+        run_id=p.get("runId") or None,
+        existing_individuals=str(p.get("existingInd", "")).replace(",", " ").split(),
+        existing_corporates=str(p.get("existingCorp", "")).replace(",", " ").split(),
     )
     out = {"files": [{"step": f.step, "info": f.info_cd, "path": f.path, "lines": f.result.lines}
                      for f in res.files],
@@ -116,6 +121,11 @@ def generate_set(params: str) -> dict:
         out["zipPath"] = shutil.make_archive(str(OUT_DIR / name), "zip", root_dir=OUT_DIR, base_dir=name)
         out["zipName"] = name + ".zip"
     return out
+
+
+@_safe
+def new_run_id() -> str:
+    return core.new_run_id()
 
 
 @_safe
