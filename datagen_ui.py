@@ -81,6 +81,7 @@ class App(tk.Tk):
         self.err_custom_var = tk.StringVar()
         self.status = tk.StringVar(value="Sẵn sàng")
         self.set_cfg: dict = g.get("set", {})
+        self.set_pending: tuple[core.SetResult, str] | None = None   # bộ file đang xem trước, chờ ghi
 
         self._build()
         self.reload_layouts()
@@ -135,7 +136,8 @@ class App(tk.Tk):
         ttk.Button(bot, text="Chọn...", command=self.choose_out_dir).pack(side="left")
         ttk.Button(bot, text="Mở thư mục", command=self.open_out_dir).pack(side="left", padx=4)
         ttk.Button(bot, text="Kiểm tra file...", command=self.validate_file).pack(side="right")
-        ttk.Button(bot, text="★ Tạo file", command=self.generate_file).pack(side="right", padx=6)
+        self.gen_btn = ttk.Button(bot, text="★ Tạo file", command=self.generate_file)
+        self.gen_btn.pack(side="right", padx=6)
         ttk.Button(bot, text="Xem trước", command=self.preview).pack(side="right")
         ttk.Button(bot, text="Tạo bộ file liên kết...", command=self.open_set_dialog).pack(side="right", padx=6)
         ttk.Label(self, textvariable=self.status, relief="sunken", anchor="w", padding=(8, 2)).pack(fill="x")
@@ -307,6 +309,7 @@ class App(tk.Tk):
         self.status.set(msg)
 
     def select_layout(self, info: str):
+        self._set_mode(None)
         if self.layout and self.layout.info_cd != info:
             self._save_config()
         self.layout = self.repo[info]
@@ -556,6 +559,7 @@ class App(tk.Tk):
             raise ValueError("Số khách hàng phải là số nguyên ≥ 0.")
 
     def preview(self):
+        self._set_mode(None)
         try:
             res = self._run_generate()
         except Exception as e:
@@ -567,6 +571,9 @@ class App(tk.Tk):
                         f"{len(res.report)} lỗi đã chèn (chưa ghi file)")
 
     def generate_file(self):
+        if self.set_pending:
+            self._write_set(*self.set_pending)
+            return
         try:
             res = self._run_generate()
             out = Path(self.out_dir.get())
@@ -689,36 +696,44 @@ class App(tk.Tk):
             res = built[0]
             self._show_set(res)
             self.nb.select(self.prev_tab)
+            self._set_mode(built)
             self.status.set(f"Xem trước bộ {len(res.files)} file: "
                             + ", ".join(f"{f.info_cd} {len(f.result.lines) - 2}" for f in res.files)
-                            + " dòng (chưa ghi file)")
+                            + " dòng — bấm “★ Tạo bộ file” để ghi")
 
         def run():
             built = build()
-            if not built:
-                return
-            res, suffix = built
-            folder = Path(self.out_dir.get()) / f"bo_lien_ket_{suffix}"
-            try:
-                if folder.exists() and any(folder.iterdir()) and not messagebox.askyesno(
-                        "Ghi đè?", f"{folder} đã có dữ liệu. Ghi đè các file trùng tên?", parent=win):
-                    return
-                manifest = core.write_set(folder, res, self.crlf_var.get())
-            except Exception as e:
-                messagebox.showerror("Không tạo được bộ file", str(e), parent=win)
-                return
-            win.destroy()
-            self._save_config()
-            self._show_set(res)
-            self.nb.select(self.prev_tab)
-            self.status.set(f"Đã tạo bộ {len(res.files)} file trong {folder}")
-            messagebox.showinfo("Hoàn tất", f"Đã tạo bộ file trong:\n{folder}\n\n{manifest.read_text(encoding='utf-8')}")
+            if built and self._write_set(*built, parent=win) and win.winfo_exists():
+                win.destroy()
 
         btns = ttk.Frame(body)
         btns.grid(row=7, column=0, columnspan=2, sticky="e", pady=(12, 0))
         ttk.Button(btns, text="Đóng", command=win.destroy).pack(side="right")
         ttk.Button(btns, text="★ Tạo bộ file", command=run).pack(side="right", padx=6)
         ttk.Button(btns, text="Xem trước", command=preview).pack(side="right")
+
+    def _set_mode(self, pending: tuple[core.SetResult, str] | None):
+        """Đang xem trước bộ file liên kết: nút chính ghi cả bộ đã xem thay vì 1 file."""
+        self.set_pending = pending
+        self.gen_btn.configure(text="★ Tạo bộ file" if pending else "★ Tạo file")
+
+    def _write_set(self, res: core.SetResult, suffix: str, parent=None) -> bool:
+        folder = Path(self.out_dir.get()) / f"bo_lien_ket_{suffix}"
+        try:
+            if folder.exists() and any(folder.iterdir()) and not messagebox.askyesno(
+                    "Ghi đè?", f"{folder} đã có dữ liệu. Ghi đè các file trùng tên?", parent=parent or self):
+                return False
+            manifest = core.write_set(folder, res, self.crlf_var.get())
+        except Exception as e:
+            messagebox.showerror("Không tạo được bộ file", str(e), parent=parent or self)
+            return False
+        self._set_mode(None)
+        self._save_config()
+        self._show_set(res)
+        self.nb.select(self.prev_tab)
+        self.status.set(f"Đã tạo bộ {len(res.files)} file trong {folder}")
+        messagebox.showinfo("Hoàn tất", f"Đã tạo bộ file trong:\n{folder}\n\n{manifest.read_text(encoding='utf-8')}")
+        return True
 
     def _show_set(self, res: core.SetResult):
         """Xem trước cả bộ: từng file theo thứ tự gửi, có dòng tiêu đề tên file."""

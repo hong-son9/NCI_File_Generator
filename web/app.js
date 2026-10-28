@@ -146,6 +146,7 @@ function headerValues() {
 
 // ------------------------------------------------------------------ chọn loại dữ liệu
 function selectLayout(info) {
+  if (state.setPending) setSetMode(null);
   if (state.info && state.info !== info) saveConfig();
   state.info = info;
   $("info").value = info;
@@ -428,6 +429,7 @@ async function runGenerate() {
 }
 
 async function preview() {
+  setSetMode(null);
   try {
     const res = await runGenerate();
     showResult(res);
@@ -452,6 +454,10 @@ function download(path, name, type) {
 }
 
 async function generateFile() {
+  if (state.setPending) {
+    await doSet(state.setPending, true);
+    return;
+  }
   let res;
   try {
     res = await runGenerate();
@@ -575,16 +581,29 @@ async function runSet(ev, write = true) {
   }
   params.types = [...document.querySelectorAll("#set-types input:checked")].map((x) => x.value);
   saveStore("set", params);
+  const seedText = $("seed").value.trim();
+  if (seedText && !/^-?\d+$/.test(seedText)) {
+    alert("Seed phải là số nguyên (hoặc để trống).");
+    return;
+  }
+  // seed chốt lúc xem trước: bấm "★ Tải bộ file" sau đó ra đúng bộ đã xem
+  if (await doSet({ ...params, seed: seedText ? Number(seedText) : state.setSeed }, write)) $("set-dialog").close();
+}
+
+function setSetMode(params) {
+  // đang xem trước bộ file liên kết: nút chính tải cả bộ thay vì 1 file
+  state.setPending = params;
+  $("btn-generate").textContent = params ? "★ Tải bộ file" : "★ Tạo file";
+}
+
+async function doSet(params, write) {
   let res;
   try {
-    const seedText = $("seed").value.trim();
-    if (seedText && !/^-?\d+$/.test(seedText)) throw new Error("Seed phải là số nguyên (hoặc để trống).");
     setStatus("Đang sinh bộ file...");
     await new Promise((r) => setTimeout(r, 20));
     res = call("generate_set", JSON.stringify({
       ...params,
       header: headerValues(),
-      seed: seedText ? Number(seedText) : state.setSeed,
       lifecycle: $("lifecycle").checked,
       suffix: $("suffix").value.trim(),
       crlf: $("crlf").checked,
@@ -594,20 +613,22 @@ async function runSet(ev, write = true) {
   } catch (e) {
     setStatus("Không tạo được bộ file");
     alert("Không tạo được bộ file: " + e.message);
-    return;
+    return false;
   }
-  $("set-dialog").close();
   showSet(res);
   switchTab("preview");
   if (!write) {
+    setSetMode(params);
     const counts = res.files.map((f) => `${f.info} ${f.lines.length - 2}`).join(", ");
-    setStatus(`Xem trước bộ ${res.files.length} file: ${counts} dòng (chưa tải file)`);
-    return;
+    setStatus(`Xem trước bộ ${res.files.length} file: ${counts} dòng — bấm “★ Tải bộ file” để tải`);
+    return true;
   }
+  setSetMode(null);
   saveConfig();
   state.setSeed = null; // lần tạo sau: bộ dữ liệu mới
   setStatus(`Đã tạo bộ ${res.files.length} file: ${res.zipName}`);
   alert(res.manifest);
+  return true;
 }
 
 function showSet(res) {
