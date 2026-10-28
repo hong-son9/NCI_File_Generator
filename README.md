@@ -46,6 +46,28 @@ web/       bản web cho Cloudflare Pages (index.html, app.js, web_api.py, build
 - **Liên kết giữa các file.** Dùng cùng seed và cùng số dòng thì `custCd` / `ctrtNo` khớp nhau: LOAN `LN00000001` ↔ LRPY, DELQ, GUAR.debtorCtrtNo, COLL.debtorCtrtNo; CARD `CD00000001` ↔ CRPY.
 - **Header là MST** thì app tự sinh evtCd = 1 cho mọi dòng (F009).
 
+## Bộ file liên kết (nút "Tạo bộ file liên kết...")
+
+Sinh một lần cả bộ file theo thứ tự gửi, mỗi bước một thư mục, kèm `thu_tu_gui.txt`:
+
+```
+bo_lien_ket_<yymmdd>/
+  1_khach_hang/          INID, COID
+  2_hop_dong/            LOAN, CARD
+  3_thong_tin_hop_dong/  LRPY, CRPY, DELQ, GUAR, COLL
+```
+
+- Chọn số khách hàng cá nhân (`CUST000001`…) và/hoặc doanh nghiệp (`CORP000001`…), số hợp đồng vay và số thẻ cho mỗi khách hàng, rồi chọn các loại cần tạo. Chọn LRPY/DELQ/GUAR/COLL thì app tự kèm LOAN; chọn CRPY thì tự kèm CARD. INID/COID luôn được tạo.
+- `custCd`, `ctrtNo`, `debtorCustCd`, `debtorCtrtNo` khớp nhau giữa các file. Khách hàng doanh nghiệp cũng có hợp đồng LOAN/CARD.
+- Khách hàng chỉ có đăng ký mới và thay đổi, không bị tất toán hay xóa, vì hợp đồng còn tham chiếu tới họ.
+- LRPY/CRPY/DELQ/GUAR/COLL chỉ gắn với hợp đồng còn hiệu lực:
+  - LRPY/CRPY không có tháng nào trước ngày mở hợp đồng.
+  - DELQ ưu tiên hợp đồng đã xuống nhóm nợ ≥ 2.
+  - GUAR/COLL tương ứng với LOAN có `guarStatFg` / `collStatFg` = 1.
+  - Người bảo lãnh là khách hàng cá nhân mới, được đánh số tiếp theo và cũng có trong INID.
+- Chi nhánh, nhóm nợ, loại vay, ngày mở và ngày đáo hạn lấy theo hợp đồng gốc khi file con có các cột này.
+- Seed, vòng đời, Header, đuôi tên file và CRLF lấy theo màn hình chính. Bộ file không chèn lỗi. Bản web tải về một file `.zip`.
+
 ## Số khách hàng & vòng đời hợp đồng (hàng trên cùng)
 
 - **Số khách hàng = 1** (mặc định): cả file dùng chung một `custCd`. Với INID/COID thì mọi dòng là cùng một người hoặc một doanh nghiệp. Nếu nhập N thì các hợp đồng chia đều cho N khách hàng; nhập 0 thì mỗi hợp đồng là một khách hàng riêng.

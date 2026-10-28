@@ -237,6 +237,14 @@ dialog {
 dialog::backdrop { background: rgb(15 23 42 / 0.45); }
 dialog .table-wrap { border: 1px solid var(--border); border-radius: 8px; }
 .dialog-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+#set-dialog { width: min(620px, calc(100vw - 32px)); }
+#set-dialog h2 { margin: 18px 0 8px; }
+#set-dialog .hint { min-height: 0; }
+.set-steps { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 8px 14px; align-items: center; font-size: 13px; }
+.set-steps .checks { margin: 0; gap: 8px 18px; }
+.set-steps .muted { color: var(--muted); }
+.dialog-foot { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
+.preview .file-title { color: var(--accent); font-weight: 600; }
 .ok { color: var(--ok); font-weight: 600; }
 .bad { color: var(--bad); font-weight: 600; }
 

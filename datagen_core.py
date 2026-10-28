@@ -1072,22 +1072,28 @@ def lifecycle_info(layout: Layout) -> Lifecycle:
                      bool(layout.get("baseDt")) and "2" not in allowed, "2" in allowed, "7" in allowed)
 
 
-def _plan_rows(n: int, lc: Lifecycle, customers: int, lifecycle: bool, mst: bool, rnd) -> list[tuple]:
-    """Danh sách (nhóm, khách hàng, thứ tự sự kiện, số sự kiện của nhóm, evt) cho từng dòng."""
+def _plan_rows(n: int, lc: Lifecycle, customers: int, lifecycle: bool, mst: bool, rnd,
+               groups: list[dict] | None = None, keep_open: bool = False) -> list[tuple]:
+    """Danh sách (nhóm, khách hàng, thứ tự sự kiện, số sự kiện của nhóm, evt) cho từng dòng.
+    groups (bộ file liên kết): mỗi phần tử là 1 hợp đồng / khách hàng định sẵn -> 1 chuỗi, bỏ qua n và customers.
+    Phần tử có thể có "max" (số sự kiện tối đa) và "open" (không tất toán / xóa, mặc định = keep_open)."""
     plan, g = [], 0
     by_customer = lc.key == lc.cust
     seq_ok = lifecycle and not mst and lc.evt is not None
-    while len(plan) < n:
+    while g < len(groups) if groups is not None else len(plan) < n:
         g += 1
-        remain = n - len(plan)
+        remain = n - len(plan) if groups is None else groups[g - 1].get("max", 4)
+        stay_open = groups[g - 1].get("open", keep_open) if groups is not None else keep_open
         if not seq_ok:
             k = 1
-        elif by_customer:                                   # INID/COID/EWST: mỗi khách hàng 1 chuỗi
+        elif by_customer and groups is None:                # INID/COID/EWST: mỗi khách hàng 1 chuỗi
             left = max(customers - g + 1, 1) if customers else remain
             k = -(-remain // left)
         else:
             k = min(remain, rnd.choices([1, 2, 3, 4], [40, 25, 20, 15])[0])
-        if by_customer and (not seq_ok or not customers):
+        if groups is not None:
+            cust = groups[g - 1]["cust"]
+        elif by_customer and (not seq_ok or not customers):
             cust = g                                        # tránh trùng đăng ký mới cùng 1 khách hàng
         else:
             cust = ((g - 1) % customers) + 1 if customers else g
@@ -1100,12 +1106,14 @@ def _plan_rows(n: int, lc: Lifecycle, customers: int, lifecycle: bool, mst: bool
         else:
             evts = ["1"] + ["3"] * (k - 1)
             r = rnd.random()
-            if k >= 2 and lc.can_delete and r < 0.25:      # đăng ký sai -> xóa (7), kết thúc chuỗi
+            if stay_open:
+                pass
+            elif k >= 2 and lc.can_delete and r < 0.25:    # đăng ký sai -> xóa (7), kết thúc chuỗi
                 evts[-1] = "7"
             elif k >= 2 and lc.can_close and r < 0.25 + (0.2 if by_customer else 0.45):
                 evts[-1] = "2"
         plan.extend((g, cust, j, k, e) for j, e in enumerate(evts))
-    return plan[:n]
+    return plan if groups is not None else plan[:n]
 
 
 MATURITY_FIELDS = ("matuDt", "expirationMonth")
@@ -1179,7 +1187,8 @@ def _fit_contract(layout: Layout, lc: Lifecycle, ctx: _Ctx, evts: list[str]) -> 
             back_hi = mat_hi - 60 if mat and open_end and mat_hi - 60 > need else need + 1500
             _set(ctx, occ.name, _fmt_date(today - timedelta(days=rnd.randint(need, back_hi)), occ.fmt))
             _repair(layout, ctx)
-    elif lc.change_date and len(evts) > 1 and row.get(lc.change_date) and lc.change_date not in ctx.locked:
+    elif not occ and lc.change_date and len(evts) > 1 and row.get(lc.change_date) \
+            and lc.change_date not in ctx.locked:
         cd, need = layout.get(lc.change_date), 20 * (len(evts) - 1)    # INID/COID: chừa chỗ cho các lần cập nhật
         d = _parse_date(row[lc.change_date], cd.fmt)
         if not d or (today - d).days < need:
@@ -1385,10 +1394,15 @@ def generate(layout: Layout, header_layout: Layout, trailer_layout: Layout,
              errors: list[ErrorSpec] | None = None, file_errors=None,
              csv_rows: list[dict] | None = None, seed: int | None = None,
              file_suffix: str | None = None, filename: str | None = None,
-             customers: int = 1, lifecycle: bool = True) -> GenResult:
+             customers: int = 1, lifecycle: bool = True,
+             groups: list[dict] | None = None, personas: dict | None = None, keep_open: bool = False) -> GenResult:
     """
     customers: số khách hàng trong file (custCd dùng chung); 0 = mỗi hợp đồng 1 khách hàng.
     lifecycle: mỗi hợp đồng là chuỗi sự kiện 1 (mới) -> 3 (thay đổi) ... -> 2 (tất toán), ngày tăng dần.
+    groups: hợp đồng / khách hàng định sẵn (xem _plan_rows): {"cust": khóa persona, "values": {cột: giá trị}};
+            values (vd custCd, ctrtNo) giữ cố định cho cả chuỗi. Khi có groups thì bỏ qua n_rows và customers.
+    personas: dùng chung giữa các file của bộ liên kết (cùng khách hàng -> cùng tên, tỉnh, chi nhánh).
+    keep_open: không tất toán / xóa (khách hàng còn hợp đồng tham chiếu).
     """
     rnd = random.Random(seed)
     fixed = fixed or {}
@@ -1408,8 +1422,9 @@ def generate(layout: Layout, header_layout: Layout, trailer_layout: Layout,
             rows.append(_build_row(layout, ctx, src, fixed, mst))
             ctxs.append(ctx)
     else:
-        personas, prev, dates, story = {}, {}, [], []
-        plan = _plan_rows(n_rows, lc, customers, lifecycle, mst, rnd)
+        personas = {} if personas is None else personas
+        prev, dates, story = {}, [], []
+        plan = _plan_rows(n_rows, lc, customers, lifecycle, mst, rnd, groups, keep_open)
         for i, (g, cust, j, k, evt) in enumerate(plan, 1):
             persona = personas.setdefault(cust, _make_persona(rnd))
             ctx = _Ctx(rnd, g, header, persona, cust=cust, row_no=i)
@@ -1419,8 +1434,8 @@ def generate(layout: Layout, header_layout: Layout, trailer_layout: Layout,
             elif j > 0 and evt in ("3", "7"):              # LRPY/CRPY: sửa / xóa bản ghi tháng vừa gửi
                 vals = _history_fix(layout, lc, ctx, prev, evt, fixed)
             else:
-                src = {}
-                if lc.evt and (lifecycle or i == 1) and lc.evt not in fixed:
+                src = dict(groups[g - 1].get("values", {})) if groups else {}
+                if lc.evt and (lifecycle or i == 1 or groups) and lc.evt not in fixed:
                     src[lc.evt] = evt                       # dòng đầu tiên / đầu mỗi hợp đồng luôn là 1
                 if lc.history and "baseDt" not in fixed:     # LRPY/CRPY: mỗi dòng 1 tháng, tăng dần
                     months = [p[4] for p in plan[i - 1 - j:i - 1 - j + k]].count("1")
@@ -1527,6 +1542,208 @@ def generate(layout: Layout, header_layout: Layout, trailer_layout: Layout,
                        "code": FILE_ERROR_CODES[code], "label": FILE_ERROR_LABELS[code], "old": "", "new": "",
                        "note": notes.get(code, "")})
     return GenResult(lines, report, {it["line"] for it in report if it["line"] != ""}, out_name)
+
+
+# =========================================================================== bộ file liên kết
+
+SET_STEPS = (("INID", "COID"), ("LOAN", "CARD"), ("LRPY", "CRPY", "DELQ", "GUAR", "COLL"))
+SET_STEP_NAMES = ("Khách hàng", "Hợp đồng", "Thông tin gắn với hợp đồng")
+SET_STEP_DIRS = ("1_khach_hang", "2_hop_dong", "3_thong_tin_hop_dong")
+SET_TYPES = tuple(t for step in SET_STEPS for t in step)
+SET_PARENT = {"LRPY": "LOAN", "DELQ": "LOAN", "GUAR": "LOAN", "COLL": "LOAN", "CRPY": "CARD"}
+SET_SHARE = {"DELQ": 0.3, "GUAR": 0.3, "COLL": 0.4}      # tỷ lệ hợp đồng có quá hạn / bảo lãnh / tài sản bảo đảm
+SET_FLAG = {"GUAR": "guarStatFg", "COLL": "collStatFg"}   # cờ trên LOAN phải khớp với file GUAR / COLL
+SET_CARRY = {                                             # cột lấy theo hợp đồng gốc (LOAN / CARD)
+    "LRPY": ("branchCd", "branchNm", "debtGrpCd"),
+    "CRPY": ("branchCd", "branchNm", "debtGrpCd", "lmtAmt", "cadvLmtAmt"),
+    "DELQ": ("branchCd", "branchNm", "debtGrpCd", "loanTypeCd", "loanAmt"),
+    "GUAR": ("branchCd", "branchNm", "occrDt", "matuDt"),
+    "COLL": ("branchCd", "branchNm", "occrDt"),
+}
+HISTORY_MONTHS = 4                                        # số tháng LRPY / CRPY tối đa cho mỗi hợp đồng
+CORP_PERSONA = 10 ** 7                                    # khóa persona của KH doanh nghiệp (tránh trùng cá nhân)
+
+
+@dataclass
+class SetFile:
+    step: int            # 1, 2, 3: thứ tự gửi
+    info_cd: str
+    result: GenResult
+    path: str            # đường dẫn trong bộ: <thư mục bước>/<tên file>
+
+
+@dataclass
+class SetResult:
+    files: list[SetFile]
+    notes: list[str]
+
+
+def _result_rows(layout: Layout, res: GenResult) -> list[dict]:
+    return [dict(zip(layout.names, ln.split(layout.delimiter))) for ln in res.lines[1:-1]]
+
+
+def _open_contracts(layout: Layout, res: GenResult) -> list[dict]:
+    """Trạng thái cuối của từng hợp đồng (dòng cuối mỗi ctrtNo), chỉ giữ hợp đồng chưa tất toán / xóa."""
+    last = {r["ctrtNo"]: r for r in _result_rows(layout, res)}
+    return [r for r in last.values() if r.get("evtCd") not in ("2", "7")]
+
+
+def _carry(child: Layout, parent: dict) -> dict:
+    out = {}
+    for n in SET_CARRY.get(child.info_cd, ()):
+        f, v = child.get(n), parent.get(n, "")
+        if f and v and (not f.allowed or v in f.allowed):
+            out[n] = v
+    return out
+
+
+def _history_cap(occr: str) -> int:
+    """Số tháng LRPY / CRPY có thể có: các cuối tháng (trước tháng này) không sớm hơn ngày mở hợp đồng."""
+    d = _parse_date(occr, None)
+    return sum(1 for m in range(1, HISTORY_MONTHS + 1) if not d or _month_end(-m) >= d)
+
+
+def _date_after(rnd, occr: str, min_days: int = 30, keep: int = 90) -> str:
+    """Ngày ngẫu nhiên từ occr + min_days tới hôm nay - keep (vd ngày phát sinh quá hạn của 1 khoản vay),
+    chừa chỗ cho các lần thay đổi sau đó."""
+    today, d = date.today(), _parse_date(occr, None)
+    hi = today - timedelta(days=keep)
+    lo = min(d + timedelta(days=min_days), today) if d else today - timedelta(days=365)
+    return (lo + timedelta(days=rnd.randint(0, max((hi - lo).days, 0)))).strftime("%Y%m%d")
+
+
+def _chain_cap(layout: Layout, occr: str) -> int:
+    """Số sự kiện tối đa khi ngày mở bị cố định (lấy theo hợp đồng gốc): đủ ngày cho từng lần thay đổi,
+    như _fit_contract (cách ngày mở ≥ gap, mỗi lần sau cách ~20 ngày)."""
+    d = _parse_date(occr, None)
+    if not d:
+        return 4
+    lo = _rule_gap(layout, "occrDt", lifecycle_info(layout).change_date)[0]
+    return max(1, min(4, 1 + ((date.today() - d).days - lo) // 20))
+
+
+def generate_set(repo: dict[str, Layout], header_values: dict, types, individuals: int = 1, corporates: int = 0,
+                 loans_per_cust: int = 1, cards_per_cust: int = 1, seed: int | None = None,
+                 lifecycle: bool = True, file_suffix: str | None = None) -> SetResult:
+    """
+    Bộ file liên kết theo thứ tự gửi: INID / COID (khách hàng) -> LOAN / CARD (hợp đồng) ->
+    LRPY / CRPY / DELQ / GUAR / COLL (thông tin gắn với hợp đồng). custCd, ctrtNo, debtorCustCd, debtorCtrtNo
+    khớp nhau giữa các file: KH cá nhân CUST000001..., doanh nghiệp CORP000001...; người bảo lãnh là KH cá nhân
+    đánh số tiếp theo và cũng được đăng ký trong INID. Chọn thông tin con thì tự kèm file gốc (LRPY -> LOAN...),
+    khách hàng luôn được đăng ký. Thông tin con chỉ gắn với hợp đồng còn hiệu lực; KH không bị tất toán / xóa.
+    """
+    sel = {t for t in types if t in SET_TYPES}
+    sel |= {SET_PARENT[t] for t in sel if t in SET_PARENT}
+    if not sel:
+        raise ValueError("Chưa chọn loại dữ liệu nào cho bộ file.")
+    if individuals < 0 or corporates < 0 or individuals + corporates == 0:
+        raise ValueError("Cần ít nhất 1 khách hàng (cá nhân hoặc doanh nghiệp).")
+    if loans_per_cust < 1 or cards_per_cust < 1:
+        raise ValueError("Số hợp đồng mỗi khách hàng phải ≥ 1.")
+    if individuals:
+        sel.add("INID")
+    if corporates:
+        sel.add("COID")
+    missing = [t for t in sorted(sel) + [HEADER_CD, TRAILER_CD] if t not in repo]
+    if missing:
+        raise ValueError(f"Thiếu layout {', '.join(missing)}.")
+
+    rnd, personas, out, notes = random.Random(seed), {}, {}, []
+    borrowers = [(f"CUST{i:06d}", i) for i in range(1, individuals + 1)] \
+        + [(f"CORP{i:06d}", CORP_PERSONA + i) for i in range(1, corporates + 1)]
+    persona_of = dict(borrowers)
+
+    def gen(info: str, groups: list[dict], keep_open: bool = False) -> None:
+        if not groups:
+            notes.append(f"{info}: không có hợp đồng phù hợp nên không tạo file.")
+            return
+        out[info] = generate(repo[info], repo[HEADER_CD], repo[TRAILER_CD], header_values,
+                             seed=rnd.randrange(2 ** 31), lifecycle=lifecycle, file_suffix=file_suffix,
+                             groups=groups, personas=personas, keep_open=keep_open)
+
+    # ---- sinh hợp đồng trước (để biết bảo lãnh / TSBĐ / người bảo lãnh); thứ tự gửi xếp lại ở cuối
+    contracts = {}
+    for info, prefix, per in (("LOAN", "LN", loans_per_cust), ("CARD", "CD", cards_per_cust)):
+        if info not in sel:
+            continue
+        owners = [(code, key) for code, key in borrowers for _ in range(per)]
+        groups = [{"cust": key, "values": {"custCd": code, "ctrtNo": f"{prefix}{n:08d}"}}
+                  for n, (code, key) in enumerate(owners, 1)]
+        for child, flag in SET_FLAG.items():             # hợp đồng có bảo lãnh / TSBĐ: cờ = 1, giữ hiệu lực
+            if info == "LOAN" and child in sel and repo["LOAN"].get(flag):
+                for gr in rnd.sample(groups, max(1, round(len(groups) * SET_SHARE[child]))):
+                    gr["values"][flag], gr["open"] = "1", True
+        gen(info, groups)
+        contracts[info] = _open_contracts(repo[info], out[info])
+    loans, cards = contracts.get("LOAN", []), contracts.get("CARD", [])
+
+    def link(child: str, r: dict, **values) -> dict:
+        vals = {"custCd": r["custCd"], **_carry(repo[child], r), **values}
+        return {"cust": persona_of[r["custCd"]], "values": vals, "max": _chain_cap(repo[child], vals.get("occrDt", ""))}
+
+    for child, parents in (("LRPY", loans), ("CRPY", cards)):
+        if child in sel:
+            gen(child, [{**link(child, r, ctrtNo=r["ctrtNo"]), "max": cap}
+                        for r in parents if (cap := _history_cap(r.get("occrDt", "")))])
+    if "DELQ" in sel:                                    # ưu tiên hợp đồng đã xuống nhóm nợ ≥ 2
+        cand = loans + cards
+        bad = [r for r in cand if r.get("debtGrpCd", "1") not in ("", "1")]
+        rest = [r for r in cand if r not in bad]
+        extra = max(1, round(len(cand) * SET_SHARE["DELQ"])) - len(bad)
+        pick = bad + rnd.sample(rest, min(max(extra, 0), len(rest)))
+        gen("DELQ", [link("DELQ", r, ctrtNo=r["ctrtNo"], occrDt=_date_after(rnd, r.get("occrDt", "")))
+                     for r in cand if r in pick])
+    guarantors = []
+    if "GUAR" in sel:                                    # mỗi khoản bảo lãnh 1 người bảo lãnh (KH cá nhân mới)
+        groups = []
+        for r in (r for r in loans if r.get("guarStatFg") == "1"):
+            no = individuals + len(guarantors) + 1
+            guarantors.append(no)
+            gr = link("GUAR", r, ctrtNo=f"GR{len(groups) + 1:08d}", debtorCustCd=r["custCd"],
+                      debtorCtrtNo=r["ctrtNo"])
+            gr["values"]["custCd"], gr["cust"] = f"CUST{no:06d}", no
+            groups.append(gr)
+        gen("GUAR", groups)
+    if "COLL" in sel:                                    # bên bảo đảm là chính người vay
+        gen("COLL", [link("COLL", r, ctrtNo=f"CL{n:08d}", debtorCustCd=r["custCd"], debtorCtrtNo=r["ctrtNo"])
+                     for n, r in enumerate((r for r in loans if r.get("collStatFg") == "1"), 1)])
+
+    # ---- khách hàng: cá nhân (kể cả người bảo lãnh) / doanh nghiệp, không tất toán / xóa
+    if "INID" in sel:
+        gen("INID", [{"cust": i, "values": {"custCd": f"CUST{i:06d}"}}
+                     for i in list(range(1, individuals + 1)) + guarantors], keep_open=True)
+    if "COID" in sel:
+        gen("COID", [{"cust": CORP_PERSONA + i, "values": {"custCd": f"CORP{i:06d}"}}
+                     for i in range(1, corporates + 1)], keep_open=True)
+
+    files = [SetFile(s, t, out[t], f"{SET_STEP_DIRS[s - 1]}/{out[t].filename}")
+             for s, step in enumerate(SET_STEPS, 1) for t in step if t in out]
+    return SetResult(files, notes)
+
+
+def set_manifest(res: SetResult) -> str:
+    """Nội dung thu_tu_gui.txt: các file theo thứ tự gửi."""
+    lines = ["Thứ tự gửi bộ file liên kết (gửi bước sau khi NICE đã xử lý xong bước trước):", ""]
+    for s, name in enumerate(SET_STEP_NAMES, 1):
+        files = [f for f in res.files if f.step == s]
+        if files:
+            lines.append(f"Bước {s} - {name}:")
+            lines += [f"    {f.path}  ({len(f.result.lines) - 2} dòng)" for f in files]
+    if res.notes:
+        lines += ["", "Ghi chú:"] + [f"    {n}" for n in res.notes]
+    return "\n".join(lines) + "\n"
+
+
+def write_set(folder, res: SetResult, crlf: bool = False) -> Path:
+    """Ghi bộ file vào folder/<thư mục bước>/ kèm thu_tu_gui.txt. Trả về đường dẫn thu_tu_gui.txt."""
+    folder = Path(folder)
+    for f in res.files:
+        path = folder / f.path
+        path.parent.mkdir(parents=True, exist_ok=True)
+        write_lines(path, f.result.lines, crlf)
+    manifest = folder / "thu_tu_gui.txt"
+    manifest.write_text(set_manifest(res), encoding="utf-8")
+    return manifest
 
 
 def write_lines(path, lines: list[str], crlf: bool = False) -> None:

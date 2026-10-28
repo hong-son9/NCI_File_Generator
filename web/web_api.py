@@ -7,6 +7,7 @@ Mọi hàm nhận/trả chuỗi JSON. File đọc/ghi qua hệ thống file ảo
 from __future__ import annotations
 
 import json
+import shutil
 import traceback
 from pathlib import Path
 
@@ -57,6 +58,8 @@ def load() -> dict:
         "rowErrors": core.applicable_errors(None),
         "rowLevel": core.ROW_LEVEL,
         "rulePrefix": core.RULE_PREFIX,
+        "setSteps": core.SET_STEPS,
+        "setStepNames": core.SET_STEP_NAMES,
         "layouts": {t: _layout_meta(REPO[t]) for t in types},
     }
 
@@ -89,6 +92,30 @@ def generate(params: str) -> dict:
         core.write_report(rep_path, res.report)
     return {"lines": res.lines, "report": res.report, "errorLines": sorted(res.error_lines),
             "filename": res.filename, "dataPath": str(data_path), "reportPath": str(rep_path) if rep_path else None}
+
+
+@_safe
+def generate_set(params: str) -> dict:
+    """Như App.open_set_dialog: sinh bộ file liên kết, ghi vào /tmp/out/<thư mục> rồi nén thành 1 file zip."""
+    p = json.loads(params)
+    res = core.generate_set(
+        REPO, p["header"], p.get("types", []),
+        individuals=int(p.get("individuals", 1)), corporates=int(p.get("corporates", 0)),
+        loans_per_cust=int(p.get("loans", 1)), cards_per_cust=int(p.get("cards", 1)),
+        seed=p.get("seed"), lifecycle=bool(p.get("lifecycle", True)), file_suffix=p.get("suffix") or None,
+    )
+    out = {"files": [{"step": f.step, "info": f.info_cd, "path": f.path, "lines": f.result.lines}
+                     for f in res.files],
+           "notes": res.notes, "manifest": core.set_manifest(res)}
+    if p.get("write", True):            # write=False: chỉ xem trước
+        name = f"bo_lien_ket_{p.get('suffix') or 'nice'}"
+        folder = OUT_DIR / name
+        if folder.exists():
+            shutil.rmtree(folder)
+        core.write_set(folder, res, bool(p.get("crlf")))
+        out["zipPath"] = shutil.make_archive(str(OUT_DIR / name), "zip", root_dir=OUT_DIR, base_dir=name)
+        out["zipName"] = name + ".zip"
+    return out
 
 
 @_safe

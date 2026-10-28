@@ -172,6 +172,7 @@
     <div id="status" class="status">Sẵn sàng</div>
     <div class="buttons">
       <label class="btn ghost">Kiểm tra file…<input id="check-file" type="file" hidden></label>
+      <button id="btn-set" type="button" class="btn">Tạo bộ file liên kết…</button>
       <button id="btn-preview" type="button" class="btn">Xem trước</button>
       <button id="btn-generate" type="button" class="btn primary">★ Tạo file</button>
     </div>
@@ -189,6 +190,32 @@
         <tbody></tbody>
       </table>
     </div>
+  </dialog>
+
+  <dialog id="set-dialog">
+    <form id="set-form" method="dialog">
+      <div class="dialog-head">
+        <strong>Tạo bộ file liên kết</strong>
+        <button type="button" id="set-close" class="btn ghost icon" aria-label="Đóng">✕</button>
+      </div>
+      <p class="hint">Sinh một lần cả bộ file theo thứ tự gửi: khách hàng → hợp đồng → thông tin gắn với hợp đồng.
+        Mọi custCd, ctrtNo, debtorCustCd, debtorCtrtNo đều khớp nhau. Tải về 1 file zip, mỗi bước một thư mục.</p>
+      <div class="form-grid">
+        <label for="set-individuals">Khách hàng cá nhân (INID, CUST000001…)</label><input id="set-individuals" type="number" min="0" value="1">
+        <label for="set-corporates">Khách hàng doanh nghiệp (COID, CORP000001…)</label><input id="set-corporates" type="number" min="0" value="0">
+        <label for="set-loans">Hợp đồng vay mỗi khách hàng (LOAN)</label><input id="set-loans" type="number" min="1" value="1">
+        <label for="set-cards">Thẻ mỗi khách hàng (CARD)</label><input id="set-cards" type="number" min="1" value="1">
+      </div>
+      <h2>Loại cần tạo</h2>
+      <div id="set-types" class="set-steps"></div>
+      <p class="hint">Chọn LRPY / DELQ / GUAR / COLL thì tự kèm LOAN, CRPY thì kèm CARD. Seed, vòng đời, Header,
+        đuôi tên file và CRLF lấy theo màn hình chính. Bộ file không chèn lỗi.</p>
+      <div class="dialog-foot">
+        <button type="button" id="set-cancel" class="btn ghost">Đóng</button>
+        <button type="button" id="set-preview" class="btn">Xem trước</button>
+        <button type="submit" id="set-run" class="btn primary">★ Tạo bộ file</button>
+      </div>
+    </form>
   </dialog>
 
   <script src="app.js"></script>

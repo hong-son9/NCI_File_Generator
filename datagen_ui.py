@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import json
 import os
+import random
 import subprocess
 import sys
 import tkinter as tk
@@ -79,6 +80,7 @@ class App(tk.Tk):
         self.err_rows_var = tk.StringVar(value="1")
         self.err_custom_var = tk.StringVar()
         self.status = tk.StringVar(value="Sẵn sàng")
+        self.set_cfg: dict = g.get("set", {})
 
         self._build()
         self.reload_layouts()
@@ -135,6 +137,7 @@ class App(tk.Tk):
         ttk.Button(bot, text="Kiểm tra file...", command=self.validate_file).pack(side="right")
         ttk.Button(bot, text="★ Tạo file", command=self.generate_file).pack(side="right", padx=6)
         ttk.Button(bot, text="Xem trước", command=self.preview).pack(side="right")
+        ttk.Button(bot, text="Tạo bộ file liên kết...", command=self.open_set_dialog).pack(side="right", padx=6)
         ttk.Label(self, textvariable=self.status, relief="sunken", anchor="w", padding=(8, 2)).pack(fill="x")
 
     def _build_header_tab(self):
@@ -526,21 +529,23 @@ class App(tk.Tk):
                 raise ValueError("Số dòng phải là số nguyên ≥ 1.")
         else:
             n = len(self.csv_rows)
-        seed_txt = self.seed_var.get().strip()
-        try:
-            seed = int(seed_txt) if seed_txt else None
-        except ValueError:
-            raise ValueError("Seed phải là số nguyên (hoặc để trống).")
         header = {k: v.get() for k, v in self.header_vars.items()}
         return core.generate(
             self.layout, self.repo[core.HEADER_CD], self.repo[core.TRAILER_CD], header,
             n_rows=n, fixed=self.fixed, errors=self.errors,
             file_errors=[k for k, v in self.file_err_vars.items() if v.get()],
-            csv_rows=self.csv_rows, seed=seed,
+            csv_rows=self.csv_rows, seed=self._seed(),
             customers=self._customers(), lifecycle=self.lifecycle_var.get(),
             file_suffix=self.suffix_var.get().strip() or None,
             filename=self.filename_var.get().strip() or None,
         )
+
+    def _seed(self) -> int | None:
+        seed_txt = self.seed_var.get().strip()
+        try:
+            return int(seed_txt) if seed_txt else None
+        except ValueError:
+            raise ValueError("Seed phải là số nguyên (hoặc để trống).")
 
     def _customers(self) -> int:
         try:
@@ -607,6 +612,132 @@ class App(tk.Tk):
         for r in res.report:
             self.rep_tree.insert("", "end", values=(r["line"], r["field"], r.get("code", ""), r["label"],
                                                     r["old"], r["new"], r["note"]))
+
+    # ------------------------------------------------------------------ bộ file liên kết
+    def open_set_dialog(self):
+        missing = [c for c in (core.HEADER_CD, core.TRAILER_CD) if c not in self.repo]
+        if missing:
+            messagebox.showerror("Thiếu layout", f"Thiếu layout {', '.join(missing)} trong thư mục layout.")
+            return
+        cfg = self.set_cfg
+        auto_seed = random.randrange(2 ** 31)   # seed trống: xem trước và tạo file ra cùng 1 bộ
+        win = tk.Toplevel(self)
+        win.title("Tạo bộ file liên kết")
+        win.transient(self)
+        win.resizable(False, False)
+        body = ttk.Frame(win, padding=12)
+        body.pack(fill="both", expand=True)
+        ttk.Label(body, foreground="#335", justify="left", wraplength=520,
+                  text="Sinh một lần cả bộ file theo thứ tự gửi: khách hàng → hợp đồng → thông tin gắn với hợp đồng. "
+                       "Mọi custCd, ctrtNo, debtorCustCd, debtorCtrtNo đều khớp nhau.").grid(
+            row=0, column=0, columnspan=2, sticky="w", pady=(0, 8))
+        nums = {}
+        for i, (key, label, default) in enumerate([
+                ("individuals", "Khách hàng cá nhân (INID, CUST000001...)", 1),
+                ("corporates", "Khách hàng doanh nghiệp (COID, CORP000001...)", 0),
+                ("loans", "Hợp đồng vay mỗi khách hàng (LOAN)", 1),
+                ("cards", "Thẻ mỗi khách hàng (CARD)", 1)], 1):
+            ttk.Label(body, text=label).grid(row=i, column=0, sticky="w", pady=2)
+            nums[key] = tk.StringVar(value=str(cfg.get(key, default)))
+            ttk.Spinbox(body, from_=0, to=100_000, textvariable=nums[key], width=8).grid(
+                row=i, column=1, sticky="w", padx=8)
+
+        box = ttk.LabelFrame(body, text="Loại cần tạo", padding=8)
+        box.grid(row=5, column=0, columnspan=2, sticky="ew", pady=(10, 0))
+        chosen = set(cfg.get("types", core.SET_TYPES))
+        type_vars: dict[str, tk.BooleanVar] = {}
+        for s, (step, name) in enumerate(zip(core.SET_STEPS, core.SET_STEP_NAMES)):
+            ttk.Label(box, text=f"{s + 1}. {name}").grid(row=s, column=0, sticky="w", pady=2)
+            if s == 0:      # khách hàng: luôn đăng ký, theo số khách hàng ở trên
+                ttk.Label(box, text="INID / COID (theo số khách hàng)", foreground="#555").grid(
+                    row=s, column=1, columnspan=5, sticky="w", padx=(8, 0))
+                continue
+            for j, t in enumerate(step):
+                type_vars[t] = tk.BooleanVar(value=t in chosen and t in self.repo)
+                ttk.Checkbutton(box, text=t, variable=type_vars[t],
+                                state="normal" if t in self.repo else "disabled").grid(
+                    row=s, column=j + 1, sticky="w", padx=(8, 0))
+        ttk.Label(body, foreground="#555", justify="left", wraplength=520,
+                  text="Chọn LRPY / DELQ / GUAR / COLL thì tự kèm LOAN, CRPY thì kèm CARD. Seed, vòng đời, Header, "
+                       "đuôi tên file và CRLF lấy theo màn hình chính. Bộ file không chèn lỗi.").grid(
+            row=6, column=0, columnspan=2, sticky="w", pady=(8, 0))
+
+        def build() -> tuple[core.SetResult, str] | None:
+            try:
+                vals = {k: int(v.get()) for k, v in nums.items()}
+            except ValueError:
+                messagebox.showwarning("Số không hợp lệ", "Các ô số phải là số nguyên.", parent=win)
+                return None
+            types = [t for t, v in type_vars.items() if v.get()]
+            self.set_cfg = {**vals, "types": types}
+            suffix = self.suffix_var.get().strip() or date.today().strftime("%y%m%d")
+            try:
+                return core.generate_set(
+                    self.repo, {k: v.get() for k, v in self.header_vars.items()}, types,
+                    individuals=vals["individuals"], corporates=vals["corporates"],
+                    loans_per_cust=vals["loans"], cards_per_cust=vals["cards"],
+                    seed=self._seed() if self.seed_var.get().strip() else auto_seed,
+                    lifecycle=self.lifecycle_var.get(), file_suffix=suffix), suffix
+            except Exception as e:
+                messagebox.showerror("Không tạo được bộ file", str(e), parent=win)
+                return None
+
+        def preview():
+            built = build()
+            if not built:
+                return
+            res = built[0]
+            self._show_set(res)
+            self.nb.select(self.prev_tab)
+            self.status.set(f"Xem trước bộ {len(res.files)} file: "
+                            + ", ".join(f"{f.info_cd} {len(f.result.lines) - 2}" for f in res.files)
+                            + " dòng (chưa ghi file)")
+
+        def run():
+            built = build()
+            if not built:
+                return
+            res, suffix = built
+            folder = Path(self.out_dir.get()) / f"bo_lien_ket_{suffix}"
+            try:
+                if folder.exists() and any(folder.iterdir()) and not messagebox.askyesno(
+                        "Ghi đè?", f"{folder} đã có dữ liệu. Ghi đè các file trùng tên?", parent=win):
+                    return
+                manifest = core.write_set(folder, res, self.crlf_var.get())
+            except Exception as e:
+                messagebox.showerror("Không tạo được bộ file", str(e), parent=win)
+                return
+            win.destroy()
+            self._save_config()
+            self._show_set(res)
+            self.nb.select(self.prev_tab)
+            self.status.set(f"Đã tạo bộ {len(res.files)} file trong {folder}")
+            messagebox.showinfo("Hoàn tất", f"Đã tạo bộ file trong:\n{folder}\n\n{manifest.read_text(encoding='utf-8')}")
+
+        btns = ttk.Frame(body)
+        btns.grid(row=7, column=0, columnspan=2, sticky="e", pady=(12, 0))
+        ttk.Button(btns, text="Đóng", command=win.destroy).pack(side="right")
+        ttk.Button(btns, text="★ Tạo bộ file", command=run).pack(side="right", padx=6)
+        ttk.Button(btns, text="Xem trước", command=preview).pack(side="right")
+
+    def _show_set(self, res: core.SetResult):
+        """Xem trước cả bộ: từng file theo thứ tự gửi, có dòng tiêu đề tên file."""
+        t = self.preview_text
+        t.configure(state="normal")
+        t.delete("1.0", "end")
+        shown = 0
+        for f in res.files:
+            t.insert("end", f"### Bước {f.step}: {f.path}\n", ("ln",))
+            for line in f.result.lines[:max(PREVIEW_LIMIT - shown, 0)]:
+                t.insert("end", line + "\n", ("ht",) if line[:1] in ("H", "T") else ())
+            shown += len(f.result.lines)
+            if shown > PREVIEW_LIMIT:
+                t.insert("end", f"... (chỉ hiển thị {PREVIEW_LIMIT} dòng đầu của cả bộ)\n", ("ln",))
+                break
+        for note in res.notes:
+            t.insert("end", f"### {note}\n", ("ln",))
+        t.configure(state="disabled")
+        self.rep_tree.delete(*self.rep_tree.get_children())
 
     def _jump_to_line(self, _=None):
         sel = self.rep_tree.selection()
@@ -705,7 +836,7 @@ class App(tk.Tk):
                 })
             _write_json(GLOBAL_CFG, {
                 "out_dir": self.out_dir.get(),
-                "crlf": self.crlf_var.get(), "report": self.report_var.get(),
+                "crlf": self.crlf_var.get(), "report": self.report_var.get(), "set": self.set_cfg,
                 "header": {k: v.get() for k, v in self.header_vars.items()
                            if k not in ("recordType", "informationType")},
             })

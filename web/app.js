@@ -90,6 +90,7 @@ function init(meta) {
   sel.replaceChildren(...meta.types.map((t) => new Option(t, t)));
   buildHeader(g.header || {});
   buildFileErrors();
+  buildSetTypes();
   if (meta.types.length) selectLayout(meta.types.includes(DEFAULT_INFO) ? DEFAULT_INFO : meta.types[0]);
 
   let msg = `Đã nạp ${meta.types.length} loại dữ liệu`;
@@ -520,6 +521,119 @@ function showResult(res) {
   }
 }
 
+// ------------------------------------------------------------------ bộ file liên kết
+function buildSetTypes() {
+  const box = $("set-types");
+  box.replaceChildren();
+  state.meta.setSteps.forEach((step, s) => {
+    const name = document.createElement("span");
+    name.textContent = `${s + 1}. ${state.meta.setStepNames[s]}`;
+    const cell = document.createElement("div");
+    cell.className = "checks";
+    if (s === 0) {
+      // khách hàng: luôn đăng ký, theo số khách hàng ở trên
+      cell.classList.add("muted");
+      cell.textContent = "INID / COID (theo số khách hàng)";
+    } else {
+      for (const t of step) {
+        const l = document.createElement("label");
+        l.className = "check";
+        const input = document.createElement("input");
+        input.type = "checkbox";
+        input.value = t;
+        input.disabled = !state.meta.types.includes(t);
+        l.append(input, " " + t);
+        cell.append(l);
+      }
+    }
+    box.append(name, cell);
+  });
+}
+
+function openSetDialog() {
+  const cfg = loadStore("set");
+  const chosen = new Set(cfg.types || state.meta.setSteps.flat());
+  for (const [id, def] of [["individuals", 1], ["corporates", 0], ["loans", 1], ["cards", 1]]) {
+    $("set-" + id).value = cfg[id] ?? def;
+  }
+  for (const box of document.querySelectorAll("#set-types input")) box.checked = !box.disabled && chosen.has(box.value);
+  // seed trống: xem trước rồi mở lại hộp thoại để tạo file vẫn ra đúng bộ đã xem
+  state.setSeed ??= Math.floor(Math.random() * 2 ** 31);
+  $("set-dialog").showModal();
+}
+
+async function runSet(ev, write = true) {
+  ev.preventDefault();
+  const params = {};
+  for (const id of ["individuals", "corporates", "loans", "cards"]) {
+    const n = Number($("set-" + id).value);
+    if (!Number.isInteger(n) || n < 0) {
+      alert("Các ô số phải là số nguyên ≥ 0.");
+      return;
+    }
+    params[id] = n;
+  }
+  params.types = [...document.querySelectorAll("#set-types input:checked")].map((x) => x.value);
+  saveStore("set", params);
+  let res;
+  try {
+    const seedText = $("seed").value.trim();
+    if (seedText && !/^-?\d+$/.test(seedText)) throw new Error("Seed phải là số nguyên (hoặc để trống).");
+    setStatus("Đang sinh bộ file...");
+    await new Promise((r) => setTimeout(r, 20));
+    res = call("generate_set", JSON.stringify({
+      ...params,
+      header: headerValues(),
+      seed: seedText ? Number(seedText) : state.setSeed,
+      lifecycle: $("lifecycle").checked,
+      suffix: $("suffix").value.trim(),
+      crlf: $("crlf").checked,
+      write,
+    }));
+    if (write) download(res.zipPath, res.zipName, "application/zip");
+  } catch (e) {
+    setStatus("Không tạo được bộ file");
+    alert("Không tạo được bộ file: " + e.message);
+    return;
+  }
+  $("set-dialog").close();
+  showSet(res);
+  switchTab("preview");
+  if (!write) {
+    const counts = res.files.map((f) => `${f.info} ${f.lines.length - 2}`).join(", ");
+    setStatus(`Xem trước bộ ${res.files.length} file: ${counts} dòng (chưa tải file)`);
+    return;
+  }
+  saveConfig();
+  state.setSeed = null; // lần tạo sau: bộ dữ liệu mới
+  setStatus(`Đã tạo bộ ${res.files.length} file: ${res.zipName}`);
+  alert(res.manifest);
+}
+
+function showSet(res) {
+  // xem trước cả bộ: từng file theo thứ tự gửi, có dòng tiêu đề tên file
+  const frag = document.createDocumentFragment();
+  const add = (text, cls) => {
+    const div = document.createElement("div");
+    div.textContent = text;
+    if (cls) div.className = cls;
+    frag.append(div);
+  };
+  let shown = 0;
+  for (const f of res.files) {
+    add(`### Bước ${f.step}: ${f.path}`, "file-title");
+    for (const line of f.lines.slice(0, Math.max(PREVIEW_LIMIT - shown, 0))) add(line, "HT".includes(line[0]) ? "ht" : "");
+    shown += f.lines.length;
+    if (shown > PREVIEW_LIMIT) {
+      add(`... (chỉ hiển thị ${PREVIEW_LIMIT} dòng đầu của cả bộ)`, "ln");
+      break;
+    }
+  }
+  for (const note of res.notes) add("### " + note, "ln");
+  $("preview-text").replaceChildren(frag);
+  $("report-table").tBodies[0].replaceChildren();
+}
+
 // ------------------------------------------------------------------ kiểm tra file
 async function checkFile(file) {
   if (!file) return;
@@ -584,6 +698,10 @@ $("btn-preview").addEventListener("click", preview);
 $("btn-generate").addEventListener("click", generateFile);
 $("check-file").addEventListener("change", (e) => checkFile(e.target.files[0]));
 $("check-close").addEventListener("click", () => $("check-dialog").close());
+$("btn-set").addEventListener("click", openSetDialog);
+$("set-form").addEventListener("submit", runSet);
+$("set-preview").addEventListener("click", (e) => runSet(e, false));
+for (const id of ["set-close", "set-cancel"]) $(id).addEventListener("click", () => $("set-dialog").close());
 window.addEventListener("beforeunload", () => state.info && saveConfig());
 
 boot();
