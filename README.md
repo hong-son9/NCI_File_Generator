@@ -51,7 +51,7 @@ web/       bản web cho Cloudflare Pages (index.html, app.js, web_api.py, build
 - **Tên file:** `<mã TC>_<loại><INF|MST>_NICE.<yymmdd>`. Chế độ xử lý được lấy từ tên file, nên phần `INF`/`MST` theo `registrationType` ở Header.
 - **Thứ tự gửi:** file khác chỉ được xử lý khi INID **cùng tổ chức, cùng đuôi ngày trong tên file** đã xử lý xong; GUAR/COLL cần thêm LOAN xử lý xong. Bộ file liên kết vì vậy luôn có INID, dù chỉ gồm Header/Trailer.
 - **Mã lần chạy `{run}`** (tab 1, nút "Mới"): ghép vào số hợp đồng, vd `LN{run}{seq:06d}` → `LN2610281530000001`. Mỗi lần chạy là hợp đồng mới, nên gửi lại không bị E142. Mọi file sinh cùng lúc dùng chung mã này, nên LRPY/DELQ/GUAR/COLL vẫn khớp với LOAN.
-- **LOAN chỉ đăng ký được với khách hàng đã đăng ký sẵn** (nếu không: E157). Trong hộp thoại bộ file, nhập **mã khách hàng có sẵn**. Khi tạo một file LOAN riêng, đặt `custCd` ở tab 2, vd `{KH0001|KH0002}`.
+- **LOAN chỉ đăng ký được với khách hàng đã đăng ký sẵn** (nếu không: E157). Nhập mã vào ô **"Mã KH có sẵn (custCd)"** ở màn hình chính, vd `KH0001, KH0002`. Khi tạo từng file riêng, hợp đồng lần lượt dùng các mã này (quay vòng), và số khách hàng bằng số mã. Hộp thoại bộ file có ô riêng; nếu để trống, ô đó tự lấy giá trị từ màn hình chính.
 - **Header:** `userId` phải là tài khoản hợp lệ của tổ chức; `baseDateTo` không được ở tương lai (F025).
 - **Kiểm tra file…** báo thêm:
   - tên file sai mẫu;

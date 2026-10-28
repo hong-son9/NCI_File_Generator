@@ -1410,7 +1410,7 @@ def generate(layout: Layout, header_layout: Layout, trailer_layout: Layout,
              file_suffix: str | None = None, filename: str | None = None,
              customers: int = 1, lifecycle: bool = True,
              groups: list[dict] | None = None, personas: dict | None = None, keep_open: bool = False,
-             run_id: str | None = None) -> GenResult:
+             run_id: str | None = None, cust_codes: list[str] | None = None) -> GenResult:
     """
     customers: số khách hàng trong file (custCd dùng chung); 0 = mỗi hợp đồng 1 khách hàng.
     lifecycle: mỗi hợp đồng là chuỗi sự kiện 1 (mới) -> 3 (thay đổi) ... -> 2 (tất toán), ngày tăng dần.
@@ -1419,9 +1419,13 @@ def generate(layout: Layout, header_layout: Layout, trailer_layout: Layout,
     personas: dùng chung giữa các file của bộ liên kết (cùng khách hàng -> cùng tên, tỉnh, chi nhánh).
     keep_open: không tất toán / xóa (khách hàng còn hợp đồng tham chiếu).
     run_id: mã lần chạy cho {run} trong mẫu (vd số hợp đồng LN{run}{seq:06d}); trống = thời điểm hiện tại.
+    cust_codes: mã KH đã đăng ký sẵn: khách hàng thứ k dùng mã thứ k (quay vòng), số khách hàng = số mã.
     """
     rnd = random.Random(seed)
     run = run_id or new_run_id()
+    cust_codes = [c for c in dict.fromkeys(c.strip() for c in cust_codes or []) if c]
+    if cust_codes and groups is None:
+        customers = len(cust_codes)
     fixed = fixed or {}
     errors = errors or []
     file_errors = set(file_errors or [])
@@ -1452,6 +1456,8 @@ def generate(layout: Layout, header_layout: Layout, trailer_layout: Layout,
                 vals = _history_fix(layout, lc, ctx, prev, evt, fixed)
             else:
                 src = dict(groups[g - 1].get("values", {})) if groups else {}
+                if cust_codes and lc.cust and lc.cust not in fixed and lc.cust not in src:
+                    src[lc.cust] = cust_codes[(cust - 1) % len(cust_codes)]
                 if lc.evt and (lifecycle or i == 1 or groups) and lc.evt not in fixed:
                     src[lc.evt] = evt                       # dòng đầu tiên / đầu mỗi hợp đồng luôn là 1
                 if lc.history and "baseDt" not in fixed:     # LRPY/CRPY: mỗi dòng 1 tháng, tăng dần

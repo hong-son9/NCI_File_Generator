@@ -86,6 +86,7 @@ function init(meta) {
   $("report").checked = g.report !== false;
   $("suffix").value = yymmdd(new Date());
   $("run-id").value = meta.runId;
+  $("cust-codes").value = g.custCodes || "";
 
   const sel = $("info");
   sel.replaceChildren(...meta.types.map((t) => new Option(t, t)));
@@ -193,7 +194,10 @@ function saveConfig() {
   const header = headerValues();
   delete header.recordType;
   delete header.informationType;
-  saveStore("global", { info: state.info, header, crlf: $("crlf").checked, report: $("report").checked });
+  saveStore("global", {
+    info: state.info, header, crlf: $("crlf").checked, report: $("report").checked,
+    custCodes: $("cust-codes").value.trim(),
+  });
 }
 
 // ------------------------------------------------------------------ tab 2: giá trị cột
@@ -418,6 +422,7 @@ function generateParams() {
     suffix: $("suffix").value.trim(),
     filename: $("filename").value.trim(),
     runId: $("run-id").value.trim(),
+    custCodes: $("cust-codes").value.trim(),
     crlf: $("crlf").checked,
     report: $("report").checked,
   };
@@ -565,6 +570,8 @@ function openSetDialog() {
     $("set-" + id).value = cfg[id] ?? def;
   }
   for (const id of ["existingInd", "existingCorp"]) $("set-" + id).value = cfg[id] || "";
+  // ô trống: lấy mã KH có sẵn ở màn hình chính
+  if (!$("set-existingInd").value) $("set-existingInd").value = $("cust-codes").value.trim();
   for (const box of document.querySelectorAll("#set-types input")) box.checked = !box.disabled && chosen.has(box.value);
   // seed trống: xem trước rồi mở lại hộp thoại để tạo file vẫn ra đúng bộ đã xem
   state.setSeed ??= Math.floor(Math.random() * 2 ** 31);

@@ -68,6 +68,7 @@ class App(tk.Tk):
         self.rows_var = tk.StringVar(value="10")
         self.seed_var = tk.StringVar()
         self.cust_var = tk.StringVar(value="1")
+        self.cust_codes_var = tk.StringVar(value=g.get("cust_codes", ""))   # mã KH đã đăng ký sẵn
         self.lifecycle_var = tk.BooleanVar(value=True)
         self.suffix_var = tk.StringVar(value=date.today().strftime("%y%m%d"))
         self.filename_var = tk.StringVar()
@@ -115,6 +116,9 @@ class App(tk.Tk):
         ttk.Button(r2, text="Dùng file CSV...", command=self.load_csv).pack(side="left")
         ttk.Button(r2, text="Bỏ CSV", command=self.clear_csv).pack(side="left", padx=4)
         ttk.Label(r2, textvariable=self.csv_label, foreground="#555").pack(side="left", padx=6)
+        ttk.Label(r2, text="Mã KH có sẵn (custCd):").pack(side="left", padx=(24, 0))
+        ttk.Entry(r2, textvariable=self.cust_codes_var, width=36).pack(side="left", padx=6)
+        ttk.Label(r2, text="cách nhau bằng dấu phẩy; trống = tự sinh", foreground="#555").pack(side="left")
 
         self.nb = ttk.Notebook(self)
         self.nb.pack(fill="both", expand=True, padx=10, pady=4)
@@ -550,7 +554,11 @@ class App(tk.Tk):
             file_suffix=self.suffix_var.get().strip() or None,
             filename=self.filename_var.get().strip() or None,
             run_id=self.run_var.get().strip() or None,
+            cust_codes=self._cust_codes(),
         )
+
+    def _cust_codes(self) -> list[str]:
+        return self.cust_codes_var.get().replace(",", " ").split()
 
     def _seed(self) -> int | None:
         seed_txt = self.seed_var.get().strip()
@@ -661,7 +669,8 @@ class App(tk.Tk):
         for i, (key, label) in enumerate([("existingInd", "Mã KH cá nhân có sẵn trong DB"),
                                           ("existingCorp", "Mã KH doanh nghiệp có sẵn trong DB")], 5):
             ttk.Label(body, text=label).grid(row=i, column=0, sticky="w", pady=2)
-            lists[key] = tk.StringVar(value=cfg.get(key, ""))
+            # ô trống: lấy mã KH có sẵn ở màn hình chính
+            lists[key] = tk.StringVar(value=cfg.get(key) or (self.cust_codes_var.get() if key == "existingInd" else ""))
             ttk.Entry(body, textvariable=lists[key], width=40).grid(row=i, column=1, sticky="w", padx=8)
 
         box = ttk.LabelFrame(body, text="Loại cần tạo", padding=8)
@@ -874,6 +883,7 @@ class App(tk.Tk):
             _write_json(GLOBAL_CFG, {
                 "out_dir": self.out_dir.get(),
                 "crlf": self.crlf_var.get(), "report": self.report_var.get(), "set": self.set_cfg,
+                "cust_codes": self.cust_codes_var.get().strip(),
                 "header": {k: v.get() for k, v in self.header_vars.items()
                            if k not in ("recordType", "informationType")},
             })

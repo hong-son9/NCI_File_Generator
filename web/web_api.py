@@ -84,6 +84,7 @@ def generate(params: str) -> dict:
         seed=p.get("seed"), customers=int(p.get("customers", 1)), lifecycle=bool(p.get("lifecycle", True)),
         file_suffix=p.get("suffix") or None, filename=p.get("filename") or None,
         run_id=p.get("runId") or None,
+        cust_codes=str(p.get("custCodes", "")).replace(",", " ").split(),
     )
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     data_path = OUT_DIR / res.filename
