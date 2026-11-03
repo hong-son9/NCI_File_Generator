@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<layout infoCd="CRPY" delimiter="|:" fieldCount="26">
+<layout infoCd="CRPY" delimiter="|:" fieldCount="27">
     <field name="recordType" type="String" index="0" desc="Record Type (Y, String, 1)"/>
     <field name="evtCd" type="String" index="1" desc="Registration Event (Y, String, 1) - 등록구분. 1:신규등록, 3:변경, 7:삭제 (NCI Code Master C04 참조. 상환정보는 이력성 데이터로 해지 개념 없음)"/>
     <field name="instCd" type="String" index="2" desc="Institution Code (Y, String, 7) - 회원기관 식별코드 (NICE 발급)"/>
@@ -26,4 +26,5 @@
     <field name="nextPayDueDt" type="String" index="23" desc="Next Payment Due Date (N, String, 8) - 다음 청구기간의 결제 마감 예정일 (yyyymmdd)"/>
     <field name="nextMinPayAmt" type="BigDecimal" index="24" desc="Next Minimum Payment Amount (N, Number, 18) - 다음 결제일까지 납부해야 하는 최소 결제금액(리볼빙 등) (VND)"/>
     <field name="consentFg" type="String" index="25" desc="Consent Flag (Y, String, 1) - 정보수집동의여부. 1:동의, 0:미동의"/>
+    <field name="respCd" type="String" index="26" desc="Response Code (Y, String, 4) - 응답코드"/>
 </layout>

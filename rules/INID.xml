@@ -38,6 +38,7 @@
     <field name="vehicleTypeCd" required="N" maxLen="2" codeRef="C10" errCode="E304" weights="11:70,12:20,15:8,13:2" fillRate="0.7"/>
     <field name="engineDisplacementCd" required="M" maxLen="2" codeRef="C11" errCode="E300"/>
     <field name="consentFg" required="Y" maxLen="1" values="1,0" errCode="E191" weights="1:97,0:3"/>
+    <field name="respCd" required="N" maxLen="4" fillRate="0"/>
 
     <rule type="atLeastOne" fields="cccdNo,cmndNo,idNumber" weights="88,8,4" errCode="E102" desc="Phải có CCCD, CMND hoặc giấy tờ khác"/>
     <rule type="requiredWhen" field="idCardType" when="idNumber" notEmpty="Y" errCode="E102"/>

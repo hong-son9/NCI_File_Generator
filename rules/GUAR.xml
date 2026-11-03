@@ -16,6 +16,7 @@
     <field name="bal" required="Y" maxLen="18" genRange="10000000-2000000000"/>
     <field name="chgClsDt" required="M" maxLen="8" format="yyyymmdd" notFuture="Y" errCode="E307"/>
     <field name="consentFg" required="Y" maxLen="1" values="1,0" errCode="E191" weights="1:97,0:3"/>
+    <field name="respCd" required="N" maxLen="4" fillRate="0"/>
 
     <rule type="dateOrder" a="occrDt" b="matuDt" strict="Y" gap="180-3650" errCode="E136"/>
     <rule type="lte" small="bal" big="lmtAmt" ratio="0.1-1.0" level="warn" desc="Dư nợ bảo lãnh ≤ hạn mức bảo lãnh"/>

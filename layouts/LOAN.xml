@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<layout infoCd="LOAN" delimiter="|:" fieldCount="31">
+<layout infoCd="LOAN" delimiter="|:" fieldCount="32">
     <field name="recordType" type="String" index="0" desc="Record Type"/>
     <field name="evtCd" type="String" index="1" desc="Event Code"/>
     <field name="instCd" type="String" index="2" desc="Institution Code"/>
@@ -31,4 +31,5 @@
     <field name="leaseCollRegNo" type="String" index="28" desc="Lease Collateral Registration Number"/>
     <field name="leaseCollManuDt" type="String" index="29" desc="Lease Collateral Manufacture Date"/>
     <field name="consentFg" type="String" index="30" desc="Consent Flag"/>
+    <field name="respCd" type="String" index="31" desc="Response Code (Y, String, 4) - 응답코드"/>
 </layout>

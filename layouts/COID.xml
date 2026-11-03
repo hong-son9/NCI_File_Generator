@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<layout infoCd="COID" delimiter="|:" fieldCount="19">
+<layout infoCd="COID" delimiter="|:" fieldCount="20">
     <field name="recordType" type="String" index="0" desc="Record Type (Y, String, 1)"/>
     <field name="evtCd" type="String" index="1" desc="Registration Event (Y, String, 1) - 등록구분. 1:신규등록, 2:해지, 3:변경, 7:삭제 (NCI Code Master C04 참조)"/>
     <field name="instCd" type="String" index="2" desc="Institution Code (Y, String, 7) - 회원기관 식별코드 (NICE 발급)"/>
@@ -19,4 +19,5 @@
     <field name="corpTelNo" type="String" index="16" desc="Corporate Telephone Number (N, String, 15) - 법인 대표 전화번호"/>
     <field name="corpFaxNo" type="String" index="17" desc="Corporate Fax Number (N, String, 15) - 법인 팩스번호"/>
     <field name="corpWebAdr" type="String" index="18" desc="Corporate Web Address (N, String, 100) - 법인 홈페이지 주소"/>
+    <field name="respCd" type="String" index="19" desc="Response Code (Y, String, 4) - 응답코드"/>
 </layout>

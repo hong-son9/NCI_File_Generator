@@ -17,6 +17,7 @@
     <field name="evalAmt" required="N" maxLen="18" genRange="80000000-5000000000"/>
     <field name="chgClsDt" required="Y" maxLen="8" format="yyyymmdd" notFuture="Y" errCode="E309"/>
     <field name="consentFg" required="Y" maxLen="1" values="1,0" errCode="E191" weights="1:97,0:3"/>
+    <field name="respCd" required="N" maxLen="4" fillRate="0"/>
 
     <rule type="valueMap" field="collRightTypeCd" when="collTypeCd" map="11:12;12:11,12;13-20:11;21:11;22-28,38:12,11;*:11,12,14,16" level="warn" desc="Loại quyền bảo đảm phù hợp loại tài sản (BĐS thế chấp, giấy tờ có giá cầm cố)"/>
     <rule type="dateOrder" a="evalDt" b="occrDt" gap="0-90" adjust="a" level="warn" desc="Thẩm định giá trước khi ký hợp đồng bảo đảm"/>

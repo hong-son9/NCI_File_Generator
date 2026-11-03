@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<layout infoCd="DELQ" delimiter="|:" fieldCount="17">
+<layout infoCd="DELQ" delimiter="|:" fieldCount="18">
     <field name="recordType" type="String" index="0" desc="Record Type (Y, String, 1)"/>
     <field name="evtCd" type="String" index="1" desc="Registration Event (Y, String, 1) - 등록구분. 1:신규등록, 2:해제, 3:변경, 7:삭제 (NCI Code Master C04 참조)"/>
     <field name="instCd" type="String" index="2" desc="Institution Code (Y, String, 7) - 회원기관 식별코드 (NICE 발급)"/>
@@ -17,4 +17,5 @@
     <field name="chgClsDt" type="String" index="14" desc="Change/Close Date (M, String, 8) - 연체 변동/해소(완제·해제)된 날짜 (yyyymmdd). evtCd가 2(해제) 3(변동) 인 경우 필수"/>
     <field name="eventReasonCode" type="String" index="15" desc="Event Reason Code (Y, String, 2) - 등록 이벤트(신규/변경/해지)가 발생한 구체적 사유 코드. 예: 01:신규등록, 02/03:연체금액 증가·감소, 11:전액상환 해지, 13:대손상각, 50:파산선고 등 (NCI Code Master C38 참조)"/>
     <field name="consentFg" type="String" index="16" desc="Consent Flag (Y, String, 1) - 정보수집동의여부. 1:동의, 0:미동의"/>
+    <field name="respCd" type="String" index="17" desc="Response Code (Y, String, 4) - 응답코드"/>
 </layout>

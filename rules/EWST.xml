@@ -7,4 +7,5 @@
     <field name="branchName" required="N" maxLen="200"/>
     <field name="customerCode" required="Y" maxLen="30" errCodeMissing="E127" default="CUST{cust:06d}"/>
     <field name="consentOfInformationCollection" required="Y" maxLen="1" values="0,1" errCode="E191" weights="1:97,0:3"/>
+    <field name="respCd" required="N" maxLen="4" fillRate="0"/>
 </rules>

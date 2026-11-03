@@ -19,6 +19,7 @@
     <field name="corpTelNo" required="N" maxLen="15" pattern="^0\d{9,10}$"/>
     <field name="corpFaxNo" required="N" maxLen="15" fillRate="0.5" pattern="^0\d{9,10}$"/>
     <field name="corpWebAdr" required="N" maxLen="100" fillRate="0.6"/>
+    <field name="respCd" required="N" maxLen="4" fillRate="0"/>
 
     <rule type="dateOrder" a="bizRegDt" b="custLstUpdtDt" gap="30-3000" level="warn" desc="Ngày cập nhật KH không trước ngày cấp ĐKKD"/>
 </rules>

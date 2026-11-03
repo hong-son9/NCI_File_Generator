@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<layout infoCd="INID" delimiter="|:" fieldCount="38">
+<layout infoCd="INID" delimiter="|:" fieldCount="39">
     <field name="recordType" type="String" index="0" desc="Record Type (Y, String, 1)"/>
     <field name="evtCd" type="String" index="1" desc="Registration Event (Y, String, 1) - 등록구분. 1:신규등록, 2:해지, 3:변경, 7:삭제 (NCI Code Master C04 참조)"/>
     <field name="instCd" type="String" index="2" desc="Institution Code (Y, String, 7) - 회원기관 식별코드 (NICE 발급)"/>
@@ -38,4 +38,5 @@
     <field name="vehicleTypeCd" type="String" index="35" desc="Vehicle Type Code (N, String, 2) - 보유 차량의 유형 코드 (오토바이/승용차/전기차 등) (NCI Code Master C10 참조)"/>
     <field name="engineDisplacementCd" type="String" index="36" desc="Engine Displacement Code (N, String, 2) - 보유 차량의 배기량 구간 코드 (NCI Code Master C11 참조)"/>
     <field name="consentFg" type="String" index="37" desc="Consent Flag (Y, String, 1) - 정보 수집·조회에 대한 정보주체 동의 여부. 1:동의, 0:미동의"/>
+    <field name="respCd" type="String" index="38" desc="Response Code (Y, String, 4) - 응답코드"/>
 </layout>

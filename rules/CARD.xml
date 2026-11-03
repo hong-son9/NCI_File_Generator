@@ -18,6 +18,7 @@
     <field name="chgClsDt" required="M" maxLen="8" format="yyyymmdd" notFuture="Y" errCode="E307"/>
     <field name="eventReasonCode" required="Y" maxLen="2" codeRef="C37" errCode="E130"/>
     <field name="consentFg" required="Y" maxLen="1" values="1,0" errCode="E191" weights="1:97,0:3"/>
+    <field name="respCd" required="N" maxLen="4" fillRate="0"/>
 
     <rule type="dateOrder" a="occrDt" b="expirationMonth" strict="Y" gap="1095-1825" level="warn" desc="Tháng hết hạn phải sau ngày phát hành"/>
     <rule type="requiredWhen" field="chgClsDt" when="evtCd" in="2,3" errCode="E146"/>

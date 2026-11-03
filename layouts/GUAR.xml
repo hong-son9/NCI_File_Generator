@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<layout infoCd="GUAR" delimiter="|:" fieldCount="16">
+<layout infoCd="GUAR" delimiter="|:" fieldCount="17">
     <field name="recordType" type="String" index="0" desc="Record Type (Y, String, 1)"/>
     <field name="evtCd" type="String" index="1" desc="Registration Event (Y, String, 1) - 등록구분. 1:신규등록, 2:해지, 3:변경, 7:삭제 (NCI Code Master C04 참조)"/>
     <field name="instCd" type="String" index="2" desc="Institution Code (Y, String, 7) - 회원기관 식별코드 (NICE 발급)"/>
@@ -16,4 +16,5 @@
     <field name="bal" type="BigDecimal" index="13" desc="Balance (Y, Number, 18) - 조회 시점 기준 보증인이 실제로 부담해야 할 잔여 보증 채무액 (VND)"/>
     <field name="chgClsDt" type="String" index="14" desc="Change/Close Date (M, String, 8) - 보증 내용이 변경되거나 보증이 해지(주채무 완제 등)된 날짜 (yyyymmdd). evtCd가 2(해지) 또는 3(변경)인 경우 필수"/>
     <field name="consentFg" type="String" index="15" desc="Consent Flag (Y, String, 1) - 정보수집동의여부(보증인 본인의 동의). 1:동의, 0:미동의"/>
+    <field name="respCd" type="String" index="16" desc="Response Code (Y, String, 4) - 응답코드"/>
 </layout>

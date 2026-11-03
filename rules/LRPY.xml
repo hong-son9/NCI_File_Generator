@@ -21,6 +21,7 @@
     <field name="bal" required="Y" maxLen="18" genRange="10000000-2500000000"/>
     <field name="overdraftAvgBal" required="N" maxLen="18" genRange="5000000-300000000" fillRate="0.1"/>
     <field name="consentFg" required="Y" maxLen="1" values="1,0" errCode="E191" weights="1:97,0:3"/>
+    <field name="respCd" required="N" maxLen="4" fillRate="0"/>
 
     <rule type="dateOrder" a="lstRepayDt" b="baseDt" gap="0-27" adjust="a" level="warn" desc="Ngày trả gần nhất không sau ngày cơ sở"/>
     <rule type="dateOrder" a="baseDt" b="nextRepayDt" strict="Y" gap="1-31" level="warn" desc="Ngày trả kỳ tới phải sau ngày cơ sở"/>

@@ -31,6 +31,7 @@
     <field name="leaseCollRegNo" required="M" maxLen="20" gen="plate"/>
     <field name="leaseCollManuDt" required="M" maxLen="8" format="yyyymmdd" notFuture="Y" errCode="E317"/>
     <field name="consentFg" required="Y" maxLen="1" values="1,0" errCode="E191" weights="1:97,0:3"/>
+    <field name="respCd" required="N" maxLen="4" fillRate="0"/>
 
     <rule type="dateOrder" a="occrDt" b="matuDt" strict="Y" gap="180-3650" errCode="E306"/>
     <rule type="requiredWhen" field="chgClsDt" when="evtCd" in="2,3" errCode="E146"/>

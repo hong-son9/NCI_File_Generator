@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<layout infoCd="EWST" delimiter="|:" fieldCount="7">
+<layout infoCd="EWST" delimiter="|:" fieldCount="8">
     <field name="recordType" type="String" index="0" desc="Record Type (Y, String, 1) - D=Data"/>
     <field name="registrationEvent" type="String" index="1" desc="Registration Event (Y, String, 1) - Sự kiện đăng ký. 1:New, 2:Closing, 3:Change, 7:Delete (NCI Code Master C04 참조)"/>
     <field name="institutionCode" type="String" index="2" desc="Institution Code (Y, String, 7) - Mã tổ chức thành viên (NICE cấp)"/>
@@ -7,4 +7,5 @@
     <field name="branchName" type="String" index="4" desc="Branch Name (N, String, 200) - Tên chi nhánh"/>
     <field name="customerCode" type="String" index="5" desc="Customer Code (Y, String, 30) - Mã khách hàng cần theo dõi cảnh báo sớm (EWS)"/>
     <field name="consentOfInformationCollection" type="String" index="6" desc="Consent of Information Collection (Y, String, 1) - 1:Consent, 0:Dissent"/>
+    <field name="respCd" type="String" index="7" desc="Response Code (Y, String, 4) - 응답코드"/>
 </layout>

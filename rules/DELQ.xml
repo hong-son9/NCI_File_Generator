@@ -17,6 +17,7 @@
     <field name="chgClsDt" required="M" maxLen="8" format="yyyymmdd" notFuture="Y" errCode="E321"/>
     <field name="eventReasonCode" required="Y" maxLen="2" codeRef="C38" errCode="E130"/>
     <field name="consentFg" required="Y" maxLen="1" values="1,0" errCode="E191" weights="1:97,0:3"/>
+    <field name="respCd" required="N" maxLen="4" fillRate="0"/>
 
     <rule type="lte" small="bal" big="loanAmt" ratio="0.3-0.95" level="warn" desc="Dư nợ ≤ số tiền vay ban đầu"/>
     <rule type="lte" small="dlqAmt" big="bal" ratio="0.02-0.3" level="warn" desc="Số tiền quá hạn ≤ dư nợ"/>

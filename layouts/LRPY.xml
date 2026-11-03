@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<layout infoCd="LRPY" delimiter="|:" fieldCount="21">
+<layout infoCd="LRPY" delimiter="|:" fieldCount="22">
     <field name="recordType" type="String" index="0" desc="Record Type (Y, String, 1)"/>
     <field name="evtCd" type="String" index="1" desc="Registration Event (Y, String, 1) - 등록구분. 1:신규등록, 3:변경, 7:삭제 (NCI Code Master C04 참조. 상환정보는 이력성 데이터로 해지 개념 없음)"/>
     <field name="instCd" type="String" index="2" desc="Institution Code (Y, String, 7) - 회원기관 식별코드 (NICE 발급)"/>
@@ -21,4 +21,5 @@
     <field name="bal" type="BigDecimal" index="18" desc="Balance (Y, Number, 18) - 일반(할부·거치식) 대출의 기준월 말 잔액 (VND)"/>
     <field name="overdraftAvgBal" type="BigDecimal" index="19" desc="Overdraft Average Balance (N, Number, 18) - 한도대출(마이너스통장 등)의 기준월 평균 사용잔액 (VND)"/>
     <field name="consentFg" type="String" index="20" desc="Consent Flag (Y, String, 1) - 정보수집동의여부. 1:동의, 0:미동의"/>
+    <field name="respCd" type="String" index="21" desc="Response Code (Y, String, 4) - 응답코드"/>
 </layout>
