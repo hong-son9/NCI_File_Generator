@@ -111,6 +111,8 @@ input::placeholder { color: var(--muted); opacity: 0.8; }
 .toolbar select { min-width: 130px; }
 .toolbar #seed { width: 120px; }
 .field-wide { flex: 1 1 280px; }
+.field-full { flex: 1 1 100%; }
+.field.hidden { display: none; }
 
 /* công tắc vòng đời */
 .switch { display: inline-flex; align-items: center; gap: 10px; cursor: pointer; min-height: 34px; }

@@ -54,6 +54,7 @@ def load() -> dict:
         "header": [{"name": f.name, "desc": f.desc} for f in H.fields] if H else [],
         "headerDefaults": core.header_defaults(),
         "runId": core.new_run_id(),
+        "contractTypes": list(core.CONTRACT_LINK),
         "fileErrors": core.FILE_ERROR_LABELS,
         "errorLabels": ALL_ERROR_LABELS,
         "rowErrors": core.applicable_errors(None),
@@ -85,6 +86,7 @@ def generate(params: str) -> dict:
         file_suffix=p.get("suffix") or None, filename=p.get("filename") or None,
         run_id=p.get("runId") or None,
         cust_codes=str(p.get("custCodes", "")).replace(",", " ").split(),
+        contracts=core.parse_contracts(str(p.get("contracts", ""))) if lay.info_cd in core.CONTRACT_LINK else None,
     )
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     data_path = OUT_DIR / res.filename

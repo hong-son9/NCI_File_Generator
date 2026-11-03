@@ -1410,7 +1410,8 @@ def generate(layout: Layout, header_layout: Layout, trailer_layout: Layout,
              file_suffix: str | None = None, filename: str | None = None,
              customers: int = 1, lifecycle: bool = True,
              groups: list[dict] | None = None, personas: dict | None = None, keep_open: bool = False,
-             run_id: str | None = None, cust_codes: list[str] | None = None) -> GenResult:
+             run_id: str | None = None, cust_codes: list[str] | None = None,
+             contracts: list[tuple[str, str, str]] | None = None) -> GenResult:
     """
     customers: số khách hàng trong file (custCd dùng chung); 0 = mỗi hợp đồng 1 khách hàng.
     lifecycle: mỗi hợp đồng là chuỗi sự kiện 1 (mới) -> 3 (thay đổi) ... -> 2 (tất toán), ngày tăng dần.
@@ -1420,10 +1421,16 @@ def generate(layout: Layout, header_layout: Layout, trailer_layout: Layout,
     keep_open: không tất toán / xóa (khách hàng còn hợp đồng tham chiếu).
     run_id: mã lần chạy cho {run} trong mẫu (vd số hợp đồng LN{run}{seq:06d}); trống = thời điểm hiện tại.
     cust_codes: mã KH đã đăng ký sẵn: khách hàng thứ k dùng mã thứ k (quay vòng), số khách hàng = số mã.
+    contracts: hợp đồng đã đăng ký sẵn (custCd, ctrtNo, ngày mở) cho loại gắn với hợp đồng (CONTRACT_LINK):
+               mỗi hợp đồng 1 chuỗi bản ghi, bỏ qua n_rows. Xem parse_contracts.
     """
     rnd = random.Random(seed)
     run = run_id or new_run_id()
     cust_codes = [c for c in dict.fromkeys(c.strip() for c in cust_codes or []) if c]
+    if contracts and groups is None and layout.info_cd in CONTRACT_LINK:
+        groups = _contract_groups(layout, contracts, rnd)
+        if not groups:
+            raise ValueError("Không hợp đồng nào dùng được: hợp đồng mở trong tháng này chưa có kỳ để báo cáo.")
     if cust_codes and groups is None:
         customers = len(cust_codes)
     fixed = fixed or {}
@@ -1624,6 +1631,48 @@ def _history_cap(occr: str) -> int:
     """Số tháng LRPY / CRPY có thể có: các cuối tháng (trước tháng này) không sớm hơn ngày mở hợp đồng."""
     d = _parse_date(occr, None)
     return sum(1 for m in range(1, HISTORY_MONTHS + 1) if not d or _month_end(-m) >= d)
+
+
+# loại gắn với 1 hợp đồng LOAN / CARD: (cột mã KH, cột số hợp đồng) phải khớp hợp đồng đã đăng ký
+CONTRACT_LINK = {
+    "LRPY": ("custCd", "ctrtNo"), "CRPY": ("custCd", "ctrtNo"), "DELQ": ("custCd", "ctrtNo"),
+    "GUAR": ("debtorCustCd", "debtorCtrtNo"), "COLL": ("debtorCustCd", "debtorCtrtNo"),
+}
+
+
+def parse_contracts(text: str) -> list[tuple[str, str, str]]:
+    """"KH01:LN01, KH01:LN02:20230801" -> [(custCd, ctrtNo, ngày mở yyyymmdd hoặc "")]."""
+    out = []
+    for tok in text.replace(",", " ").split():
+        parts = tok.split(":")
+        if len(parts) not in (2, 3) or not parts[0] or not parts[1]:
+            raise ValueError(f"Hợp đồng '{tok}' phải có dạng custCd:ctrtNo hoặc custCd:ctrtNo:yyyymmdd")
+        occr = parts[2] if len(parts) == 3 else ""
+        if occr and (len(occr) != 8 or not _parse_date(occr, None)):
+            raise ValueError(f"Ngày mở '{occr}' của {tok} phải là yyyymmdd")
+        out.append((parts[0], parts[1], occr))
+    return list(dict.fromkeys(out))
+
+
+def _contract_groups(layout: Layout, contracts: list[tuple[str, str, str]], rnd) -> list[dict]:
+    """Mỗi hợp đồng có sẵn 1 chuỗi: giữ mã KH + số hợp đồng; có ngày mở thì LRPY / CRPY không có tháng
+    trước ngày mở (E139), DELQ quá hạn sau ngày mở, GUAR / COLL lấy ngày mở làm occrDt."""
+    cust_f, ctrt_f = CONTRACT_LINK[layout.info_cd]
+    lc, persona, groups = lifecycle_info(layout), {}, []
+    for cust, ctrt, occr in contracts:
+        vals = {cust_f: cust, ctrt_f: ctrt}
+        if layout.info_cd == "COLL":                     # bên bảo đảm là chính người vay
+            vals["custCd"] = cust
+        group = {"cust": persona.setdefault(cust, len(persona) + 1), "values": vals}
+        if lc.history:
+            group["max"] = _history_cap(occr)
+            if not group["max"]:
+                continue
+        elif occr and layout.get("occrDt"):
+            vals["occrDt"] = _date_after(rnd, occr) if layout.info_cd == "DELQ" else occr
+            group["max"] = _chain_cap(layout, vals["occrDt"])
+        groups.append(group)
+    return groups
 
 
 def _date_after(rnd, occr: str, min_days: int = 30, keep: int = 90) -> str:

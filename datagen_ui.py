@@ -69,6 +69,7 @@ class App(tk.Tk):
         self.seed_var = tk.StringVar()
         self.cust_var = tk.StringVar(value="1")
         self.cust_codes_var = tk.StringVar(value=g.get("cust_codes", ""))   # mã KH đã đăng ký sẵn
+        self.contracts_var = tk.StringVar(value=g.get("contracts", ""))     # hợp đồng đã đăng ký sẵn
         self.lifecycle_var = tk.BooleanVar(value=True)
         self.suffix_var = tk.StringVar(value=date.today().strftime("%y%m%d"))
         self.filename_var = tk.StringVar()
@@ -119,6 +120,14 @@ class App(tk.Tk):
         ttk.Label(r2, text="Mã KH có sẵn (custCd):").pack(side="left", padx=(24, 0))
         ttk.Entry(r2, textvariable=self.cust_codes_var, width=36).pack(side="left", padx=6)
         ttk.Label(r2, text="cách nhau bằng dấu phẩy; trống = tự sinh", foreground="#555").pack(side="left")
+
+        # chỉ hiện với loại gắn với hợp đồng (LRPY, CRPY, DELQ, GUAR, COLL), xem _toggle_contracts
+        self.contracts_row = ttk.Frame(top)
+        ttk.Label(self.contracts_row, text="Hợp đồng có sẵn:").pack(side="left")
+        ttk.Entry(self.contracts_row, textvariable=self.contracts_var, width=70).pack(side="left", padx=6)
+        ttk.Label(self.contracts_row, text="custCd:ctrtNo hoặc custCd:ctrtNo:ngàyMở (yyyymmdd), cách nhau bằng "
+                                           "dấu phẩy; mỗi hợp đồng 1 chuỗi, bỏ qua Số dòng",
+                  foreground="#555").pack(side="left")
 
         self.nb = ttk.Notebook(self)
         self.nb.pack(fill="both", expand=True, padx=10, pady=4)
@@ -333,6 +342,7 @@ class App(tk.Tk):
         self._refresh_columns()
         self._refresh_err_fields()
         self._refresh_errors()
+        self._toggle_contracts()
         self.status.set(f"{info}: {len(self.layout.fields)} cột")
 
     # ------------------------------------------------------------------ cột
@@ -555,7 +565,19 @@ class App(tk.Tk):
             filename=self.filename_var.get().strip() or None,
             run_id=self.run_var.get().strip() or None,
             cust_codes=self._cust_codes(),
+            contracts=self._contracts(),
         )
+
+    def _toggle_contracts(self):
+        if self.layout and self.layout.info_cd in core.CONTRACT_LINK:
+            self.contracts_row.pack(fill="x", pady=(6, 0))
+        else:
+            self.contracts_row.pack_forget()
+
+    def _contracts(self) -> list[tuple[str, str, str]] | None:
+        if not self.layout or self.layout.info_cd not in core.CONTRACT_LINK:
+            return None
+        return core.parse_contracts(self.contracts_var.get()) or None
 
     def _cust_codes(self) -> list[str]:
         return self.cust_codes_var.get().replace(",", " ").split()
@@ -884,6 +906,7 @@ class App(tk.Tk):
                 "out_dir": self.out_dir.get(),
                 "crlf": self.crlf_var.get(), "report": self.report_var.get(), "set": self.set_cfg,
                 "cust_codes": self.cust_codes_var.get().strip(),
+                "contracts": self.contracts_var.get().strip(),
                 "header": {k: v.get() for k, v in self.header_vars.items()
                            if k not in ("recordType", "informationType")},
             })

@@ -87,6 +87,7 @@ function init(meta) {
   $("suffix").value = yymmdd(new Date());
   $("run-id").value = meta.runId;
   $("cust-codes").value = g.custCodes || "";
+  $("contracts").value = g.contracts || "";
 
   const sel = $("info");
   sel.replaceChildren(...meta.types.map((t) => new Option(t, t)));
@@ -153,6 +154,8 @@ function selectLayout(info) {
   state.info = info;
   $("info").value = info;
   if (state.headerInputs.informationType) state.headerInputs.informationType.value = info;
+  // ô "Hợp đồng có sẵn" chỉ hiện với loại gắn với hợp đồng (LRPY, CRPY, DELQ, GUAR, COLL)
+  $("contracts-field").classList.toggle("hidden", !state.meta.contractTypes.includes(info));
   clearCsv();
   loadConfig(info);
   renderCols();
@@ -197,6 +200,7 @@ function saveConfig() {
   saveStore("global", {
     info: state.info, header, crlf: $("crlf").checked, report: $("report").checked,
     custCodes: $("cust-codes").value.trim(),
+    contracts: $("contracts").value.trim(),
   });
 }
 
@@ -423,6 +427,7 @@ function generateParams() {
     filename: $("filename").value.trim(),
     runId: $("run-id").value.trim(),
     custCodes: $("cust-codes").value.trim(),
+    contracts: $("contracts").value.trim(),
     crlf: $("crlf").checked,
     report: $("report").checked,
   };
