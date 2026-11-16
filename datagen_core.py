@@ -1086,11 +1086,34 @@ def lifecycle_info(layout: Layout) -> Lifecycle:
                      bool(layout.get("baseDt")) and "2" not in allowed, "2" in allowed, "7" in allowed)
 
 
+HISTORY_FIX_RATE = 0.2      # LRPY / CRPY: tỷ lệ tháng có bản sửa (evtCd 3) sau khi gửi
+HISTORY_DELETE_RATE = 0.08  # tỷ lệ tháng bị xóa (evtCd 7) sau khi gửi / sửa
+
+
+def _history_events(k: int, months: int, can_delete: bool, rnd) -> list[str]:
+    """Sự kiện của 1 hợp đồng LRPY / CRPY, tối đa k dòng trong tối đa `months` tháng. Mỗi tháng bắt đầu bằng 1
+    (phát sinh), có thể có 3 (sửa, ≤ 2 lần) rồi 7 (xóa) cùng baseDt; sau 7 không còn sự kiện nào của tháng đó.
+    Số dòng nhiều hơn số tháng thì phần dư thành sửa / xóa để vẫn đủ k dòng."""
+    evts, m = [], 0
+    while len(evts) < k and m < months:
+        evts.append("1")
+        m += 1
+        need = (k - len(evts)) - (months - m)            # dòng dư so với số tháng còn lại
+        n3 = 1 if rnd.random() < HISTORY_FIX_RATE else 0
+        n3 = min(max(n3, min(2, need)), k - len(evts))
+        evts += ["3"] * n3
+        need = (k - len(evts)) - (months - m)
+        if can_delete and len(evts) < k and (need > 0 or rnd.random() < HISTORY_DELETE_RATE):
+            evts.append("7")
+    return evts
+
+
 def _plan_rows(n: int, lc: Lifecycle, customers: int, lifecycle: bool, mst: bool, rnd,
                groups: list[dict] | None = None, keep_open: bool = False) -> list[tuple]:
     """Danh sách (nhóm, khách hàng, thứ tự sự kiện, số sự kiện của nhóm, evt) cho từng dòng.
     groups (bộ file liên kết): mỗi phần tử là 1 hợp đồng / khách hàng định sẵn -> 1 chuỗi, bỏ qua n và customers.
-    Phần tử có thể có "max" (số sự kiện tối đa) và "open" (không tất toán / xóa, mặc định = keep_open)."""
+    Phần tử có thể có "max" (số sự kiện tối đa), "k" (đúng k bản ghi) và "open" (không tất toán / xóa,
+    mặc định = keep_open)."""
     plan, g = [], 0
     by_customer = lc.key == lc.cust
     seq_ok = lifecycle and not mst and lc.evt is not None
@@ -1098,7 +1121,10 @@ def _plan_rows(n: int, lc: Lifecycle, customers: int, lifecycle: bool, mst: bool
         g += 1
         remain = n - len(plan) if groups is None else groups[g - 1].get("max", 4)
         stay_open = groups[g - 1].get("open", keep_open) if groups is not None else keep_open
-        if not seq_ok:
+        exact = groups[g - 1].get("k") if groups is not None else None
+        if exact and (seq_ok or lc.history):                # LRPY/CRPY: mỗi tháng 1 dòng evtCd=1, không cần chuỗi
+            k = exact
+        elif not seq_ok:
             k = 1
         elif by_customer and groups is None:                # INID/COID/EWST: mỗi khách hàng 1 chuỗi
             left = max(customers - g + 1, 1) if customers else remain
@@ -1113,10 +1139,9 @@ def _plan_rows(n: int, lc: Lifecycle, customers: int, lifecycle: bool, mst: bool
             cust = ((g - 1) % customers) + 1 if customers else g
         if not seq_ok:
             evts = ["1"] * k
-        elif lc.history:                                    # mỗi tháng 1 dòng; đôi khi sửa (3) / xóa (7) tháng cuối
-            evts = ["1"] * k
-            if k >= 2 and lc.can_delete and rnd.random() < 0.25:
-                evts[-1] = rnd.choice(["3", "7"])
+        elif lc.history:                                    # mỗi tháng: 1, đôi khi sửa (3) / xóa (7) cùng tháng
+            months = groups[g - 1].get("months", k) if groups is not None else k
+            evts = _history_events(k, months, lc.can_delete, rnd)
         else:
             evts = ["1"] + ["3"] * (k - 1)
             r = rnd.random()
@@ -1422,13 +1447,13 @@ def generate(layout: Layout, header_layout: Layout, trailer_layout: Layout,
     run_id: mã lần chạy cho {run} trong mẫu (vd số hợp đồng LN{run}{seq:06d}); trống = thời điểm hiện tại.
     cust_codes: mã KH đã đăng ký sẵn: khách hàng thứ k dùng mã thứ k (quay vòng), số khách hàng = số mã.
     contracts: hợp đồng đã đăng ký sẵn (custCd, ctrtNo, ngày mở) cho loại gắn với hợp đồng (CONTRACT_LINK):
-               mỗi hợp đồng 1 chuỗi bản ghi, bỏ qua n_rows. Xem parse_contracts.
+               mỗi hợp đồng 1 chuỗi bản ghi, n_rows chia đều cho các hợp đồng. Xem parse_contracts.
     """
     rnd = random.Random(seed)
     run = run_id or new_run_id()
     cust_codes = [c for c in dict.fromkeys(c.strip() for c in cust_codes or []) if c]
     if contracts and groups is None and layout.info_cd in CONTRACT_LINK:
-        groups = _contract_groups(layout, contracts, rnd)
+        groups = _contract_groups(layout, contracts, rnd, n_rows)
         if not groups:
             raise ValueError("Không hợp đồng nào dùng được: hợp đồng mở trong tháng này chưa có kỳ để báo cáo.")
     if cust_codes and groups is None:
@@ -1467,14 +1492,15 @@ def generate(layout: Layout, header_layout: Layout, trailer_layout: Layout,
                     src[lc.cust] = cust_codes[(cust - 1) % len(cust_codes)]
                 if lc.evt and (lifecycle or i == 1 or groups) and lc.evt not in fixed:
                     src[lc.evt] = evt                       # dòng đầu tiên / đầu mỗi hợp đồng luôn là 1
-                if lc.history and "baseDt" not in fixed:     # LRPY/CRPY: mỗi dòng 1 tháng, tăng dần
-                    months = [p[4] for p in plan[i - 1 - j:i - 1 - j + k]].count("1")
-                    src["baseDt"] = _month_end(-(months - j)).strftime("%Y%m%d")
+                if lc.history and "baseDt" not in fixed:     # LRPY/CRPY: mỗi tháng 1 dòng evtCd=1, tăng dần
+                    chain = [p[4] for p in plan[i - 1 - j:i - 1 - j + k]]
+                    month_no = chain[:j + 1].count("1") - 1     # sửa / xóa (3, 7) giữ baseDt của tháng
+                    src["baseDt"] = _month_end(-(chain.count("1") - month_no)).strftime("%Y%m%d")
                 if j > 0 and lc.history:                    # tháng tiếp theo của cùng hợp đồng
                     src.update(_next_month(layout, lc, prev, fixed))
                 vals = _build_row(layout, ctx, src or None, fixed, mst)
                 if j == 0 and lc.history and lifecycle:
-                    _fit_history(layout, ctx, k)
+                    _fit_history(layout, ctx, [p[4] for p in plan[i - 1:i - 1 + k]].count("1"))
                     vals = [ctx.row[f.name] for f in layout.fields]
                 if j == 0 and not lc.history:
                     evts = [p[4] for p in plan[i - 1:i - 1 + k]]
@@ -1627,10 +1653,10 @@ def _carry(child: Layout, parent: dict) -> dict:
     return out
 
 
-def _history_cap(occr: str) -> int:
-    """Số tháng LRPY / CRPY có thể có: các cuối tháng (trước tháng này) không sớm hơn ngày mở hợp đồng."""
+def _history_cap(occr: str, limit: int = HISTORY_MONTHS) -> int:
+    """Số tháng LRPY / CRPY có thể có (tối đa limit): các cuối tháng (trước tháng này) không sớm hơn ngày mở."""
     d = _parse_date(occr, None)
-    return sum(1 for m in range(1, HISTORY_MONTHS + 1) if not d or _month_end(-m) >= d)
+    return sum(1 for m in range(1, limit + 1) if not d or _month_end(-m) >= d)
 
 
 # loại gắn với 1 hợp đồng LOAN / CARD: (cột mã KH, cột số hợp đồng) phải khớp hợp đồng đã đăng ký
@@ -1654,23 +1680,27 @@ def parse_contracts(text: str) -> list[tuple[str, str, str]]:
     return list(dict.fromkeys(out))
 
 
-def _contract_groups(layout: Layout, contracts: list[tuple[str, str, str]], rnd) -> list[dict]:
-    """Mỗi hợp đồng có sẵn 1 chuỗi: giữ mã KH + số hợp đồng; có ngày mở thì LRPY / CRPY không có tháng
-    trước ngày mở (E139), DELQ quá hạn sau ngày mở, GUAR / COLL lấy ngày mở làm occrDt."""
+def _contract_groups(layout: Layout, contracts: list[tuple[str, str, str]], rnd, n_rows: int) -> list[dict]:
+    """Mỗi hợp đồng có sẵn 1 chuỗi, n_rows chia đều cho các hợp đồng (mỗi hợp đồng ít nhất 1 dòng).
+    Giữ mã KH + số hợp đồng; có ngày mở thì LRPY / CRPY không có tháng trước ngày mở (E139), DELQ quá hạn
+    sau ngày mở, GUAR / COLL lấy ngày mở làm occrDt; số bản ghi không vượt số tháng / ngày từ ngày mở."""
     cust_f, ctrt_f = CONTRACT_LINK[layout.info_cd]
     lc, persona, groups = lifecycle_info(layout), {}, []
-    for cust, ctrt, occr in contracts:
+    base, extra = divmod(max(n_rows, 1), len(contracts))
+    for i, (cust, ctrt, occr) in enumerate(contracts):
+        want = max(1, base + (1 if i < extra else 0))
         vals = {cust_f: cust, ctrt_f: ctrt}
         if layout.info_cd == "COLL":                     # bên bảo đảm là chính người vay
             vals["custCd"] = cust
-        group = {"cust": persona.setdefault(cust, len(persona) + 1), "values": vals}
-        if lc.history:
-            group["max"] = _history_cap(occr)
-            if not group["max"]:
+        group = {"cust": persona.setdefault(cust, len(persona) + 1), "values": vals, "k": want}
+        if lc.history:                                   # mỗi tháng 1 dòng, lùi dần từ tháng trước
+            group["months"] = _history_cap(occr, want)
+            if not group["months"]:
                 continue
         elif occr and layout.get("occrDt"):
             vals["occrDt"] = _date_after(rnd, occr) if layout.info_cd == "DELQ" else occr
-            group["max"] = _chain_cap(layout, vals["occrDt"])
+            group["k"] = _chain_cap(layout, vals["occrDt"], want)
+        group["max"] = group["k"]
         groups.append(group)
     return groups
 
@@ -1684,14 +1714,14 @@ def _date_after(rnd, occr: str, min_days: int = 30, keep: int = 90) -> str:
     return (lo + timedelta(days=rnd.randint(0, max((hi - lo).days, 0)))).strftime("%Y%m%d")
 
 
-def _chain_cap(layout: Layout, occr: str) -> int:
-    """Số sự kiện tối đa khi ngày mở bị cố định (lấy theo hợp đồng gốc): đủ ngày cho từng lần thay đổi,
-    như _fit_contract (cách ngày mở ≥ gap, mỗi lần sau cách ~20 ngày)."""
+def _chain_cap(layout: Layout, occr: str, limit: int = 4) -> int:
+    """Số sự kiện tối đa (≤ limit) khi ngày mở bị cố định (lấy theo hợp đồng gốc): đủ ngày cho từng lần
+    thay đổi, như _fit_contract (cách ngày mở ≥ gap, mỗi lần sau cách ~20 ngày)."""
     d = _parse_date(occr, None)
     if not d:
-        return 4
+        return limit
     lo = _rule_gap(layout, "occrDt", lifecycle_info(layout).change_date)[0]
-    return max(1, min(4, 1 + ((date.today() - d).days - lo) // 20))
+    return max(1, min(limit, 1 + ((date.today() - d).days - lo) // 20))
 
 
 def generate_set(repo: dict[str, Layout], header_values: dict, types, individuals: int = 1, corporates: int = 0,

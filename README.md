@@ -54,7 +54,7 @@ web/       bản web cho Cloudflare Pages (index.html, app.js, web_api.py, build
 - **LOAN chỉ đăng ký được với khách hàng đã đăng ký sẵn** (nếu không: E157). Nhập mã vào ô **"Mã KH có sẵn (custCd)"** ở màn hình chính, vd `KH0001, KH0002`. Khi tạo từng file riêng, hợp đồng lần lượt dùng các mã này (quay vòng), và số khách hàng bằng số mã. Hộp thoại bộ file có ô riêng; nếu để trống, ô đó tự lấy giá trị từ màn hình chính.
 - **LRPY / CRPY / DELQ / GUAR / COLL phải gắn với hợp đồng đã đăng ký** (nếu không: E141). Khi chọn một trong các loại này, màn hình chính hiện thêm ô **"Hợp đồng có sẵn"**:
   - Nhập dạng `custCd:ctrtNo` hoặc `custCd:ctrtNo:ngàyMở`, vd `KH0001:LN2610281749000001:20230801`.
-  - Mỗi hợp đồng là một chuỗi bản ghi; ô "Số dòng" bị bỏ qua.
+  - "Số dòng" được chia đều cho các hợp đồng. LRPY/CRPY: mỗi dòng là một tháng, lùi dần từ tháng trước (30 dòng, 1 hợp đồng → 30 tháng). DELQ/GUAR/COLL: một chuỗi đăng ký → thay đổi … cho mỗi hợp đồng.
   - Có ngày mở thì LRPY/CRPY không có tháng nào trước ngày mở (E139); DELQ có ngày quá hạn sau ngày mở; GUAR/COLL dùng ngày mở làm `occrDt`.
   - GUAR/COLL ghi hợp đồng vào `debtorCustCd` / `debtorCtrtNo`.
 - **Header:** `userId` phải là tài khoản hợp lệ của tổ chức; `baseDateTo` không được ở tương lai (F025).
@@ -97,7 +97,7 @@ bo_lien_ket_<yymmdd>/
   - Đăng ký mới có nhóm nợ ban đầu (LOAN/CARD nhóm 1, DELQ nhóm 2). Hợp đồng chưa tất toán thì chưa đến hạn; hợp đồng đã đến hạn thì tất toán (lý do 21) vào khoảng ngày đáo hạn.
   - Khoảng 1/4 hợp đồng tất toán là nợ xấu: nhóm nợ tăng dần lên 4–5 rồi xử lý bằng xóa nợ/bán nợ/ghi nhận tổn thất/phá sản (23, 24, 26, 32); `25`/`28` chỉ khi có tài sản bảo đảm, `27` chỉ khi có bảo lãnh.
   - Ân hạn không quá 1/3 thời hạn vay; chu kỳ trả không đều (`22`/`99`) thì để trống số kỳ trả.
-  - LRPY/CRPY là dữ liệu lịch sử, nên mỗi dòng là một tháng (`baseDt` = cuối tháng, tăng dần) và đều có evtCd = 1. Các tháng của cùng hợp đồng giữ nhóm nợ, hạn mức, số trả mỗi kỳ; dư nợ giảm đúng số gốc đã trả, số kỳ còn lại giảm 1.
+  - LRPY/CRPY là dữ liệu lịch sử theo tháng (`baseDt` = cuối tháng, tăng dần). Mỗi tháng bắt đầu bằng evtCd = 1 (phát sinh). Trong cùng tháng, đôi khi có thêm evtCd = 3 (sửa, tối đa 2 lần) và/hoặc evtCd = 7 (xóa) với cùng `baseDt`, vd `1 → 3 → 7`. Sau evtCd = 7 thì tháng đó không còn sự kiện nào. Các tháng của cùng hợp đồng giữ nhóm nợ, hạn mức, số trả mỗi kỳ; dư nợ giảm đúng số gốc đã trả, số kỳ còn lại giảm 1.
 - **Kiểm tra trình tự sự kiện:**
   - E142: đăng ký mới trùng cho cùng một hợp đồng.
   - E124: thay đổi hoặc tất toán sau khi đã tất toán/xóa.

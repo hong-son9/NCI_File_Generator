@@ -126,7 +126,7 @@ class App(tk.Tk):
         ttk.Label(self.contracts_row, text="Hợp đồng có sẵn:").pack(side="left")
         ttk.Entry(self.contracts_row, textvariable=self.contracts_var, width=70).pack(side="left", padx=6)
         ttk.Label(self.contracts_row, text="custCd:ctrtNo hoặc custCd:ctrtNo:ngàyMở (yyyymmdd), cách nhau bằng "
-                                           "dấu phẩy; mỗi hợp đồng 1 chuỗi, bỏ qua Số dòng",
+                                           "dấu phẩy; Số dòng chia đều cho các hợp đồng",
                   foreground="#555").pack(side="left")
 
         self.nb = ttk.Notebook(self)
