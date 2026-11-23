@@ -14,17 +14,17 @@
     <field name="cadvLmtAmt" required="Y" maxLen="18" genRange="5000000-100000000"/>
     <field name="payReqAmt" required="Y" maxLen="18" genRange="500000-60000000"/>
     <field name="payAmt" required="Y" maxLen="18" genRange="500000-60000000"/>
-    <field name="revolBal" required="N" maxLen="18" genRange="0-30000000" fillRate="0.3"/>
+    <field name="revolBal" required="Y" maxLen="18" genRange="0-30000000" fillRate="0.3"/>
     <field name="useAmt" required="Y" maxLen="18" genRange="1000000-80000000"/>
-    <field name="lsUseAmt" required="N" maxLen="18" genRange="500000-50000000"/>
-    <field name="instlUseAmt" required="N" maxLen="18" genRange="0-20000000"/>
-    <field name="cadvUseAmt" required="N" maxLen="18" genRange="0-10000000"/>
-    <field name="debitUseAmt" required="N" maxLen="18" genRange="0-10000000" fillRate="0.2"/>
-    <field name="ovseUseAmt" required="N" maxLen="18" genRange="0-20000000" fillRate="0.3"/>
-    <field name="ovseCadvUseAmt" required="N" maxLen="18" genRange="0-5000000" fillRate="0.1"/>
+    <field name="lsUseAmt" required="Y" maxLen="18" genRange="500000-50000000"/>
+    <field name="instlUseAmt" required="Y" maxLen="18" genRange="0-20000000"/>
+    <field name="cadvUseAmt" required="Y" maxLen="18" genRange="0-10000000"/>
+    <field name="debitUseAmt" required="Y" maxLen="18" genRange="0-10000000" fillRate="0.2"/>
+    <field name="ovseUseAmt" required="Y" maxLen="18" genRange="0-20000000" fillRate="0.3"/>
+    <field name="ovseCadvUseAmt" required="Y" maxLen="18" genRange="0-5000000" fillRate="0.1"/>
     <field name="payDueDt" required="N" maxLen="8" format="yyyymmdd" notFuture="Y" errCode="E311" default="{dateadd:baseDt:-20:-5}"/>
     <field name="nextPayDueDt" required="N" maxLen="8" format="yyyymmdd" errCode="E313" default="{dateadd:payDueDt:28:31}"/>
-    <field name="nextMinPayAmt" required="N" maxLen="18" genRange="200000-5000000"/>
+    <field name="nextMinPayAmt" required="Y" maxLen="18" genRange="200000-5000000"/>
     <field name="consentFg" required="Y" maxLen="1" values="1,0" errCode="E191" weights="1:97,0:3"/>
     <field name="respCd" required="N" maxLen="4" fillRate="0"/>
 

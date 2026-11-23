@@ -89,6 +89,7 @@ class Field:
     gen_range: tuple | None = None
     weights: dict | None = None
     fill_rate: float | None = None
+    empty_value: str | None = None 
 
     @property
     def is_numeric(self) -> bool:
@@ -273,6 +274,7 @@ def _apply_rules(f: Field, el: ET.Element, codes: dict, parse_desc: bool = True)
         f.weights = _parse_weights(a["weights"])
     if a.get("fillRate"):
         f.fill_rate = float(a["fillRate"])
+    f.empty_value = a.get("emptyValue")
 
 
 def rules_path(layout_path) -> Path:
@@ -606,7 +608,7 @@ def default_value(f: Field, ctx: _Ctx, force: bool = False) -> str:
     if not force:
         if f.is_cond and f.fill_rate is None:
             return ""
-        if f.fill_rate is not None and rnd.random() > f.fill_rate:
+        if f.fill_rate is not None and not f.is_required and rnd.random() > f.fill_rate:
             return ""
     if nm in ("instcd", "institutioncode") and ctx.header.get("institutionCode"):
         return ctx.header["institutionCode"]
@@ -793,9 +795,9 @@ def repair_rule(rule: Rule, ctx: _Ctx, layout: Layout) -> None:
             if row.get(f.name, "") == "":
                 _set(ctx, f.name, default_value(f, ctx, force=True))
         elif f.is_cond and row.get(f.name, "") != "" and not any(
-                r is not rule and r.type == "requiredWhen" and r.g("field") == f.name and _cond(r, row)
-                for r in layout.rules):
-            _set(ctx, f.name, "")
+            r is not rule and r.type == "requiredWhen" and r.g("field") == f.name and _cond(r, row)
+            for r in layout.rules):
+         _set(ctx, f.name, f.empty_value or "") 
     elif t == "atLeastOne":
         names = rule.g("fields").split(",")
         if all(row.get(n, "") == "" for n in names):
@@ -1332,7 +1334,13 @@ def _repair(layout: Layout, ctx: _Ctx) -> None:
     for _ in range(2):
         for rule in layout.rules:
             repair_rule(rule, ctx, layout)
+    _fill_empty(layout, ctx)
 
+def _fill_empty(layout: Layout, ctx: _Ctx) -> None:
+    """Cột có emptyValue (vd NOT NULL trong DB) không bao giờ để rỗng."""
+    for f in layout.fields:
+        if f.empty_value is not None and ctx.row.get(f.name, "") == "":
+            _set(ctx, f.name, f.empty_value)
 
 def _build_row(layout: Layout, ctx: _Ctx, src: dict | None, fixed: dict, mst: bool) -> list[str]:
     for f in layout.fields:
